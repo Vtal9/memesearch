@@ -5,4 +5,3 @@ class MemesSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Memes
 		fields = '__all__'
-		
