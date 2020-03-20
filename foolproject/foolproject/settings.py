@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'foolproject',
     'rest_framework',
     'frontend',
-    'memes'
+    'emails',
+    'memes',
 ]
 
 MIDDLEWARE = [

@@ -22,7 +22,8 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('memes.urls'))
+    path('', include('memes.urls')),
+    path('emails/', include('emails.urls'))
 ]
 
 
