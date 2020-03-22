@@ -1,13 +1,19 @@
-const path = require("path");
+const path = require("path")
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  mode: "development",
   context: path.join(__dirname, "src"),
   entry: ["./main.tsx"],
   output: {
-    path: path.join(__dirname, "www"),
+    path: path.join(__dirname, "dist"),
+    publicPath: 'static/',
     filename: "bundle.js"
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'index.html'
+    })
+  ],
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
   },
