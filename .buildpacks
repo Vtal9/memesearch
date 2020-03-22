@@ -1,0 +1,2 @@
+backend=heroku/python
+frontend=heroku/nodejs
