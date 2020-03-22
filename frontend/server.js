@@ -30,7 +30,7 @@ app.use('/emails', proxy('localhost:8000', {
   proxyReqPathResolver: req => '/emails' + req.url
 }))
 
-const server = app.listen(3000, function() {
+const server = app.listen(process.env.PORT || 3000, function() {
   const host = server.address().address;
   const port = server.address().port;
   console.log("Example app listening at http://%s:%s", host, port);
