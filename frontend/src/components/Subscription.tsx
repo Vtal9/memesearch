@@ -25,7 +25,7 @@ export default function Subscription() {
   }
 
   return (
-    !done ? (
+    done ? (
       <div style={{ display: 'flex', alignItems: 'center', margin: '10px 0' }}>
         <Icon>check</Icon>
         <Typography>Подписка оформлена</Typography>
