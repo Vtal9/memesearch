@@ -1,0 +1,85 @@
+$color: #3f51b5
+$small-screen: 600px
+$medium-screen: 800px
+
+*
+  outline: none
+  margin: 0
+  padding: 0
+body
+  background: #eeeeee
+a, a:visited
+  color: $color
+a
+  text-decoration: none
+  &:hover
+    text-decoration: underline
+.vmiddle
+  display: flex
+  align-items: center
+.section
+  padding: 40px 0
+  @media (max-width: $small-screen)
+    padding: 20px 0
+.text-with-img
+  display: flex
+  align-items: flex-start
+  @media (max-width: $small-screen)
+    flex-direction: column
+  img 
+    width: 30%
+    margin: 0 20px 0 0
+    @media (max-width: $small-screen)
+      width: 100%
+      margin: 0 0 20px 0
+.logo
+  width: 200px
+  display: block
+  margin-right: 20px
+  margin-bottom: 20px
+.header
+  padding: 20px 0
+.file-picker
+  display: flex
+  flex-direction: column
+  align-items: center
+  width: 100%
+  padding: 20px
+  border: 3px dashed #cccccc
+  background: white
+  &.over
+    background: #dddddd
+.meme-form
+  display: flex
+  margin-bottom: 30px
+  &.single
+    flex-direction: column
+    .img
+      width: 100%
+      max-height: 400px
+      object-position: center
+  &.extra
+    justify-content: center
+    padding: 20px
+  .img
+    object-position: top
+    background-color: #eeeeee
+    width: 300px
+    @media (max-width: $small-screen)
+      width: 150px
+  .control
+    flex: 1
+    display: flex
+    flex-direction: column
+    align-items: flex-end
+    .caption
+      align-self: flex-start
+      display: flex
+      align-items: center
+    .inputs
+      display: flex
+      margin-bottom: 10px
+      @media (max-width: $medium-screen)
+        flex-direction: column
+    .error
+      margin-top: 10px
