@@ -118,7 +118,7 @@ export default class Upload extends React.Component<{}, UploadState> {
           new_items[initial_length + index].setContent(response.data.id, img)
           self.setState({ items: new_items })
         }
-        img.src = response.data.image.replace('localhost:8000', 'localhost:3000')
+        img.src = response.data.image.replace('http://localhost:8000/', '')
       }).catch(function(error) {
         console.error(error)
         new_items[initial_length + index].setError()
