@@ -16,3 +16,10 @@ class UnMarkedMemesViewSet(viewsets.ModelViewSet):
 		permissions.AllowAny
 	]
 	serializer_class = MemesSerializer
+
+class MarkedMemesViewSet(viewsets.ModelViewSet):
+	queryset = Memes.objects.exclude(imageDescription = "")
+	permission_classes = [
+		permissions.AllowAny
+	]
+	serializer_class = MemesSerializer
