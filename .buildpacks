@@ -1,2 +1,0 @@
-backend=https://github.com/heroku/heroku-buildpack-python
-frontend=https://github.com/heroku/heroku-buildpack-nodejs
