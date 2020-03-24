@@ -78,13 +78,13 @@ class Form extends React.Component<FormProps, FormState> {
                   const d = e.target.value
                   this.setState({ imageDescription: d, imageDescriptionError: badDescription(d) })
                 }}
-                label='Что изображено?' helperText='Описание картинки, ключевые объекты, важные для поиска. Например: &laquo;негр, бегущий школьник&raquo;' />
+                label='Что изображено?' helperText='Описание картинки, ключевые объекты, важные для поиска.&#13;Например: &laquo;негр, бегущий школьник&raquo;&#13;Разные сущности разделяйте переносом строки' />
             </Grid>
             <Grid item xs>
               <TextField fullWidth multiline
                 value={this.state.textDescription}
                 onChange={e => this.setState({ textDescription: e.target.value })}
-                label='Что написано?' />
+                label='Что написано?' helperText='Разные надписи разделяйте переносом строки' />
             </Grid>
           </Grid>
           <Button variant='contained' color='primary' type='submit'
