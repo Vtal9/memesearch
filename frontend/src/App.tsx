@@ -4,6 +4,7 @@ import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
 import Mark from './pages/Mark'
+import Search from './pages/Search'
 import logo from './img/logo.svg'
 import './style.sass'
 import { Tabs, Tab } from '@material-ui/core'
@@ -14,6 +15,7 @@ const pages = [
   { url: '/', title: 'Главная', cmp: <Home /> },
   { url: '/upload', title: 'Загрузить', cmp: <Upload /> },
   { url: '/markup', title: 'Разметить', cmp: <Mark /> },
+  { url: '/search', title: 'Найти', cmp: <Search /> },
 ]
 
 
