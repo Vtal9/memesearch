@@ -37,7 +37,7 @@ export default class Search extends React.Component<{}, { q: string, results: an
         </div>
         <div>
           {this.state.results.map(meme =>
-            <img src={meme.image} style={{ height: 300 }} />
+            <img src={meme.image} style={{ height: 300, margin: '0 0 10px 10px' }} />
           )}
         </div>
       </Center>
