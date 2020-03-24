@@ -11,14 +11,14 @@ export default class Search extends React.Component<{}, { q: string, results: an
     this.state = { q: '', results: [] }
   }
 
-  makeRequest() {
+  makeRequest(q: string) {
     const self = this
-    if (this.state.q.trim() === '') return
+    if (q.trim().length === 0) return
     Axios.get('api/memes/').then(function(response) {
       self.setState({ results: response.data.filter((item: any) => (
-        (item.textDescription as string).indexOf(self.state.q) !== -1
+        (item.textDescription as string).indexOf(q) !== -1
         ||
-        (item.imageDescription as string).indexOf(self.state.q) !== -1
+        (item.imageDescription as string).indexOf(q) !== -1
       )) })
     })
   }
@@ -31,7 +31,7 @@ export default class Search extends React.Component<{}, { q: string, results: an
             value={this.state.q}
             onChange={e => {
               this.setState({ q: e.target.value })
-              this.makeRequest()
+              this.makeRequest(e.target.value)
             }}
           />
         </div>
