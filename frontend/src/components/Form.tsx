@@ -45,7 +45,7 @@ class Form extends React.Component<FormProps, FormState> {
 
     this.setState({ state: 'saving' })
     const self = this
-    Axios.patch('/api/memes/' + this.props.meme.id + '/', {
+    Axios.patch('api/memes/' + this.props.meme.id + '/', {
       imageDescription: this.state.imageDescription,
       textDescription: this.state.textDescription
     }).then(function(response) {
