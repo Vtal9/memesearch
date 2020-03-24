@@ -33,11 +33,12 @@ export default {
   },
 
   showSnackbarAxiosError(context: WithSnackbarProps, error: Types.SnackbarError) {
+    console.log(error)
     context.enqueueSnackbar(error.msg, {
-      autoHideDuration: 7000,
+      autoHideDuration: 5000,
       persist: !error.short,
       action: key => (
-        <Button onClick={() => context.closeSnackbar(key)}>Закрыть</Button>
+        <Button onClick={() => context.closeSnackbar(key)} color='secondary'>Закрыть</Button>
       )
     })
   }

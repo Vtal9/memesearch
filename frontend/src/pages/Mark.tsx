@@ -44,7 +44,8 @@ class Mark extends React.Component<WithSnackbarProps, MarkState> {
       if (response.data.length === 0) {
         self.setState({ state: 'nojob' })
       } else {
-        const json = response.data[0]
+        const index = ~~(Math.random() * response.data.length)
+        const json = response.data[index]
         const img = new Image()
         img.onload = function() {
           self.setMeme(img, json.id, json.imageDescription, json.textDescription)
