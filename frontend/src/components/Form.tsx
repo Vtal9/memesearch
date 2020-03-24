@@ -78,7 +78,11 @@ class Form extends React.Component<FormProps, FormState> {
                   const d = e.target.value
                   this.setState({ imageDescription: d, imageDescriptionError: badDescription(d) })
                 }}
-                label='Что изображено?' helperText='Описание картинки, ключевые объекты, важные для поиска.&#13;Например: &laquo;негр, бегущий школьник&raquo;&#13;Разные сущности разделяйте переносом строки' />
+                label='Что изображено?' helperText={<span>
+                  Описание картинки, ключевые объекты, важные для поиска.<br />
+                  Например: &laquo;негр; бегущий школьник; постирония&raquo;.<br />
+                  Разные сущности разделяйте переносом строки
+                </span>} />
             </Grid>
             <Grid item xs>
               <TextField fullWidth multiline

@@ -24,7 +24,7 @@ const App = withRouter(props => (
       <Tabs indicatorColor="primary" textColor="primary"
         value={props.location.pathname} onChange={(_: any, url: string) => location.href = '#' + url}
       >
-        {pages.map(page =>
+        {pages.filter(page => page.url !== '/search').map(page =>
           <Tab key={page.url} value={page.url} label={page.title} />
         )}
       </Tabs>

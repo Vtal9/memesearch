@@ -135,7 +135,7 @@ export default () => (
           Задонатить нам на индуса, который будет размечать мемы за вас
         </C>
         <C>
-          Сообщить нам любые свои идеи на этот счёт
+          <a href='https://docs.google.com/forms/d/1d0NYKmlJcAL5mG6UgFGh0BMxUdiK60Tue3Gzla2_oG8' target='_blank'>Сообщить</a> нам любые свои идеи на этот счёт
         </C>
       </div>
       <div style={{
