@@ -53,7 +53,7 @@ class Form extends React.Component<FormProps, FormState> {
       if (self.props.onDone) self.props.onDone()
     }).catch(function(error) {
       self.setState({ state: 'initial' })
-      self.props.enqueueSnackbar(Funcs.axiosError(error))
+      Funcs.showSnackbarAxiosError(self.props, Funcs.axiosError(error))
     })
   }
 

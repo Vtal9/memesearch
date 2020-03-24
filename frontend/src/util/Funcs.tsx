@@ -5,7 +5,7 @@ import { Button } from "@material-ui/core";
 
 export default {
   axiosError(error: any) {
-    let msg = error.message
+    let msg: string = error.message
     const snackbarError: Types.SnackbarError = { msg, short: true }
 
     switch (msg) {
