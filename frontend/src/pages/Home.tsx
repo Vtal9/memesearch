@@ -55,15 +55,15 @@ export default () => (
     <Section style={backImg(elon_musk)}>
       <BigFont>
         Часто бывает такое: вы помните,<br />
-        что есть <b>восхитительный мем</b>,<br />
-        <i>идеально</i> вписывающийся в возникшую ситуацию,<br />
-        но просто нагуглить его не получается...
+        что есть <i>восхитительный мем</i>,<br />
+        <b>идеально</b> вписывающийся в возникшую ситуацию,<br />
+        но просто нагуглить его не получается?
       </BigFont>
     </Section>
     <Section style={{
       background: 'white'
     }}>
-      <Heading>У нас отличные новости!</Heading>
+      <Heading>У нас для вас отличные новости!</Heading>
     </Section>
     <Section>
       <div className='text-with-img'>
@@ -135,7 +135,7 @@ export default () => (
           Задонатить нам на индуса, который будет размечать мемы за вас
         </C>
         <C>
-          Сообщить нам любые свои идеи на этот счёт
+          <a href='https://docs.google.com/forms/d/1d0NYKmlJcAL5mG6UgFGh0BMxUdiK60Tue3Gzla2_oG8' target='_blank'>Сообщить</a> нам любые свои идеи на этот счёт
         </C>
       </div>
       <div style={{
@@ -144,7 +144,7 @@ export default () => (
         alignItems: 'center'
       }}>
         <Typography>
-          Также вы можете написать свою электронную почту, если хотите,
+          Также вы можете подписаться на рассылку,
           чтобы мы сообщали вам о всех важных событиях и крупных обновлениях:
         </Typography>
         <Subscription />

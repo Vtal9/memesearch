@@ -1,11 +1,13 @@
 import React from 'react'
 import Center from '../layout/Center';
-import { CircularProgress, Card, Typography } from '@material-ui/core';
+import { CircularProgress, Card, Typography, Button } from '@material-ui/core';
 import Axios from 'axios';
 import Form from '../components/Form'
 import Types from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
+import { withSnackbar, WithSnackbarProps } from 'notistack';
+import Funcs from '../util/Funcs';
 
 
 const EmptyForm = (props: React.PropsWithChildren<{}>) => (
@@ -17,8 +19,8 @@ interface MarkState {
   meme?: Types.Meme
 }
 
-export default class Mark extends React.Component<{}, MarkState> {
-  constructor(props: {}) {
+class Mark extends React.Component<WithSnackbarProps, MarkState> {
+  constructor(props: WithSnackbarProps) {
     super(props)
     this.state = {
       state: 'loading'
@@ -42,13 +44,17 @@ export default class Mark extends React.Component<{}, MarkState> {
       if (response.data.length === 0) {
         self.setState({ state: 'nojob' })
       } else {
-        const json = response.data[0]
+        const index = ~~(Math.random() * response.data.length)
+        const json = response.data[index]
         const img = new Image()
         img.onload = function() {
           self.setMeme(img, json.id, json.imageDescription, json.textDescription)
         }
         img.src = json.image.replace('http://localhost:8000', '')
       }
+    }).catch(function(error) {
+      self.setState({ state: 'error' })
+      Funcs.showSnackbarAxiosError(self.props, Funcs.axiosError(error))
     })
   }
 
@@ -67,6 +73,16 @@ export default class Mark extends React.Component<{}, MarkState> {
         </Center>
       )
     }
+    if (state === 'error') {
+      return (
+        <Center>
+          <div className='vmiddle'>
+            <Typography>Не удалось загрузить мем.</Typography>
+            <Button color='primary' onClick={() => this.setState({ state: 'loading' })}>Повторить попытку</Button>
+          </div>
+        </Center>
+      )
+    }
     return (
       <Center>
         {meme ?
@@ -80,3 +96,5 @@ export default class Mark extends React.Component<{}, MarkState> {
     )
   }
 }
+
+export default withSnackbar(Mark)

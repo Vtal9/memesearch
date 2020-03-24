@@ -5,6 +5,7 @@ import { Typography, ButtonBase, CircularProgress, Button, Card } from '@materia
 import Center from '../layout/Center'
 import Form from '../components/Form'
 import Icon from '@material-ui/core/Icon'
+import Funcs from '../util/Funcs';
 
 export interface FileGetterProps {
   handleFiles: Function
@@ -62,6 +63,11 @@ class UploadItem {
     return this._state
   }
 
+  private _error_text: string
+  get error_text() {
+    return this._error_text
+  }
+
   constructor(file: File) {
     this._file = file
     this._state = 'uploading'
@@ -73,8 +79,9 @@ class UploadItem {
     this._id = id
   }
 
-  setError() {
+  setError(text: string) {
     this._state = 'error'
+    this._error_text = text
   }
 
   close() {
@@ -120,8 +127,7 @@ export default class Upload extends React.Component<{}, UploadState> {
         }
         img.src = response.data.image.replace('http://localhost:8000/', '')
       }).catch(function(error) {
-        console.error(error)
-        new_items[initial_length + index].setError()
+        new_items[initial_length + index].setError(Funcs.axiosError(error).msg)
         self.setState({ items: new_items })
       })
     })
@@ -152,14 +158,17 @@ export default class Upload extends React.Component<{}, UploadState> {
           ) : item.state === 'error' ? (
             <EmptyForm key={index}>
               <div className='vmiddle'>
-                <Typography color='error'>Загрузка {item.file.name} не удалась</Typography>
+                <Typography color='error'>
+                  Загрузка {item.file.name} не удалась.<br />
+                  {item.error_text}
+                </Typography>
                 <Button color='primary' onClick={() => this.close(index)}>Ладно</Button>
               </div>
             </EmptyForm>
           ) : item.state === 'done' ? (
             <EmptyForm key={index}>
               <div className='vmiddle'>
-                <Typography>Спасибо за помощь!</Typography>
+                <Typography>Данные сохранены, спасибо за помощь!</Typography>
                 <Button color='primary' onClick={() => this.close(index)}>ОК</Button>
               </div>
             </EmptyForm>
