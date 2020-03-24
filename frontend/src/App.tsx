@@ -6,7 +6,8 @@ import Upload from './pages/Upload'
 import Mark from './pages/Mark'
 import logo from './img/logo.svg'
 import './style.sass'
-import { Tabs, Tab } from '@material-ui/core';
+import { Tabs, Tab } from '@material-ui/core'
+import { SnackbarProvider } from 'notistack'
 
 
 const pages = [
@@ -37,5 +38,5 @@ const App = withRouter(props => (
 ))
 
 export default () => (
-  <Router><App /></Router>
+  <SnackbarProvider><Router><App /></Router></SnackbarProvider>
 )

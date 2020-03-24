@@ -2,13 +2,15 @@ import React from 'react'
 import { TextField, Card, CardMedia, CardContent, Grid, Button, Icon, Typography, CircularProgress } from '@material-ui/core';
 import Axios from 'axios'
 import Types from '../util/Types'
+import { withSnackbar, WithSnackbarProps } from 'notistack';
+import Funcs from '../util/Funcs';
 
 
 function badDescription(d: string) {
   return d.trim() === ''
 }
 
-export interface FormProps extends React.Attributes {
+export interface FormProps extends React.Attributes, WithSnackbarProps {
   meme: Types.Meme
   onDone?: () => void
   signle?: boolean
@@ -18,10 +20,10 @@ interface FormState {
   imageDescription: string
   textDescription: string
   imageDescriptionError?: boolean
-  state: 'initial' | 'saving' | 'error' | 'saved'
+  state: 'initial' | 'saving' | 'saved'
 }
 
-export default class Form extends React.Component<FormProps, FormState> {
+class Form extends React.Component<FormProps, FormState> {
   constructor(props: FormProps) {
     super(props)
     this.state = {
@@ -31,10 +33,15 @@ export default class Form extends React.Component<FormProps, FormState> {
     }
   }
 
-  handleSubmit() {
+  handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+
     if (!this.props.meme) return
 
-    if (this.state.imageDescriptionError) return
+    if (badDescription(this.state.imageDescription)) {
+      this.setState({ imageDescriptionError: true })
+      return
+    }
 
     this.setState({ state: 'saving' })
     const self = this
@@ -45,14 +52,17 @@ export default class Form extends React.Component<FormProps, FormState> {
       self.setState({ state: 'saved' })
       if (self.props.onDone) self.props.onDone()
     }).catch(function(error) {
-      self.setState({ state: 'error' })
+      self.setState({ state: 'initial' })
+      self.props.enqueueSnackbar(Funcs.axiosError(error))
     })
   }
 
   render() {
     const { meme, signle } = this.props
     return (
-      <Card className={signle ? 'meme-form single' : 'meme-form'} component='form' onSubmit={() => this.handleSubmit()}>
+      <Card className={signle ? 'meme-form single' : 'meme-form'}
+        component='form' onSubmit={e => this.handleSubmit(e)}
+      >
         <CardMedia component='img' className='img' image={meme.img.src} style={{ objectFit: 'contain' }} />
         <CardContent className='control'>
           {!this.props.signle &&
@@ -68,7 +78,7 @@ export default class Form extends React.Component<FormProps, FormState> {
                   const d = e.target.value
                   this.setState({ imageDescription: d, imageDescriptionError: badDescription(d) })
                 }}
-                label='Что изображено?' helperText='Описание картинки, ключевые объекты. Например: &laquo;негр, бегущий школьник&raquo;' />
+                label='Что изображено?' helperText='Описание картинки, ключевые объекты, важные для поиска. Например: &laquo;негр, бегущий школьник&raquo;' />
             </Grid>
             <Grid item xs>
               <TextField fullWidth multiline
@@ -79,12 +89,12 @@ export default class Form extends React.Component<FormProps, FormState> {
           </Grid>
           <Button variant='contained' color='primary' type='submit'
             {...(this.state.state === 'saving' && { disabled: true })}
-            startIcon={<Icon>done</Icon>}>Готово</Button>
-          {this.state.state === 'error' &&
-            <Typography variant='caption' color='error' className='error'>Случилась ошибка. Попробуйте ещё раз.</Typography>
-          }
+            startIcon={<Icon>done</Icon>}
+          >Готово</Button>
         </CardContent>
       </Card>
     )
   }
 }
+
+export default withSnackbar(Form)

@@ -1,11 +1,13 @@
 import React from 'react'
 import { TextField, Button, Typography, Icon } from '@material-ui/core';
 import Axios from 'axios';
+import { withSnackbar, WithSnackbarProps } from 'notistack';
+import Funcs from '../util/Funcs';
 
 
 const email_regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-export default function Subscription() {
+export default withSnackbar(function Subscription(props: WithSnackbarProps) {
   const [ email, setEmail ] = React.useState('')
   const [ incorrect, setError ] = React.useState(false)
   const [ done, setDone ] = React.useState(false)
@@ -19,7 +21,7 @@ export default function Subscription() {
       }).then(function(response) {
         setDone(true)
       }).catch(function(error) {
-        alert('Что-то пошло не так, повторите попытку')
+        Funcs.showSnackbarAxiosError(props, Funcs.axiosError(error))
       })
     }
   }
@@ -41,4 +43,4 @@ export default function Subscription() {
       </form>
     )
   )
-}
+})

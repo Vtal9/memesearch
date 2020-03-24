@@ -5,6 +5,11 @@ declare namespace Types {
     imageDescription: string
     textDescription: string
   }
+
+  interface SnackbarError {
+    msg: string
+    short?: boolean
+  }
 }
 
 export default Types
