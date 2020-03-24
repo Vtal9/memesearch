@@ -12,7 +12,8 @@ export default withSnackbar(function Subscription(props: WithSnackbarProps) {
   const [ incorrect, setError ] = React.useState(false)
   const [ done, setDone ] = React.useState(false)
 
-  function handleSubmit() {
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
     if (!email.match(email_regex)) {
       setError(true)
     } else {
