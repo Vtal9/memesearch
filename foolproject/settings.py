@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import yadisk
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -140,3 +141,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MAX_UPLOAD_SIZE = "10485760"
+
+YADISK_TOKEN = 'AgAAAAA-tVsqAAY9lcTQmf1Vxkeng_D-ndynk6I'
+
+print('call')

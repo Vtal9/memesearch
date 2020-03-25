@@ -2,10 +2,9 @@ from django.db import models
 import yadisk
 from django.db.models import F
 import time
+from django.conf import settings
 
-TOKEN = 'AgAAAAA-tVsqAAY9lcTQmf1Vxkeng_D-ndynk6I'
-
-y = yadisk.YaDisk(token=TOKEN)
+y = yadisk.YaDisk(token=settings.YADISK_TOKEN)
 
 
 

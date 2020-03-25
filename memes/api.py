@@ -2,8 +2,10 @@ from memes.models import Memes
 from rest_framework import viewsets, permissions
 from .serializers import MemesSerializer
 from django.http import HttpRequest
-import random
+import yadisk
+from django.conf import settings
 
+y = yadisk.YaDisk(token=settings.YADISK_TOKEN)
 
 class MemesViewSet(viewsets.ModelViewSet):
 	serializer_class = MemesSerializer
@@ -47,5 +49,4 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 				permissions.AllowAny
 			]
 			queryset.url = yadisk.functions.resources.get_download_link(y.get_session(), queryset.fileName)
-
 			return queryset
