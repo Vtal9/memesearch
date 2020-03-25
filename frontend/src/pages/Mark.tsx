@@ -1,6 +1,6 @@
 import React from 'react'
 import Center from '../layout/Center';
-import { CircularProgress, Card, Typography, Button } from '@material-ui/core';
+import { CircularProgress, Card, Typography, Button, Icon } from '@material-ui/core';
 import Axios from 'axios';
 import Form from '../components/Form'
 import Types from '../util/Types'
@@ -50,11 +50,6 @@ class Mark extends React.Component<WithSnackbarProps, MarkState> {
         }, () => {
           self.setState({ state: 'error' })
         })
-        const img = new Image()
-        img.onload = function() {
-          
-        }
-        img.src = json.url
       }
     }).catch(function(error) {
       self.setState({ state: 'error' })
@@ -94,10 +89,18 @@ class Mark extends React.Component<WithSnackbarProps, MarkState> {
     }
     return (
       <Center>
-        {meme ?
-          <Form meme={meme} signle={true} onDone={() => {
-            this.makeLoading()
-          }} />
+        {meme && this.state.state !== 'loading' ?
+          <div>
+            <Form meme={meme} signle={true} onDone={() => {
+              this.makeLoading()
+            }} />
+            <Button
+              className='refresh'
+              onClick={() => this.setState({ state: 'loading' })}
+              startIcon={<Icon>refresh</Icon>}
+              color='primary'
+            >Загрузить другой мем</Button>
+          </div>
         :
           <EmptyForm><CircularProgress /></EmptyForm>
         }
