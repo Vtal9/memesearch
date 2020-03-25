@@ -6,6 +6,8 @@ import Center from '../layout/Center'
 import Form from '../components/Form'
 import Icon from '@material-ui/core/Icon'
 import Funcs from '../util/Funcs';
+import Gluejar from '../components/Gluejar'
+
 
 export interface FileGetterProps {
   handleFiles: Function
@@ -31,9 +33,9 @@ function FileGetter(props: FileGetterProps) {
         <Typography>Выберите файл с компьютера</Typography>
         <Typography variant='caption'>или</Typography>
         <Typography>Перетащите файлы сюда</Typography>
-        {/* <Typography variant='caption'>или</Typography>
+        <Typography variant='caption'>или</Typography>
         <Typography>Вставьте картинку из буфера обмена</Typography>
-        <Gluejar onPaste={() => {}} onError={() => {}} /> */}
+        {/* <Gluejar onPaste={() => {}} onError={() => {}} /> */}
       </div>
     </ButtonBase>
   )

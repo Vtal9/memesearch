@@ -98,13 +98,13 @@ class Form extends React.Component<FormProps, FormState> {
           </Grid>
           <Grid container spacing={2} justify='flex-end'>
             <Grid item>
-              <Button variant='contained' onClick={() => {
+              {/* <Button variant='contained' onClick={() => {
                 this.setState({ imageDescription: 'Это не мем' }, () => {
                   this.handleSubmit(undefined)
                 })
               }}
                 {...(this.state.state === 'saving' && { disabled: true })}
-              >Это не мем</Button>
+              >Это не мем</Button> */}
             </Grid>
             <Grid item>
               <Button variant='contained' color='primary' type='submit'
