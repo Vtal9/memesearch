@@ -9,7 +9,6 @@ import yadisk
 class MemesViewSet(viewsets.ModelViewSet):
 	serializer_class = MemesSerializer
 
-	
 	def get_queryset(self):
 		queryset = Memes.objects.all()
 		permission_classes = [
@@ -37,7 +36,6 @@ class MarkedMemesViewSet(viewsets.ModelViewSet):
 
 class NewURLMemesViewSet(viewsets.ModelViewSet):
 	serializer_class = MemesSerializer
-
 	
 	def get_queryset(self):	
 		y = settings.Y
@@ -45,7 +43,6 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 
 		if idMeme is not None:
 			queryset = Memes.objects.get(pk=idMeme)
-			print(queryset)
 			permission_classes = [
 				permissions.AllowAny
 			]

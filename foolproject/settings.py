@@ -144,5 +144,3 @@ MAX_UPLOAD_SIZE = "10485760"
 
 YADISK_TOKEN = 'AgAAAAA-tVsqAAY9lcTQmf1Vxkeng_D-ndynk6I'
 Y = yadisk.YaDisk(token=YADISK_TOKEN)
-
-print('call')
