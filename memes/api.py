@@ -44,7 +44,7 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 		idMeme = self.request.GET.get('id')
 
 		if idMeme is not None:
-			queryset = Memes.objects.get(pk=idMeme)
+			queryset = Memes.objects.filter(pk=idMeme)[0]
 			permission_classes = [
 				permissions.AllowAny
 			]
