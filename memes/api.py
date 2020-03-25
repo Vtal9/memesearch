@@ -32,3 +32,20 @@ class MarkedMemesViewSet(viewsets.ModelViewSet):
 		permissions.AllowAny
 	]
 	serializer_class = MemesSerializer
+
+
+class NewURLMemesViewSet(viewsets.ModelViewSet):
+	serializer_class = MemesSerializer
+
+	
+	def get_queryset(self):	
+		idMeme = self.request.GET.get('id')
+
+		if idMeme is not None:
+			queryset = Memes.objects.get(pk=idMeme)
+			permission_classes = [
+				permissions.AllowAny
+			]
+			queryset.url = yadisk.functions.resources.get_download_link(y.get_session(), queryset.fileName)
+
+			return queryset
