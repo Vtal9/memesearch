@@ -8,6 +8,7 @@ declare namespace Types {
 
   interface SnackbarError {
     msg: string
+    resolved: boolean
     short?: boolean
   }
 }

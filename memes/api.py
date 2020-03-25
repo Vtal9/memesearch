@@ -2,7 +2,7 @@ from memes.models import Memes
 from rest_framework import viewsets, permissions
 from .serializers import MemesSerializer
 from django.http import HttpRequest
-
+import random
 
 
 class MemesViewSet(viewsets.ModelViewSet):
@@ -20,7 +20,7 @@ class MemesViewSet(viewsets.ModelViewSet):
 
 
 class UnMarkedMemesViewSet(viewsets.ModelViewSet):
-	queryset = Memes.objects.filter(imageDescription = "")
+	queryset = Memes.objects.filter(imageDescription = "").order_by('?')[0:1]
 	permission_classes = [
 		permissions.AllowAny
 	]

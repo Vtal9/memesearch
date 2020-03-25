@@ -44,17 +44,26 @@ class Mark extends React.Component<WithSnackbarProps, MarkState> {
       if (response.data.length === 0) {
         self.setState({ state: 'nojob' })
       } else {
-        const index = ~~(Math.random() * response.data.length)
-        const json = response.data[index]
+        const json = response.data[0]
+        Funcs.loadImage(json.id, json.url, image => {
+          self.setMeme(image, json.id, json.imageDescription, json.textDescription)
+        }, () => {
+          self.setState({ state: 'error' })
+        })
         const img = new Image()
         img.onload = function() {
-          self.setMeme(img, json.id, json.imageDescription, json.textDescription)
+          
         }
-        img.src = json.image.replace('http://localhost:8000', '')
+        img.src = json.url
       }
     }).catch(function(error) {
       self.setState({ state: 'error' })
-      Funcs.showSnackbarAxiosError(self.props, Funcs.axiosError(error))
+      const errorObj = Funcs.axiosError(error)
+      if (!errorObj.resolved) {
+        errorObj.msg = 'Неизвестная ошибка'
+        errorObj.short = true
+      }
+      Funcs.showSnackbarAxiosError(self.props, errorObj)
     })
   }
 

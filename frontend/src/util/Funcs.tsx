@@ -2,15 +2,17 @@ import React from 'react'
 import Types from "./Types";
 import { WithSnackbarProps } from "notistack";
 import { Button } from "@material-ui/core";
+import Axios from 'axios';
 
 export default {
   axiosError(error: any) {
     let msg: string = error.message
-    const snackbarError: Types.SnackbarError = { msg, short: true }
+    const snackbarError: Types.SnackbarError = { msg, short: true, resolved: false }
 
     switch (msg) {
     case 'Network Error':
-      msg = 'Нет интернета'
+      msg = 'Нет связи с сервером'
+      snackbarError.resolved = true
       break
     }
     if (error.response) {
@@ -41,5 +43,16 @@ export default {
         <Button onClick={() => context.closeSnackbar(key)} color='secondary'>Закрыть</Button>
       )
     })
+  },
+
+  loadImage(id: number, src: string, success: (img: HTMLImageElement) => void, failure: () => void) {
+    const img = new Image()
+    img.onload = () => success
+    img.onerror = () => {
+      Axios.get(`api/new_url/${id}/`).then(function(response) {
+        alert('what)')
+      }).catch(failure)
+    }
+    img.src = src
   }
 }

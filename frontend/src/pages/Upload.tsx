@@ -19,13 +19,14 @@ function FileGetter(props: FileGetterProps) {
   }
 
   const { isDragActive, getRootProps, getInputProps} = useDropzone({
-    onDrop: files => handleFiles(files)
+    onDrop: files => handleFiles(files),
+    accept: 'image/*'
   })
 
   return (
     <ButtonBase {...getRootProps()} style={{ width: '100%', marginBottom: 30 }}>
       <div className={isDragActive ? 'file-picker over' : 'file-picker'}>
-        <input {...getInputProps()} accept="image/*" />
+        <input {...getInputProps()} />
         <Icon fontSize='large'>cloud_upload</Icon>
         <Typography>Выберите файл с компьютера</Typography>
         <Typography variant='caption'>или</Typography>
@@ -112,6 +113,11 @@ export default class Upload extends React.Component<{}, UploadState> {
     const self = this
     files.forEach((file, index) => {
       const formdata = new FormData()
+      if (file.size > 10 * 1024 * 1024) {
+        new_items[initial_length + index].setError('Превышен лимит в 10 МБ')
+        self.setState({ items: new_items })
+        return
+      }
       formdata.append('image', file)
       formdata.append("textDescription", "")
       formdata.append("imageDescription", "")
@@ -120,14 +126,21 @@ export default class Upload extends React.Component<{}, UploadState> {
           'Content-Type': 'multipart/form-data'
         }
       }).then(function(response) {
-        const img = new Image()
-        img.onload = function() {
-          new_items[initial_length + index].setContent(response.data.id, img)
+        Funcs.loadImage(response.data.id, response.data.url, image => {
+          new_items[initial_length + index].setContent(response.data.id, image)
           self.setState({ items: new_items })
-        }
-        img.src = response.data.image.replace('http://localhost:8000/', '')
+        }, () => {
+          new_items[initial_length + index].setError('Ошибка при загрузке')
+          self.setState({ items: new_items })
+        })
       }).catch(function(error) {
-        new_items[initial_length + index].setError(Funcs.axiosError(error).msg)
+        const errorObj = Funcs.axiosError(error)
+        if (!errorObj.resolved) {
+          if (error.response && error.response.status === 400) {
+            errorObj.msg = 'Файл должен быть картинкой'
+          }
+        }
+        new_items[initial_length + index].setError(errorObj.msg)
         self.setState({ items: new_items })
       })
     })

@@ -25,7 +25,7 @@ SECRET_KEY = 'z78fvt0a+e!)ecvhgb(n7!nz2e1f7rqx6rk)wxs*cs8^m%k7jv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ 'localhost', 'localhost' ]
 
 
 # Application definition
@@ -104,22 +104,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-<<<<<<< HEAD
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-    ],
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
-    ]
-}
-=======
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ]
 }
->>>>>>> 0c4babeb29d70f7985d9cc52a420e175e18ba263
 
 
 
@@ -149,3 +138,5 @@ TEMPLATES[0]['DIRS'] = [STATIC]
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MAX_UPLOAD_SIZE = "10485760"
