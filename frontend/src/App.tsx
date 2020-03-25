@@ -1,5 +1,5 @@
 import React from 'react'
-import { HashRouter as Router, Route, Link, withRouter, Redirect } from 'react-router-dom'
+import { HashRouter as Router, Route, Link, withRouter } from 'react-router-dom'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
@@ -10,11 +10,19 @@ import { Tabs, Tab } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
 
 
+const TitleWrapper = (props: {title: string, cmp: JSX.Element}) => {
+  document.title = 'MemeSearch: ' + props.title
+  return props.cmp
+}
+
 const pages = [
   { url: '/', title: 'Главная', cmp: <Home /> },
   { url: '/upload', title: 'Загрузить', cmp: <Upload /> },
   { url: '/markup', title: 'Разметить', cmp: <Mark /> }
-]
+].map(page => {
+  page.cmp = <TitleWrapper title={page.title} cmp={page.cmp} />
+  return page
+})
 
 
 const App = withRouter(props => (

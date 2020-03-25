@@ -51,7 +51,7 @@ const elon_musk = 'https://sun9-60.userapi.com/e64oM2-yQaamcYYE8thCFbaIxXMFTIZ8q
 const taktika = 'https://sun9-59.userapi.com/rm6ZVxuOQEQrh9k-hbgIz0vK1bnuEjWX09vSrQ/5HKjBmaRUR8.jpg'
 const yandex_money = 'https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets=%D0%9D%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D1%83%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0&targets-hint=&default-sum=100&button-text=11&payment-type-choice=on&hint=&successURL=&quickpay=shop&account=4100112271118330'
 const smeshariki = 'https://sun9-35.userapi.com/IuO4PcE7HUqo1XF7W3MlMHIXdRnP73c9LlbVtA/JhrH53AWHWI.jpg'
-const google_form = 'https://docs.google.com/forms/d/1d0NYKmlJcAL5mG6UgFGh0BMxUdiK60Tue3Gzla2_oG8'
+const google_form = 'https://forms.gle/vtsFXmXxnqeh245U6'
 
 export default () => {
   const [ donateOpen, setDonateOpen ] = React.useState(false)
