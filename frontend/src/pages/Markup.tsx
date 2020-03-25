@@ -19,7 +19,7 @@ interface MarkState {
   meme?: Types.Meme
 }
 
-class Mark extends React.Component<WithSnackbarProps, MarkState> {
+class Markup extends React.Component<WithSnackbarProps, MarkState> {
   constructor(props: WithSnackbarProps) {
     super(props)
     this.state = {
@@ -109,4 +109,4 @@ class Mark extends React.Component<WithSnackbarProps, MarkState> {
   }
 }
 
-export default withSnackbar(Mark)
+export default withSnackbar(Markup)

@@ -3,7 +3,7 @@ import { HashRouter as Router, Route, Link, withRouter } from 'react-router-dom'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
-import Mark from './pages/Mark'
+import Markup from './pages/Markup'
 import logo from './img/logo.svg'
 import './style.sass'
 import { Tabs, Tab } from '@material-ui/core'
@@ -18,7 +18,7 @@ const TitleWrapper = (props: {title: string, cmp: JSX.Element}) => {
 const pages = [
   { url: '/', title: 'Главная', cmp: <Home /> },
   { url: '/upload', title: 'Загрузить', cmp: <Upload /> },
-  { url: '/markup', title: 'Разметить', cmp: <Mark /> }
+  { url: '/markup', title: 'Разметить', cmp: <Markup /> }
 ].map(page => {
   page.cmp = <TitleWrapper title={page.title} cmp={page.cmp} />
   return page
