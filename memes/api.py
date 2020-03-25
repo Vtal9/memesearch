@@ -47,5 +47,6 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 				permissions.AllowAny
 			]
 			queryset.url = yadisk.functions.resources.get_download_link(y.get_session(), queryset.fileName)
+			super(Memes, queryset).save(*args, **kwargs, update_fields=['url']) 
 
 			return queryset
