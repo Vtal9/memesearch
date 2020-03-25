@@ -49,7 +49,7 @@ export default {
     const img = new Image()
     img.onload = () => success
     img.onerror = () => {
-      Axios.get(`api/new_url/${id}/`).then(function(response) {
+      Axios.get(`api/new_url/?id=${id}/`).then(function(response) {
         alert('what)')
       }).catch(failure)
     }

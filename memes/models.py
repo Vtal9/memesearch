@@ -27,4 +27,4 @@ class Memes(models.Model):
 
 		super(Memes, self).save(*args, **kwargs) 
 		if(self.id % 100 == 0):
-			y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(time.time()))
+			y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
