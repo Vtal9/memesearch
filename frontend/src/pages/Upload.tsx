@@ -138,6 +138,8 @@ export default class Upload extends React.Component<{}, UploadState> {
         if (!errorObj.resolved) {
           if (error.response && error.response.status === 400) {
             errorObj.msg = 'Файл должен быть картинкой'
+          } else {
+            errorObj.msg = 'Неизвестная ошибка'
           }
         }
         new_items[initial_length + index].setError(errorObj.msg)

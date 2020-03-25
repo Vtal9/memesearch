@@ -33,8 +33,8 @@ class Form extends React.Component<FormProps, FormState> {
     }
   }
 
-  handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  handleSubmit(e: React.FormEvent | undefined) {
+    if (e) e.preventDefault()
 
     if (!this.props.meme) return
 
@@ -53,6 +53,11 @@ class Form extends React.Component<FormProps, FormState> {
       if (self.props.onDone) self.props.onDone()
     }).catch(function(error) {
       self.setState({ state: 'initial' })
+      const errorObj = Funcs.axiosError(error)
+      if (!errorObj.resolved) {
+        errorObj.msg = 'Неизвестная ошибка'
+        errorObj.short = true
+      }
       Funcs.showSnackbarAxiosError(self.props, Funcs.axiosError(error))
     })
   }
@@ -91,10 +96,23 @@ class Form extends React.Component<FormProps, FormState> {
                 label='Что написано?' helperText='Разные надписи разделяйте переносом строки' />
             </Grid>
           </Grid>
-          <Button variant='contained' color='primary' type='submit'
-            {...(this.state.state === 'saving' && { disabled: true })}
-            startIcon={<Icon>done</Icon>}
-          >Готово</Button>
+          <Grid container spacing={2} justify='flex-end'>
+            <Grid item>
+              <Button variant='contained' onClick={() => {
+                this.setState({ imageDescription: 'Это не мем' }, () => {
+                  this.handleSubmit(undefined)
+                })
+              }}
+                {...(this.state.state === 'saving' && { disabled: true })}
+              >Это не мем</Button>
+            </Grid>
+            <Grid item>
+              <Button variant='contained' color='primary' type='submit'
+                {...(this.state.state === 'saving' && { disabled: true })}
+                startIcon={<Icon>done</Icon>}
+              >Готово</Button>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
     )

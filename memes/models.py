@@ -14,13 +14,17 @@ class Memes(models.Model):
 	textDescription = models.TextField(blank = True, null = True)
 	imageDescription = models.TextField(blank = True, null = True)
 
+	def delete(self):
+		pass
+
 	def save(self, *args, **kwargs):
-		y = settings.Y
-		name = self.image.url.split(".")
-		self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + "." + name[-1]
-		y.upload(self.image, self.fileName)
-		self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
-		self.image = None
+		if self.image != '':
+			y = settings.Y
+			name = self.image.url.split(".")
+			self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + "." + name[-1]
+			y.upload(self.image, self.fileName)
+			self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
+			self.image = None
 
 		super(Memes, self).save(*args, **kwargs) 
 		if(self.id % 100 == 0):
