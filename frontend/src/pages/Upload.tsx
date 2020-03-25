@@ -15,7 +15,6 @@ export interface FileGetterProps {
 
 function FileGetter(props: FileGetterProps) {
   function handleFiles(files: Array<File>) {
-    console.log(files)
     if (!files || files.length === 0) return
     props.handleFiles(files)
   }
@@ -35,7 +34,7 @@ function FileGetter(props: FileGetterProps) {
         <Typography>Перетащите файлы сюда</Typography>
         <Typography variant='caption'>или</Typography>
         <Typography>Вставьте картинку из буфера обмена</Typography>
-        {/* <Gluejar onPaste={() => {}} onError={() => {}} /> */}
+        <Gluejar onPaste={files => handleFiles(files)} onError={() => {}} />
       </div>
     </ButtonBase>
   )
