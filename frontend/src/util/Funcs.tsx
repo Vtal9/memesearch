@@ -47,10 +47,13 @@ export default {
 
   loadImage(id: number, src: string, success: (img: HTMLImageElement) => void, failure: () => void) {
     const img = new Image()
-    img.onload = () => success
+    img.onload = () => success(img)
     img.onerror = () => {
       Axios.get(`api/new_meme_url/?id=${id}`).then(function(response) {
-        alert('what)')
+        const second = new Image()
+        second.onload = () => success(second)
+        second.onerror = failure
+        second.src = response.data[0].url
       }).catch(failure)
     }
     img.src = src

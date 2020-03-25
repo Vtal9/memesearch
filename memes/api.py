@@ -44,9 +44,12 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 		idMeme = self.request.GET.get('id')
 
 		if idMeme is not None:
-			queryset = Memes.objects.filter(pk=idMeme)[0]
+			queryset = Memes.objects.get(pk=idMeme)
+			print(queryset)
 			permission_classes = [
 				permissions.AllowAny
 			]
 			queryset.url = yadisk.functions.resources.get_download_link(y.get_session(), queryset.fileName)
-			return queryset
+			super(Memes, queryset).save(update_fields=['url']) 
+
+			return [queryset]
