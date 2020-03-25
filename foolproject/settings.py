@@ -143,5 +143,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MAX_UPLOAD_SIZE = "10485760"
 
 YADISK_TOKEN = 'AgAAAAA-tVsqAAY9lcTQmf1Vxkeng_D-ndynk6I'
+Y = yadisk.YaDisk(token=settings.YADISK_TOKEN)
 
 print('call')

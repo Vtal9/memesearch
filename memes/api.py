@@ -2,10 +2,9 @@ from memes.models import Memes
 from rest_framework import viewsets, permissions
 from .serializers import MemesSerializer
 from django.http import HttpRequest
-import yadisk
 from django.conf import settings
+import yadisk
 
-y = yadisk.YaDisk(token=settings.YADISK_TOKEN)
 
 class MemesViewSet(viewsets.ModelViewSet):
 	serializer_class = MemesSerializer
@@ -41,6 +40,7 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 
 	
 	def get_queryset(self):	
+		y = settings.Y
 		idMeme = self.request.GET.get('id')
 
 		if idMeme is not None:

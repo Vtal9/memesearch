@@ -4,9 +4,6 @@ from django.db.models import F
 import time
 from django.conf import settings
 
-y = yadisk.YaDisk(token=settings.YADISK_TOKEN)
-
-
 
 # Create your models here.
 class Memes(models.Model):
@@ -18,6 +15,7 @@ class Memes(models.Model):
 	imageDescription = models.TextField(blank = True, null = True)
 
 	def save(self, *args, **kwargs):
+		y = settings.Y
 		name = self.image.url.split(".")
 		self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + "." + name[-1]
 		y.upload(self.image, self.fileName)
