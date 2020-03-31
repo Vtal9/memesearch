@@ -97,9 +97,9 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
             <Button
               className='refresh'
               onClick={() => this.setState({ state: 'loading' })}
-              startIcon={<Icon>refresh</Icon>}
+              endIcon={<Icon>navigate_next</Icon>}
               color='primary'
-            >Загрузить другой мем</Button>
+            >Следующий мем</Button>
           </div>
         :
           <EmptyForm><CircularProgress /></EmptyForm>

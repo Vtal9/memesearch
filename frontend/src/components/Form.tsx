@@ -83,6 +83,11 @@ class Form extends React.Component<FormProps, FormState> {
                   const d = e.target.value
                   this.setState({ imageDescription: d, imageDescriptionError: badDescription(d) })
                 }}
+                onKeyDown={e => {
+                  if (e.ctrlKey && e.keyCode == 13) {
+                    this.handleSubmit(undefined)
+                  }
+                }}
                 label='Что изображено?' helperText={<span>
                   Описание картинки, ключевые объекты, важные для поиска.<br />
                   Например: &laquo;негр; бегущий школьник; постирония&raquo;.<br />
@@ -93,11 +98,17 @@ class Form extends React.Component<FormProps, FormState> {
               <TextField fullWidth multiline
                 value={this.state.textDescription}
                 onChange={e => this.setState({ textDescription: e.target.value })}
+                onKeyDown={e => {
+                  if (e.ctrlKey && e.keyCode == 13) {
+                    this.handleSubmit(undefined)
+                  }
+                }}
                 label='Что написано?' helperText='Разные надписи разделяйте переносом строки' />
             </Grid>
           </Grid>
-          <Grid container spacing={2} justify='flex-end'>
+          <Grid container spacing={2} justify='flex-end' alignItems='center'>
             <Grid item>
+              <Typography variant='caption'>Ctrl + Enter</Typography>
               {/* <Button variant='contained' onClick={() => {
                 this.setState({ imageDescription: 'Это не мем' }, () => {
                   this.handleSubmit(undefined)
