@@ -20,12 +20,11 @@ def parse_db_index(db_index_str, is_descr=False):
         return set(sstr.split(' '))
     else:
         url_poss = {}
-        s = db_index_str.replace('\'', '')[1:-1].replace(' ', '').replace('],', ']')
+        s = db_index_str.replace('\'', '')[1:-1].replace('],', ']')
 
         for token in s.split(']')[:-1]:  # -1 because after ']', next is empty
-            temp = token.split(':')
-            print(db_index_str)
-            url_poss[temp[0]] = [int(num) for num in temp[1][1:].split(',')]
+            temp = token.split(': ')
+            url_poss[temp[0].replace(' ', '')] = [int(num) for num in temp[1][1:].split(',')]
         return url_poss
 
 
