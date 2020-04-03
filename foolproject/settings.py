@@ -26,7 +26,7 @@ SECRET_KEY = 'z78fvt0a+e!)ecvhgb(n7!nz2e1f7rqx6rk)wxs*cs8^m%k7jv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ 'localhost', 'localhost' ]
+# ALLOWED_HOSTS = [ 'localhost', 'localhost' ]
 
 
 # Application definition
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 #    'frontend',
     'emails',
     'memes',
+    'searchEngine',
 ]
 
 MIDDLEWARE = [
@@ -105,11 +106,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-    ]
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_RENDERER_CLASSES': [
+#         'rest_framework.renderers.JSONRenderer',
+#     ]
+# }
 
 
 

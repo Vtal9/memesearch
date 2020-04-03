@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html')),
     path('', include('memes.urls')),
     path('emails/', include('emails.urls')),
+    path('search/', include('searchEngine.urls')),
 ]
 
 
