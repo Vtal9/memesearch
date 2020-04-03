@@ -29,8 +29,8 @@ def parse_db_index(db_index_str, is_descr=False):
 
 
 def db_query(word, is_descr=False):
-    return ImageDescriptions.objects.filter(Q(word=word))[0].index if is_descr else \
-        TextDescriptions.objects.filter(Q(word=word))[0].index
+    return ImageDescriptions.objects.get(Q(word=word)).index if is_descr else \
+        TextDescriptions.objects.get(Q(word=word)).index
 
 
 def db_result(word, is_descr=False):
