@@ -121,7 +121,7 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         # ([urls],"error")
         result = query.make_query(text_phrase=query_text,
                                   descr_words=query_image)
-        queryset = request.user.images.filter(Q(image__in=result[0]))
+        queryset = request.user.images.filter(Q(id__in=result[0]))
         # записываем их в  response
         if result[1] == "":
             response = HttpResponse([{'url': i.image} for i in queryset])
