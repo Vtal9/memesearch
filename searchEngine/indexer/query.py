@@ -134,7 +134,7 @@ def make_query(text_phrase="", descr_words=""):
 
     if text_phrase == "": # descr_word != ""
         common_urls_from_descr = make_query_descr_part(descr_words)
-        return list(set(common_urls_from_descr)), "text is empty"
+        return list(set(common_urls_from_descr)), ""
 
     urls_weight_from_text = make_query_text_part(text_phrase)
 
@@ -143,7 +143,7 @@ def make_query(text_phrase="", descr_words=""):
             return [], "no text words found in the database"
 
         common_urls_from_descr = make_query_descr_part(descr_words)
-        return list(set(common_urls_from_descr))
+        return list(set(common_urls_from_descr)), ""
     else:
         if descr_words != "":
             common_urls_from_descr = set(make_query_descr_part(descr_words))
