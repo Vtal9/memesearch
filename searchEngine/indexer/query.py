@@ -118,9 +118,8 @@ def make_query_text_part(text):
 def make_query_descr_part(descr):
     sdescr = simplifier.simplify_string(descr)
     words = sdescr.split(' ')
-
+    print("descr=", descr)
     common_urls = db_result(words[0], is_descr=True)[words[0]]
-
     if len(words) > 1:
         for word in words:
             common_urls.intersection(db_result(word, is_descr=True)[word])
@@ -132,7 +131,7 @@ def make_query(text_phrase="", descr_words=""):
     if text_phrase == "" and descr_words == "":
         return [], "query is empty"
 
-    if text_phrase == "": # descr_word != ""
+    if text_phrase == "":  # descr_word != ""
         common_urls_from_descr = make_query_descr_part(descr_words)
         return list(set(common_urls_from_descr)), ""
 
@@ -152,6 +151,6 @@ def make_query(text_phrase="", descr_words=""):
                     urls_weight_from_text[url] += DESCRIPTION_WEIGHT
 
         ranked_result = sorted(urls_weight_from_text, key=urls_weight_from_text.get, reverse=True)
-        ranked_result = list(dict.fromkeys(ranked_result)) # delete duplicates
+        ranked_result = list(dict.fromkeys(ranked_result))  # delete duplicates
 
         return ranked_result, ""
