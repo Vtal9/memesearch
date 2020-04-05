@@ -27,6 +27,7 @@ urlpatterns = [
     path('', include('memes.urls')),
     path('emails/', include('emails.urls')),
     path('search/', include('searchEngine.urls')),
+    path('accounts/', include('accounts.urls')),
 ]
 
 
