@@ -6,7 +6,7 @@ from . import info
 def _make_index(imeme):
     descr_index = {}
     for word in simplifier.simplify_string(imeme.img_descr).split(' '):  # simple index
-        descr_index[word] = imeme.url
+        descr_index[word] = imeme.id
 
     # input = "word1 word2 ..."
     # output = {word1: [pos1, pos2], word2: [pos3, pos4], ...}
@@ -20,7 +20,7 @@ def _make_index(imeme):
 
     text_index = {}
     for word in output_index.keys():
-        text_index[word] = {imeme.url: output_index[word]}
+        text_index[word] = {imeme.id: output_index[word]}
 
     return descr_index, text_index
 

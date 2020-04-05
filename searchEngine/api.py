@@ -23,6 +23,8 @@ class SearchAPI(generics.GenericAPIView):
     serializer_class = ImagesSerializer
 
     def get(self, request, *args, **kwargs):
+
+        print(TextDescriptions.objects.all()[0].index)
         # приходит запрос в виде двух строк - слова через пробел, мб запятые, с ключевыми словами
         query_text = self.request.GET.get('qText')
         query_image = self.request.GET.get('qImage')
@@ -51,10 +53,9 @@ class SearchAPI(generics.GenericAPIView):
 
         # записываем их в  response
         if result[1] == "":
-            response = HttpResponse([{'url': i} for i in result[0]])
+            response = HttpResponse([{'id': i} for i in result[0]])
         else:
             response = HttpResponse(result[1])
-
         return response
 
 
@@ -74,43 +75,57 @@ class ImageDescriptionsViewSet(viewsets.ModelViewSet):
     serializer_class = ImagesDescriptionsSerializer
 
 
-class SearchByOwnImagesViewSet(viewsets.ModelViewSet):
+class OwnMemesViewSet(viewsets.ModelViewSet):
+    queryset = ImageDescriptions.objects.all()
     permission_classes = [
-        permissions.AllowAny
+        permissions.IsAuthenticated
     ]
     serializer_class = ImagesSerializer
 
     def get_queryset(self):
-        if self.request.method == 'GET':
-            # приходит запрос в виде двух строк - слова через пробел, мб запятые, с ключевыми словами
-            query_text = self.request.GET.get('qText')
-            query_image = self.request.GET.get('qImage')
+        return self.request.user.images.all()
 
-            # разбиваем запросы на отдельные слова.
-            if query_text is not None:
-                text_words = simplify_string(query_text)
-            else:
-                text_words = ""
-            if query_image is not None:
-                image_words = simplify_string(query_image)
-            else:
-                image_words = ""
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
-            # ищем все картинки в описании которых совпало хотя бы одно слово. получаем список объектов модели
-            queryset_text = TextDescriptions.objects.filter(Q(word__in=text_words))
-            queryset_image = ImageDescriptions.objects.filter(Q(word__in=image_words))
 
-            # получаем список из URL
-            # ([urls],"error")
-            result = query.make_query(text_phrase=query_text,
-                                      descr_words=query_image)
+class SearchOwnMemesAPI(generics.GenericAPIView):
+    serializer_class = ImagesSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
 
-            # записываем их в  response
+    def get(self, request, *args, **kwargs):
+        # приходит запрос в виде двух строк - слова через пробел, мб запятые, с ключевыми словами
+        query_text = self.request.GET.get('qText')
+        query_image = self.request.GET.get('qImage')
 
-            if result[1] == "":
-                response = HttpResponse([{'url': i} for i in result[0]])
-            else:
-                response = HttpResponse(result[1])
-            queryset = Images.objects.all()
-            # return response
-            return queryset
+        # разбиваем запросы на отдельные слова.
+        if query_text is not None:
+            text_words = simplify_string(query_text)
+        else:
+            text_words = ""
+            query_text = ""
+        if query_image is not None:
+            image_words = simplify_string(query_image)
+        else:
+            image_words = ""
+            query_image = ""
+
+        # на данный момент достаем все внутри индексера
+        # ищем все картинки в описании которых совпало хотя бы одно слово. получаем список объектов модели
+        # queryset_text = TextDescriptions.objects.filter(Q(word__in=text_words))
+        # queryset_image = ImageDescriptions.objects.filter(Q(word__in=image_words))
+
+        # получаем список из URL
+        # ([urls],"error")
+        result = query.make_query(text_phrase=query_text,
+                                  descr_words=query_image)
+        queryset = request.user.images.filter(Q(image__in=result[0]))
+        # записываем их в  response
+        if result[1] == "":
+            response = HttpResponse([{'url': i.image} for i in queryset])
+        else:
+            response = HttpResponse(result[1])
+
+        return response

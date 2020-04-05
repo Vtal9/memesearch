@@ -13,10 +13,13 @@ from searchEngine.models import Images, TextDescriptions, ImageDescriptions
 def convert():
     marked_up_memes = Memes.objects.exclude(textDescription="")
     infos = []
+    # Images.objects.all().delete()
+    # ImageDescriptions.objects.all().delete()
+    # TextDescriptions.objects.all().delete()
     for meme in marked_up_memes:
-        image = Images(image=meme.url, fileName=meme.fileName)
+        image = Images(id=meme.id)
         image.save()
-        infos.append(MemeInfo(meme.url, meme.textDescription, meme.imageDescription))
+        infos.append(MemeInfo(meme.id, meme.textDescription, meme.imageDescription))
     indexed = indexer.full_index(infos)
     for word in indexed.text_words:
         word_index = TextDescriptions(word=word, index=indexed.text_words[word])
