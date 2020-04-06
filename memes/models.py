@@ -1,8 +1,11 @@
 from django.db import models
-import yadisk
 from django.db.models import F
-import time
 from django.conf import settings
+
+import time
+import yadisk
+from .ocr_pipeline.recognition import getTextFromImage
+
 from importlib.machinery import SourceFileLoader
 
 indexer = \
@@ -72,15 +75,21 @@ class Memes(models.Model):
         pass
 
     def save(self, *args, **kwargs):
+        # Построение нового индекса по добавленному мему
         meme_index = indexer.full_index(info.MemeInfo(self.id, self.textDescription, self.imageDescription))
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
 
         if self.image != '':
+            # Сохранение мема на яндекс.диск
             y = settings.Y
             name = self.image.url.split(".")
             self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + "." + name[-1]
             y.upload(self.image, self.fileName)
             self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
+
+            # Разметка мема (текст)
+			self.textDescription = getTextFromImage(self.image)
+
             self.image = None
 
             super(Memes, self).save(*args, **kwargs)
