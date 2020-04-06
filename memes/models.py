@@ -8,6 +8,16 @@ from .ocr_pipeline.recognition import getTextFromImage
 
 from importlib.machinery import SourceFileLoader
 
+# У всех разрабов этот код работает по-разному
+# Если сервер не запускается - закомментите код ниже *
+from searchEngine.indexer import indexer
+from searchEngine.indexer import info
+import searchEngine.models as indexer_models
+from searchEngine.indexer import simplifier
+from searchEngine.indexer import misc
+
+# * и раскомментите этот
+'''
 indexer = \
     SourceFileLoader("module.name", "./searchEngine/indexer/indexer.py") \
         .load_module()
@@ -27,6 +37,7 @@ simplifier = \
 misc = \
     SourceFileLoader("module.name", "./searchEngine/indexer/misc.py") \
         .load_module()
+'''
 
 
 def update_index_in_db(text, descr, new_index_text, new_index_descr):
@@ -88,7 +99,7 @@ class Memes(models.Model):
             self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
 
             # Разметка мема (текст)
-			self.textDescription = getTextFromImage(self.image)
+            self.textDescription = getTextFromImage(self.image)
 
             self.image = None
 

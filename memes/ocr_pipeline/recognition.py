@@ -1,13 +1,13 @@
-import craft_utils
+from . import craft_utils
 from cv2 import INTER_LINEAR
-import imgproc
+from . import imgproc
 import numpy as np
 import pytesseract
 import torch
 
-from craft import CRAFT
+from .craft import CRAFT
 from collections import OrderedDict
-from file_utils import list_images
+from .file_utils import list_images
 from torch.autograd import Variable
 
 # Most part of this code borrowed from https://github.com/clovaai/CRAFT-pytorch
@@ -94,6 +94,28 @@ def convertImagesToTexts(folder='media/'):
         texts = recognizeText(image[:,:,::-1], polys)
         result.append((img_path, " ".join(texts), ""))
     return result
+
+
+def getTextFromImage(img_path):
+    '''
+    Recognizes text from given image
+    Parameters:
+     - img_path - path to an image
+    Return value:
+     - string with all words on image splited by space 
+    '''
+    # Loading the net
+    net = CRAFT()
+    net.load_state_dict(copyStateDict(torch.load("craft_mlt_25k.pth", map_location='cpu')))
+    net.eval()
+
+    # Get list of images
+    image_list = list_images(folder)
+    image = imgproc.loadImage(img_path)
+    bboxes, polys, score_text = netForward(net, image)
+    polys = craft_utils.postProcess(polys, image.shape)
+    texts = recognizeText(image[:,:,::-1], polys)
+    return texts
 
 
 if __name__ == '__main__':
