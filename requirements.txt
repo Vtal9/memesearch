@@ -3,3 +3,9 @@ djangorestframework
 pillow
 yadisk
 django-rest-knox
+numpy
+opencv-python
+scikit-image
+pytesseract
+torch
+torchvision
