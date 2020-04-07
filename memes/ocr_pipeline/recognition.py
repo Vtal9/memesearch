@@ -106,7 +106,7 @@ def getTextFromImage(img_path):
     '''
     # Loading the net
     net = CRAFT()
-    net.load_state_dict(copyStateDict(torch.load("memes\ocr_pipeline\craft_mlt_25k.pth", map_location='cpu')))
+    net.load_state_dict(copyStateDict(torch.load("memes/ocr_pipeline/craft_mlt_25k.pth", map_location='cpu')))
     net.eval()
 
     # Loading image and infering net

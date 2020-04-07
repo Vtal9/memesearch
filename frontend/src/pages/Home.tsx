@@ -65,10 +65,9 @@ export default () => {
       </Dialog>
       <Section style={backImg(musk)}>
         <BigFont>
-          Часто бывает такое: вы помните,<br />
-          что есть <i>восхитительный мем</i>,<br />
-          <b>идеально</b> вписывающийся в возникшую ситуацию,<br />
-          но просто нагуглить его не получается?
+          Часто бывает так, что вы тратите<br />
+          на поиски нужного мема больше 30 секунд?<br />
+          Или, что ещё хуже, так его и не находите?
         </BigFont>
       </Section>
       <Section style={{
@@ -79,52 +78,42 @@ export default () => {
       <Section>
         <div className='text-with-img'>
           <img src={smeshariki} />
-          <Typography>
-            Мы создаём веб-приложение, позволяющее эффективно искать мемы по их примерному описанию.<br />
-            Вдохновившись расширенным поиском фильмов на Кинопоиске, мы решили запилить нечто похожее и для мемов.
-          </Typography>
+          <BigFont>
+            Мы создаём веб-приложение, позволяющее быстро и эффективно искать мемы
+          </BigFont>
         </div>
       </Section>
       <Section style={backImg(tactics)}>
-        <Heading>Есть ли у нас какой-то план,<br />и придерживаемся ли мы его?<br />&nbsp;</Heading>
-        <Typography paragraph variant='h5'>Да, у нас есть какой-то план, и мы его придерживаемся:</Typography>
+        <White>
+          <ul>
+            <li>Создание/перенос на наш сайт своей коллекции мемов,
+              которую мы автоматически разметим, что в разы облегчит поиск по ней,
+              а также синхронизирует её для всех ваших устройств.</li>
+            <li>Возможность поиска по всем имеющимся у нас мемам,
+              если нужный не нашелся среди ваших (найденный мем можно сразу же добавить в свою коллекцию).</li>
+            <li>Расширенный поиск, который за счёт большей кастомизации позволит
+              куда лучше искать мемы (число настраиваемых параметров будет расти).</li>
+            <li>Можно покекать с забавных случайных мемов, нажимая следующий мем в разделе разметки.</li>
+          </ul>
+        </White>
+        <Typography paragraph variant='h5'>Инструкция по созданию своей базы мемов с быстрым доступом к ней:</Typography>
         <Stepper orientation='vertical' activeStep={-1} style={{
           background: 'transparent',
           color: 'white'
         }}>
           <Step expanded>
-            <StepLabel><White><b>Pre-alpha</b> (сейчас)</White></StepLabel>
-            <StepContent>
+            <StepLabel>
               <Typography>
-                Собираем базы данных размеченных и неразмеченных мемов.
-              </Typography>
-            </StepContent>
+                <White><a onClick={} href='#'>Зарегистрируйтесь</a> на нашем сайте.</White></Typography></StepLabel>
           </Step>
           <Step expanded>
-            <StepLabel><White><b>Alpha</b> (после накопления 10-20к размеченных мемов)</White></StepLabel>
-            <StepContent>
-              <Typography>
-                Запускаем поисковик по размеченным мемам.
-                Поиск на данном этапе будет только по примерному тексту мема и описанию картинки.
-              </Typography>
-            </StepContent>
+            <StepLabel><Typography><White>Загрузите свои мемы (лучше подредактировать авторазметку).</White></Typography></StepLabel>
           </Step>
           <Step expanded>
-            <StepLabel><White><b>Beta</b> (после накопления 60-120к размеченных мемов)</White></StepLabel>
-            <StepContent>
-              <Typography>
-                Тренируем нашу замечательную нейросетку, далее свежайшие мемы будут добавляться и размечаться автоматически.
-                К критериям поиска добавляется ряд флагов и настраиваемых параметров.
-              </Typography>
-            </StepContent>
+            <StepLabel><Typography><White>Добавьте наш сайт в закладки, чтобы искать мемы ещё быстрее.</White></Typography></StepLabel>
           </Step>
           <Step expanded>
-            <StepLabel><White><b>Прекрасная Россия будущего</b></White></StepLabel>
-            <StepContent>
-              <Typography>
-                Любой существующий мем ищется за пару кликов и несколько напечатанных слов.
-              </Typography>
-            </StepContent>
+            <StepLabel><Typography><White>Поздравляем, вы великолепны!</White></Typography></StepLabel>
           </Step>
         </Stepper>
       </Section>
