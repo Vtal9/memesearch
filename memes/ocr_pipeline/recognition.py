@@ -4,6 +4,7 @@ from . import imgproc
 import numpy as np
 import pytesseract
 import torch
+import os.path
 
 from .craft import CRAFT
 from collections import OrderedDict
@@ -106,7 +107,7 @@ def getTextFromImage(img_path):
     '''
     # Loading the net
     net = CRAFT()
-    net.load_state_dict(copyStateDict(torch.load("memes\ocr_pipeline\craft_mlt_25k.pth", map_location='cpu')))
+    net.load_state_dict(copyStateDict(torch.load(os.path.join('memes', 'ocr_pipeline', 'craft_mlt_25k.pth'), map_location='cpu')))
     net.eval()
 
     # Loading image and infering net
