@@ -2,3 +2,4 @@ django
 djangorestframework
 pillow
 yadisk
+django-rest-knox

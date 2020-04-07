@@ -4,6 +4,9 @@ import { WithSnackbarProps } from "notistack";
 import { Button } from "@material-ui/core";
 import Axios from 'axios';
 
+
+const TOKEN_KEY = 'memesearch_token'
+
 export default {
   axiosError(error: any) {
     let msg: string = error.message
@@ -57,5 +60,25 @@ export default {
       }).catch(failure)
     }
     img.src = src
+  },
+
+  checkAuth(success: (u: Types.User) => void, failure: () => void) {
+    const token = localStorage.getItem(TOKEN_KEY)
+    Axios.get('accounts/api/auth/user', {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    }).then(response => success({
+      id: response.data.id,
+      username: response.data.username
+    })).catch(failure)
+  },
+
+  setAuth(token: string) {
+    localStorage.setItem(TOKEN_KEY, token)
+  },
+
+  unsetAuth() {
+    localStorage.removeItem(TOKEN_KEY)
   }
 }

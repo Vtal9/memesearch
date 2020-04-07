@@ -7,8 +7,9 @@ import Markup from './pages/Markup'
 import Search from './pages/Search'
 import logo from './img/logo.svg'
 import './style.sass'
-import { TextField, Typography } from '@material-ui/core'
+import { TextField, Typography, InputAdornment, Icon, IconButton } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
+import AuthBar from './components/AuthBar';
 
 
 const pages = [
@@ -39,8 +40,12 @@ const FastSearchForm = (props: { autofocus: boolean, onSearch: (q: string) => vo
 
   return (
     <form onSubmit={handleSubmit}>
-      <TextField label='Поиск' fullWidth value={query} autoFocus={props.autofocus}
+      <TextField label='Поиск' value={query} autoFocus={props.autofocus}
         onChange={e => setQuery(e.target.value)} error={error}
+        InputProps={{ endAdornment:
+          <InputAdornment position='end'>
+            <IconButton onClick={handleSubmit}><Icon>search</Icon></IconButton>
+          </InputAdornment> }}
       />
     </form>
   )
@@ -58,6 +63,9 @@ const App = withRouter(props => {
               autofocus={props.location.pathname === '/'}
               onSearch={q => search(q)} />
           }
+          <div style={{ justifySelf: 'flex-end' }}>
+            <AuthBar />
+          </div>
         </div>
         <div className="header-bottom">
           {pages.filter(page => page.url !== '/search').map(page =>

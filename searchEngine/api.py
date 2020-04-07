@@ -8,7 +8,7 @@ from .serializers import TextDescriptionsSerializer
 from .serializers import ImagesDescriptionsSerializer
 from django.db.models import Q
 from .indexer import indexer, info, query, simplifier
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 
 def split_query(q):
@@ -53,7 +53,7 @@ class SearchAPI(generics.GenericAPIView):
 
         # записываем их в  response
         if result[1] == "":
-            response = HttpResponse([{'id': i} for i in result[0]])
+            response = JsonResponse([{'id': i} for i in result[0]], safe=False)
         else:
             response = HttpResponse(result[1])
         return response
@@ -124,7 +124,7 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         queryset = request.user.images.filter(Q(id__in=result[0]))
         # записываем их в  response
         if result[1] == "":
-            response = HttpResponse([{'url': i.image} for i in queryset])
+            response = JsonResponse([{'url': i.image} for i in queryset], safe=False)
         else:
             response = HttpResponse(result[1])
 
