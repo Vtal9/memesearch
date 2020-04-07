@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextField, Card, CardMedia, CardContent, Grid, Button, Icon, Typography, CircularProgress } from '@material-ui/core';
+import { TextField, Card, CardMedia, CardContent, Grid, Button, Icon, Typography } from '@material-ui/core';
 import Axios from 'axios'
 import Types from '../util/Types'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
@@ -19,7 +19,7 @@ export interface FormProps extends React.Attributes, WithSnackbarProps {
 interface FormState {
   imageDescription: string
   textDescription: string
-  imageDescriptionError?: boolean
+  descriptionError?: boolean
   state: 'initial' | 'saving' | 'saved'
 }
 
@@ -39,7 +39,7 @@ class Form extends React.Component<FormProps, FormState> {
     if (!this.props.meme) return
 
     if (badDescription(this.state.imageDescription)) {
-      this.setState({ imageDescriptionError: true })
+      this.setState({ descriptionError: true })
       return
     }
 
@@ -77,11 +77,11 @@ class Form extends React.Component<FormProps, FormState> {
           }
           <Grid container className='inputs' spacing={2}>
             <Grid item xs>
-              <TextField fullWidth multiline error={this.state.imageDescriptionError} autoFocus={signle}
+              <TextField fullWidth multiline error={this.state.descriptionError} autoFocus={signle}
                 value={this.state.imageDescription}
                 onChange={e => {
                   const d = e.target.value
-                  this.setState({ imageDescription: d, imageDescriptionError: badDescription(d) })
+                  this.setState({ imageDescription: d, descriptionError: badDescription(d) })
                 }}
                 onKeyDown={e => {
                   if (e.ctrlKey && e.keyCode == 13) {

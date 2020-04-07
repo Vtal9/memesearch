@@ -1,49 +1,82 @@
-import React from 'react'
-import { HashRouter as Router, Route, Link, withRouter } from 'react-router-dom'
+import React, { FormEvent } from 'react'
+import { HashRouter as Router, Route, Link, withRouter, RouteComponentProps } from 'react-router-dom'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
 import Markup from './pages/Markup'
+import Search from './pages/Search'
 import logo from './img/logo.svg'
 import './style.sass'
-import { Tabs, Tab } from '@material-ui/core'
+import { TextField, Typography } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
 
 
-const TitleWrapper = (props: {title: string, cmp: JSX.Element}) => {
-  document.title = 'MemeSearch: ' + props.title
-  return props.cmp
+const pages = [
+  { url: '/', title: 'О проекте', cmp: Home },
+  { url: '/upload', title: 'Загрузить', cmp: Upload },
+  { url: '/markup', title: 'Разметить', cmp: Markup },
+  { url: '/search', title: 'Поиск', cmp: Search }
+]
+
+const TitleSetter = (props: { title: string }) => {
+  document.title = props.title
+  return null
 }
 
-const pages = [
-  { url: '/', title: 'Главная', cmp: <Home /> },
-  { url: '/upload', title: 'Загрузить', cmp: <Upload /> },
-  { url: '/markup', title: 'Разметить', cmp: <Markup /> }
-].map(page => {
-  page.cmp = <TitleWrapper title={page.title} cmp={page.cmp} />
-  return page
+const FastSearchForm = (props: { autofocus: boolean, onSearch: (q: string) => void }) => {
+  const [ query, setQuery ] = React.useState('')
+  const [ error, setError ] = React.useState(false)
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (query.trim() === '') {
+      setError(true)
+    } else {
+      props.onSearch(query)
+      location.href = '#/search'
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextField label='Поиск' fullWidth value={query} autoFocus={props.autofocus}
+        onChange={e => setQuery(e.target.value)} error={error}
+      />
+    </form>
+  )
+}
+
+const App = withRouter(props => {
+  const [ searchQuery, search ] = React.useState('')
+  return (
+    <div>
+      <Center className='header'>
+        <div className='header-top'>
+          <Link to='/' title='На главную'><img src={logo} className='logo' /></Link>
+          {props.location.pathname !== '/search' &&
+            <FastSearchForm
+              autofocus={props.location.pathname === '/'}
+              onSearch={q => search(q)} />
+          }
+        </div>
+        <div className="header-bottom">
+          {pages.filter(page => page.url !== '/search').map(page =>
+            props.location.pathname === page.url ?
+              <div className='header-link active'><Typography>{page.title}</Typography></div>
+            :
+              <Link className='header-link clickable' key={page.url} to={page.url}><Typography>{page.title}</Typography></Link>
+          )}
+        </div>
+      </Center>
+      {pages.map(page =>
+        <Route path={page.url} key={page.url} exact>
+          <TitleSetter title={page.title} />
+          {page.url === '/search' ? <Search query={searchQuery} /> : <page.cmp />}
+        </Route>
+      )}
+    </div>
+  )
 })
-
-
-const App = withRouter(props => (
-  <div>
-    <Center className='header'>
-      <Link to='/' title='На главную'><img src={logo} className='logo' /></Link>
-      <Tabs indicatorColor="primary" textColor="primary"
-        value={props.location.pathname} onChange={(_: any, url: string) => location.href = '#' + url}
-      >
-        {pages.map(page =>
-          <Tab key={page.url} value={page.url} label={page.title} />
-        )}
-      </Tabs>
-    </Center>
-    {pages.map(page =>
-      <Route path={page.url} key={page.url} exact>
-        {page.cmp}
-      </Route>
-    )}
-  </div>
-))
 
 export default () => (
   <SnackbarProvider><Router><App /></Router></SnackbarProvider>
