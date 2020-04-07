@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import F, Q
 from django.conf import settings
 
+import re
 import time
 import yadisk
 import os.path
@@ -89,7 +90,7 @@ class Memes(models.Model):
     def save(self, *args, **kwargs):
         if self.image != '':
             # Разметка мема (текст)
-            self.textDescription = getTextFromImage(self.image)
+            self.textDescription = re.sub("[^а-яa-z0-9 ]+", "", " ".join(getTextFromImage(self.image)).lower())
 
             # Сохранение мема на яндекс.диск
             y = settings.Y

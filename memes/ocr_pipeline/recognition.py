@@ -4,6 +4,7 @@ from . import imgproc
 import numpy as np
 import pytesseract
 import torch
+import os.path
 
 from .craft import CRAFT
 from collections import OrderedDict
