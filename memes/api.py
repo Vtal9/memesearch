@@ -17,6 +17,13 @@ class MemesViewSet(viewsets.ModelViewSet):
         # print(queryset[0].id)
         return queryset
 
+    def patch(self, request, pk):
+        queryset = Memes.objects.get(pk=pk)
+        queryset.textDescription += " " + request.textDescription
+        queryset.imageDescription += " " + request.imageDescription
+        super(Memes, queryset).save(update_fields=['textDescription, imageDescription'])
+
+
 
 class UnMarkedMemesViewSet(viewsets.ModelViewSet):
     queryset = Memes.objects.filter(textDescription="").order_by('?')[0:1]
@@ -36,6 +43,9 @@ class MarkedMemesViewSet(viewsets.ModelViewSet):
 
 class NewURLMemesViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
 
     def get_queryset(self):
         y = settings.Y
@@ -43,9 +53,7 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 
         if id_meme is not None:
             queryset = Memes.objects.get(pk=id_meme)
-            permission_classes = [
-                permissions.AllowAny
-            ]
+            
             queryset.url = yadisk.functions.resources.get_download_link(y.get_session(), queryset.fileName)
             super(Memes, queryset).save(update_fields=['url'])
 
