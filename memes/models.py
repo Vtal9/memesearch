@@ -6,7 +6,7 @@ import re
 import time
 import yadisk
 import os.path
-from .ocr_pipeline.recognition import getTextFromImage
+# from .ocr_pipeline.recognition import getTextFromImage
 
 from importlib.machinery import SourceFileLoader
 
@@ -90,7 +90,7 @@ class Memes(models.Model):
     def save(self, *args, **kwargs):
         if self.image != '':
             # Разметка мема (текст)
-            self.textDescription = re.sub("[^а-яa-z0-9 ]+", "", " ".join(getTextFromImage(self.image)).lower())
+            # self.textDescription = re.sub("[^а-яa-z0-9 ]+", "", " ".join(getTextFromImage(self.image)).lower())
 
             # Сохранение мема на яндекс.диск
             y = settings.Y

@@ -8,5 +8,5 @@ from django.urls import path
 
 urlpatterns = [
     path('api/search/', SearchAPI.as_view()),
-    path('api/Text/', TextDescriptionsViewSet),
+    path('api/Text/', TextDescriptionsViewSet.as_view({'get':'list'})),
 ]
