@@ -106,11 +106,10 @@ def getTextFromImage(img_path):
     '''
     # Loading the net
     net = CRAFT()
-    net.load_state_dict(copyStateDict(torch.load("craft_mlt_25k.pth", map_location='cpu')))
+    net.load_state_dict(copyStateDict(torch.load("memes\ocr_pipeline\craft_mlt_25k.pth", map_location='cpu')))
     net.eval()
 
-    # Get list of images
-    image_list = list_images(folder)
+    # Loading image and infering net
     image = imgproc.loadImage(img_path)
     bboxes, polys, score_text = netForward(net, image)
     polys = craft_utils.postProcess(polys, image.shape)
