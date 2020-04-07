@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Q
 from django.conf import settings
 
 import time
@@ -43,13 +43,13 @@ misc = \
 
 def update_index_in_db(text, descr, new_index_text, new_index_descr):
     stext = simplifier.simplify_string(text)
-    sdescr = simplifier.simplyfy_string(descr)
+    sdescr = simplifier.simplify_string(descr)
 
     text_words = stext.split(' ')
     descr_words = sdescr.split(' ')
 
     text_index = indexer_models.TextDescriptions.objects.filter(Q(word__in=text_words))
-    descr_index = indexer_models.ImageDesciptions.objects.filter(Q(word__in=descr_words))
+    descr_index = indexer_models.ImageDescriptions.objects.filter(Q(word__in=descr_words))
 
     updated_text_words = []
     if not (text_index is None):  # otherwise no need to update
@@ -101,7 +101,7 @@ class Memes(models.Model):
             self.image = None
 
         # Построение нового индекса по добавленному мему
-        meme_index = indexer.full_index(info.MemeInfo(self.id, self.textDescription, self.imageDescription))
+        meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
 
         super(Memes, self).save(*args, **kwargs)
