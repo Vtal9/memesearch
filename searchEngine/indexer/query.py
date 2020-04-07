@@ -95,7 +95,10 @@ def make_query_text_part(text):
     words = stext.split(' ')
     words_set = set(words)
     for word in words_set:  # optimisation
-        word_text_index.update(db_result(word, is_descr=False))
+        try:
+            word_text_index.update(db_result(word, is_descr=False))
+        except:
+            return None
 
     if len(word_text_index) == 0:
         return None
@@ -119,10 +122,14 @@ def make_query_descr_part(descr):
     sdescr = simplifier.simplify_string(descr)
     words = sdescr.split(' ')
     print("descr=", descr)
-    common_urls = db_result(words[0], is_descr=True)[words[0]]
-    if len(words) > 1:
-        for word in words:
-            common_urls.intersection(db_result(word, is_descr=True)[word])
+
+    try:
+        common_urls = db_result(words[0], is_descr=True)[words[0]]
+        if len(words) > 1:
+            for word in words:
+                common_urls.intersection(db_result(word, is_descr=True)[word])
+    except:
+        common_urls = set()
 
     return common_urls
 
