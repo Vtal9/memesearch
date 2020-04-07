@@ -4,6 +4,7 @@ from django.conf import settings
 
 import time
 import yadisk
+import os.path
 from .ocr_pipeline.recognition import getTextFromImage
 
 from importlib.machinery import SourceFileLoader
@@ -86,11 +87,10 @@ class Memes(models.Model):
         pass
 
     def save(self, *args, **kwargs):
-        # Построение нового индекса по добавленному мему
-        meme_index = indexer.full_index(info.MemeInfo(self.id, self.textDescription, self.imageDescription))
-        update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
-
         if self.image != '':
+            # Разметка мема (текст)
+            self.textDescription = getTextFromImage(self.image)
+
             # Сохранение мема на яндекс.диск
             y = settings.Y
             name = self.image.url.split(".")
@@ -98,11 +98,12 @@ class Memes(models.Model):
             y.upload(self.image, self.fileName)
             self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
 
-            # Разметка мема (текст)
-            self.textDescription = getTextFromImage(self.image)
-
             self.image = None
 
-            super(Memes, self).save(*args, **kwargs)
-            if (self.id % 100 == 0):
-                y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
+        # Построение нового индекса по добавленному мему
+        meme_index = indexer.full_index(info.MemeInfo(self.id, self.textDescription, self.imageDescription))
+        update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
+
+        super(Memes, self).save(*args, **kwargs)
+        if (self.id % 100 == 0):
+            y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
