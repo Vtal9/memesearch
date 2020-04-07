@@ -19,15 +19,11 @@ app.use(
   })
 );
 
-app.use('/api', proxy('localhost:8000', {
-  proxyReqPathResolver: req => '/api' + req.url
-}))
-app.use('/media', proxy('localhost:8000', {
-  proxyReqPathResolver: req => '/media' + req.url
-}))
-app.use('/emails', proxy('localhost:8000', {
-  proxyReqPathResolver: req => '/emails' + req.url
-}))
+['/api', '/media', '/emails', '/search', '/accounts'].forEach(path => {
+  app.use(path, proxy('localhost:8000', {
+    proxyReqPathResolver: req => path + req.url
+  }))
+})
 
 const server = app.listen(process.env.PORT || 3000, function() {
   const host = server.address().address;

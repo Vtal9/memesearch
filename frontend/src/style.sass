@@ -33,11 +33,28 @@ a
       width: 100%
       margin: 0 0 20px 0
 .logo
-  width: 150px
+  height: 45px
   display: block
-  margin-bottom: 10px
+  margin-right: 30px
 .header
-  padding: 20px 0
+  .header-top
+    display: flex
+    align-items: flex-end
+    margin: 20px 0
+    justify-content: space-between
+    form
+      width: 100%
+  .header-bottom
+    display: flex
+    margin-bottom: 20px
+  .header-link
+    padding: 10px 15px
+    &.active
+      background: #dddddd
+    &.clickable
+      text-decoration: none
+      &:hover
+        opacity: .7
 .file-picker
   display: flex
   flex-direction: column
@@ -85,3 +102,9 @@ a
 .refresh
   position: relative
   top: -20px
+.gallery
+  margin-top: 20px
+  .gallery-item
+    margin: 0 20px 20px 0
+  img.gallery-item
+    height: 200px

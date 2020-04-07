@@ -11,6 +11,11 @@ declare namespace Types {
     resolved: boolean
     short?: boolean
   }
+
+  interface User {
+    id: number
+    username: string
+  }
 }
 
 export default Types
