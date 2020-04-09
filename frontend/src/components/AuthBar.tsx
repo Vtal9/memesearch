@@ -44,7 +44,6 @@ function LoginWindow(props: LoginWindowProps) {
   function loginSuccess(id: number, username: string, token: string) {
     props.handleUser({ id, username })
     Funcs.setToken(token)
-    setLoading(false)
     props.closeMe()
   }
 
@@ -66,31 +65,29 @@ function LoginWindow(props: LoginWindowProps) {
         const { id, username } = response.data.user
         loginSuccess(id, username, response.data.token)
       }).catch(error => {
-        setLoading(false)
         setError('Неправильный логин или пароль')
+        setLoading(false)
+        return
       })
       break
     case 'register':
-      setLoading(true)
       if (!email.match(EMAIL_REGEX)) {
         setError('Введите корректный email')
         return
       }
-      if (username.length < 4) {
-        setError('Логин должен иметь хотя бы 4 символа')
-        return
-      }
-      if (password.length < 6) {
-        setError('Пароль должен иметь хотя бы 6 символов')
+      if (username.trim().length < 2) {
+        setError('Логин должен иметь хотя бы 2 символа')
         return
       }
       if (password !== password2) {
         setError('Пароли не совпадают')
         return
       }
+      setLoading(true)
       Axios.post('accounts/api/auth/register', { username, password, email }).then(response => {
         const { id, username } = response.data.user
         loginSuccess(id, username, response.data.token)
+        setLoading(false)
       }).catch(error => {
         if (error.response && error.response.data && error.response.data.username) {
           setError('Этот логин уже занят')

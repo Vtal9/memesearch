@@ -112,10 +112,16 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     super(props)
     this.state = {
       items: [],
-      authState: { status: 'unknown' },
+      authState: props.authStore.getState(),
       toOwnRepo: 0
     }
     props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
+  }
+
+  componentDidUpdate(_: any, prevState: UploadState) {
+    if (prevState.authState.status === "yes" && this.state.authState.status !== "yes") {
+      this.setState({ toOwnRepo: 0 })
+    }
   }
 
   handleFiles(files: Array<File>) {
@@ -133,13 +139,16 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
       formdata.append('image', file)
       formdata.append("textDescription", "")
       formdata.append("imageDescription", "")
-      const headers = this.state.toOwnRepo && this.state.authState.status === 'yes' ? {
+
+      const headers = this.state.toOwnRepo ? {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Token ${Funcs.getToken()}`
       } : {
         'Content-Type': 'multipart/form-data'
       }
-      Axios.post('api/memes/', formdata, {
+      //const url = this.state.toOwnRepo ? 'api/memes/' : 'api/memes/own/'
+      const url = 'api/memes/'
+      Axios.post(url, formdata, {
         headers
       }).then(function(response) {
         Funcs.loadImage(response.data.id, response.data.url, image => {
@@ -171,6 +180,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
 
   render() {
     const { items } = this.state
+    console.log(this.state.authState.status)
     return (
       <Center>
         {items.map((item, index) =>

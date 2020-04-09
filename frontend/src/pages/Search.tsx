@@ -48,6 +48,12 @@ class Search extends React.Component<SearchProps, SearchState> {
     props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
   }
 
+  componentDidUpdate(_: any, prevState: SearchState) {
+    if (prevState.authState.status === "yes" && this.state.authState.status !== "yes") {
+      this.setState({ self: false })
+    }
+  }
+
   performSearch(e: FormEvent | null = null) {
     console.log('test')
     if (e) {
