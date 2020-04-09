@@ -48,7 +48,7 @@ class SearchAPI(generics.GenericAPIView):
 
         # получаем список из URL
         # ([urls],"error")
-        if query_text == query_image: # не расширенный поиск, тогда объединяем
+        if query_text == query_image:  # не расширенный поиск, тогда объединяем
             res1 = query.make_query(text_phrase=query_text,
                                     descr_words="")
             res2 = query.make_query(text_phrase="",
@@ -57,7 +57,6 @@ class SearchAPI(generics.GenericAPIView):
         else:
             result = query.make_query(text_phrase=query_text,
                                       descr_words=query_image)
-
 
         # записываем их в  response
         if result[1] == "":
@@ -84,17 +83,24 @@ class ImageDescriptionsViewSet(viewsets.ModelViewSet):
 
 
 class OwnMemesViewSet(viewsets.ModelViewSet):
-    queryset = ImageDescriptions.objects.all()
     permission_classes = [
         permissions.IsAuthenticated
     ]
     serializer_class = ImagesSerializer
 
     def get_queryset(self):
-        return self.request.user.images.all()
+        return self.request.user.ownImages.all()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class MemesViewSet(viewsets.ModelViewSet):
+    queryset = Images.objects.all()
+    permission_classes = [
+        permissions.AllowAny
+    ]
+    serializer_class = ImagesSerializer
 
 
 class SearchOwnMemesAPI(generics.GenericAPIView):
@@ -129,7 +135,9 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         # ([urls],"error")
         result = query.make_query(text_phrase=query_text,
                                   descr_words=query_image)
-        queryset = request.user.images.filter(Q(id__in=result[0]))
+        queryset = request.user.ownImages.filter(Q(id__in=result[0]))
+        print(Images.objects.all())
+        print(request.user.ownImages)
         # записываем их в  response
         if result[1] == "":
             response = JsonResponse([{'url': i.image} for i in queryset], safe=False)

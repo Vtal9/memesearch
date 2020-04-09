@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import F, Q
 from django.conf import settings
+from django.contrib.auth.models import User
+
 
 import re
 import time
@@ -83,6 +85,8 @@ class Memes(models.Model):
     url = models.URLField(blank=True, null=True, max_length=500)
     textDescription = models.TextField(blank=True, null=True)
     imageDescription = models.TextField(blank=True, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="ownImages")
+
 
     def delete(self):
         pass
@@ -106,5 +110,5 @@ class Memes(models.Model):
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
 
         super(Memes, self).save(*args, **kwargs)
-        if (self.id % 100 == 0):
+        if self.id % 100 == 0:
             y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
