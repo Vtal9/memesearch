@@ -31,9 +31,9 @@ class MemesViewSet(viewsets.ModelViewSet):
         ]
         return queryset
 
-    def perform_create(self, serializer):
-        if self.request.user.is_authenticated:
-            serializer.save(owner=self.request.user)
+    # def perform_create(self, serializer):
+    #     if self.request.user.is_authenticated:
+    #         serializer.save(owner=self.request.user)
 
     def patch(self, request, pk):
         print("patch")

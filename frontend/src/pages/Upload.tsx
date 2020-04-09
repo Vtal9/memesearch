@@ -146,8 +146,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
       } : {
         'Content-Type': 'multipart/form-data'
       }
-      //const url = this.state.toOwnRepo ? 'api/memes/' : 'api/memes/own/'
-      const url = 'api/memes/'
+      const url = this.state.toOwnRepo ? 'api/memes/own/' : 'api/memes/'
       Axios.post(url, formdata, {
         headers
       }).then(function(response) {
