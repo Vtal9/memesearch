@@ -138,7 +138,7 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         queryset = request.user.ownImages.filter(Q(id__in=result[0]))
         # записываем их в  response
         if result[1] == "":
-            response = JsonResponse([{'url': i.url} for i in queryset], safe=False)
+            response = JsonResponse([{'id': i.id} for i in queryset], safe=False)
         else:
             response = HttpResponse(result[1])
 
