@@ -64,7 +64,7 @@ const App = withRouter(props => {
         <div className='header-top'>
           <Link to='/search' title='На главную'><img src={logo} className='logo' /></Link>
           {props.location.pathname !== '/search' &&
-            <FastSearchForm
+            <FastSearchForm 
               onSearch={q => search(q)} />
           }
           <div style={{ justifySelf: 'flex-end' }}>
