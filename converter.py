@@ -13,9 +13,9 @@ from searchEngine.models import Images, TextDescriptions, ImageDescriptions
 def convert():
     marked_up_memes = Memes.objects.exclude(textDescription="")
     infos = []
-    # Images.objects.all().delete()
-    # ImageDescriptions.objects.all().delete()
-    # TextDescriptions.objects.all().delete()
+    Images.objects.all().delete()
+    ImageDescriptions.objects.all().delete()
+    TextDescriptions.objects.all().delete()
     for meme in marked_up_memes:
         image = Images(id=meme.id)
         image.save()

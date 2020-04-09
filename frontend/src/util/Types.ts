@@ -16,6 +16,11 @@ declare namespace Types {
     id: number
     username: string
   }
+
+  interface AuthState {
+    status: 'unknown' | 'no' | 'yes'
+    user?: User
+  }
 }
 
 export default Types

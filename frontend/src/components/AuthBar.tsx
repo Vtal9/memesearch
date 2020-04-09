@@ -2,14 +2,33 @@ import React, { FormEvent } from 'react'
 import Axios from 'axios'
 import Funcs from '../util/Funcs';
 import Types from '../util/Types';
-import { Typography, Button, Dialog, DialogContent, Grid, TextField, Icon, Menu, MenuItem, ClickAwayListener, MenuList, Popper, Popover } from '@material-ui/core';
+import { Typography, Button, Dialog, DialogContent, Grid, TextField, Icon, MenuItem, MenuList, Popover } from '@material-ui/core'
+import { Store } from 'redux';
 
 
 const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
+interface AuthAction {
+  type: 'login' | 'logout'
+  user?: Types.User
+}
+
+type AuthStore = Store<Types.AuthState, AuthAction>
+
+export function authState(state: Types.AuthState = { status: 'unknown' }, action: AuthAction): Types.AuthState {
+  switch (action.type) {
+  case 'login':
+    return { status: 'yes', user: action.user }
+  case 'logout':
+    return { status: 'no' }
+  default:
+    return state
+  }
+}
+
 interface LoginWindowProps {
-  dialog: 'none' | 'login' | 'register',
-  closeMe: Function,
+  dialog: 'none' | 'login' | 'register'
+  closeMe: Function
   openRegister: Function
   handleUser: (u: Types.User) => void
 }
@@ -24,7 +43,7 @@ function LoginWindow(props: LoginWindowProps) {
 
   function loginSuccess(id: number, username: string, token: string) {
     props.handleUser({ id, username })
-    Funcs.setAuth(token)
+    Funcs.setToken(token)
     setLoading(false)
     props.closeMe()
   }
@@ -52,6 +71,7 @@ function LoginWindow(props: LoginWindowProps) {
       })
       break
     case 'register':
+      setLoading(true)
       if (!email.match(EMAIL_REGEX)) {
         setError('Введите корректный email')
         return
@@ -72,8 +92,12 @@ function LoginWindow(props: LoginWindowProps) {
         const { id, username } = response.data.user
         loginSuccess(id, username, response.data.token)
       }).catch(error => {
+        if (error.response && error.response.data && error.response.data.username) {
+          setError('Этот логин уже занят')
+        } else {
+          setError('Нет интернета')
+        }
         setLoading(false)
-        setError('Нет интернета')
       })
       break
     }
@@ -106,7 +130,9 @@ function LoginWindow(props: LoginWindowProps) {
             }
             {props.dialog === 'login' &&
               <Grid item xs={4}>
-                <Button color='primary' variant='contained' disabled={loading} fullWidth type='submit'>Войти</Button>
+                <Button color='primary' variant='contained' disabled={loading} fullWidth type='submit'>
+                  {loading ? 'Загрузка...' : 'Войти'}
+                </Button>
               </Grid>
             }
             {props.dialog === 'login' &&
@@ -116,7 +142,9 @@ function LoginWindow(props: LoginWindowProps) {
             }
             {props.dialog === 'register' &&
               <Grid item xs={12}>
-                <Button color='primary' variant='contained' disabled={loading} fullWidth type='submit'>Создать аккаунт</Button>
+                <Button color='primary' variant='contained' disabled={loading} fullWidth type='submit'>
+                {loading ? 'Загрузка...' : 'Создать аккаунт'}
+                </Button>
               </Grid>
             }
             {error !== null &&
@@ -133,37 +161,44 @@ function LoginWindow(props: LoginWindowProps) {
 
 
 interface AuthState {
-  status: 'loading' | 'done'
-  u: Types.User | null
+  authState: Types.AuthState
   dialog: 'none' | 'login' | 'register'
   userMenuAnchor: HTMLElement | null
 }
 
-export default class AuthBar extends React.Component<{}, AuthState> {
-  constructor() {
-    super({})
+interface AuthProps {
+  store: AuthStore
+}
+
+export default class AuthBar extends React.Component<AuthProps, AuthState> {
+  constructor(props: AuthProps) {
+    super(props)
     this.state = {
-      status: 'loading',
-      u: null,
+      authState: props.store.getState(),
       dialog: 'none',
       userMenuAnchor: null
     }
+    props.store.subscribe(() => this.setState({ authState: props.store.getState() }))
   }
 
   setDone(u: Types.User | null) {
-    this.setState({ status: 'done', u })
+    if (u !== null) {
+      this.props.store.dispatch({ type: 'login', user: u })
+    } else {
+      this.props.store.dispatch({ type: 'logout' })
+    }
   }
 
   componentDidMount() {
-    Funcs.checkAuth((u: Types.User) => this.setDone(u), () => this.setDone(null))
+    Funcs.checkToken((u: Types.User) => this.setDone(u), () => this.setDone(null))
   }
 
   render() {
     return (
-      this.state.status === 'loading' ?
+      this.state.authState.status === 'unknown' ?
         <Typography>...</Typography>
       :
-        this.state.u === null ?
+        this.state.authState.user === undefined ?
           <div>
             <Button color='primary' onClick={() => this.setState({ dialog: 'login' })}>Войти</Button>
             <LoginWindow dialog={this.state.dialog}
@@ -175,14 +210,16 @@ export default class AuthBar extends React.Component<{}, AuthState> {
           <div>
             <Button color='primary' startIcon={<Icon>account_circle</Icon>}
               onClick={e => this.setState({ userMenuAnchor: e.currentTarget })}
-            >{this.state.u.username}</Button>
+            >{this.state.authState.user.username}</Button>
             <Popover open={this.state.userMenuAnchor !== null} anchorEl={this.state.userMenuAnchor}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              onClose={() => this.setState({ userMenuAnchor: null })}
             >
               <MenuList>
                 <MenuItem onClick={() => {
-                  Funcs.unsetAuth()
-                  this.setState({ u: null, userMenuAnchor: null })
+                  Funcs.unsetToken()
+                  this.setDone(null)
+                  this.setState({ userMenuAnchor: null })
                 }}>Выйти</MenuItem>
               </MenuList>
             </Popover>

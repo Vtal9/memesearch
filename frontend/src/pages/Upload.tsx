@@ -1,12 +1,14 @@
 import React from 'react'
 import Axios from 'axios'
 import { useDropzone } from 'react-dropzone';
-import { Typography, ButtonBase, CircularProgress, Button, Card } from '@material-ui/core'
+import { Typography, ButtonBase, CircularProgress, Button, Card, Select, MenuItem } from '@material-ui/core'
 import Center from '../layout/Center'
 import Form from '../components/Form'
 import Icon from '@material-ui/core/Icon'
 import Funcs from '../util/Funcs';
 import Gluejar from '../components/Gluejar'
+import { Store } from 'redux';
+import Types from '../util/Types';
 
 
 export interface FileGetterProps {
@@ -25,7 +27,7 @@ function FileGetter(props: FileGetterProps) {
   })
 
   return (
-    <ButtonBase {...getRootProps()} style={{ width: '100%', marginBottom: 30 }}>
+    <ButtonBase {...getRootProps()} style={{ width: '100%' }}>
       <div className={isDragActive ? 'file-picker over' : 'file-picker'}>
         <input {...getInputProps()} />
         <Icon fontSize='large'>cloud_upload</Icon>
@@ -97,14 +99,23 @@ class UploadItem {
 
 interface UploadState {
   items: Array<UploadItem>
+  authState: Types.AuthState
+  toOwnRepo: 1 | 0
 }
 
-export default class Upload extends React.Component<{}, UploadState> {
-  constructor(props: {}) {
+interface UploadProps {
+  authStore: Store<Types.AuthState>
+}
+
+export default class Upload extends React.Component<UploadProps, UploadState> {
+  constructor(props: UploadProps) {
     super(props)
     this.state = {
-      items: []
+      items: [],
+      authState: { status: 'unknown' },
+      toOwnRepo: 0
     }
+    props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
   }
 
   handleFiles(files: Array<File>) {
@@ -122,10 +133,14 @@ export default class Upload extends React.Component<{}, UploadState> {
       formdata.append('image', file)
       formdata.append("textDescription", "")
       formdata.append("imageDescription", "")
+      const headers = this.state.toOwnRepo && this.state.authState.status === 'yes' ? {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Token ${Funcs.getToken()}`
+      } : {
+        'Content-Type': 'multipart/form-data'
+      }
       Axios.post('api/memes/', formdata, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+        headers
       }).then(function(response) {
         Funcs.loadImage(response.data.id, response.data.url, image => {
           new_items[initial_length + index].setContent(response.data.id, image)
@@ -191,6 +206,21 @@ export default class Upload extends React.Component<{}, UploadState> {
           ) : null
         )}
         <FileGetter handleFiles={(files: Array<File>) => this.handleFiles(files)} />
+        {this.state.authState.status === 'yes' &&
+          <div>
+            <div className='spacing' />
+            <Typography>Мемы буду загружаться</Typography>
+            <Select
+              value={this.state.toOwnRepo}
+              onChange={e => this.setState({ toOwnRepo: e.target.value as 0 | 1 })}
+            >
+              <MenuItem value={0}>в общее хранилище</MenuItem>
+              <MenuItem value={1}>в личное хранилище</MenuItem>
+            </Select>
+          </div>
+        }
+        <div className='spacing' />
+        <div className='spacing' />
       </Center>
     )
   }

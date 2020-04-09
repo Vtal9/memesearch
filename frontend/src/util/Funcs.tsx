@@ -62,8 +62,12 @@ export default {
     img.src = src
   },
 
-  checkAuth(success: (u: Types.User) => void, failure: () => void) {
-    const token = localStorage.getItem(TOKEN_KEY)
+  getToken() {
+    return localStorage.getItem(TOKEN_KEY)
+  },
+
+  checkToken(success: (u: Types.User) => void, failure: () => void) {
+    const token = this.getToken()
     Axios.get('accounts/api/auth/user', {
       headers: {
         Authorization: `Token ${token}`
@@ -74,11 +78,11 @@ export default {
     })).catch(failure)
   },
 
-  setAuth(token: string) {
+  setToken(token: string) {
     localStorage.setItem(TOKEN_KEY, token)
   },
 
-  unsetAuth() {
+  unsetToken() {
     localStorage.removeItem(TOKEN_KEY)
   }
 }

@@ -7,9 +7,12 @@ import { withSnackbar, WithSnackbarProps } from 'notistack';
 import Types from '../util/Types';
 import BigFont from '../layout/BigFont';
 import FlexCenter from '../layout/FlexCenter';
+import { Store } from 'redux';
+import { authState } from '../components/AuthBar';
 
 
 export interface SearchProps extends React.Attributes, WithSnackbarProps {
+  authStore: Store<Types.AuthState>
   query: string
 }
 
@@ -25,6 +28,8 @@ interface SearchState {
   extended: boolean
   state: 'initial' | 'loading' | 'done'
   results: OnlyMeme[]
+  authState: Types.AuthState
+  self: boolean
 }
 
 class Search extends React.Component<SearchProps, SearchState> {
@@ -36,8 +41,11 @@ class Search extends React.Component<SearchProps, SearchState> {
       textQuery: '',
       extended: false,
       state: 'initial',
-      results: []
+      results: [],
+      self: false,
+      authState: props.authStore.getState()
     }
+    props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
   }
 
   performSearch(e: FormEvent | null = null) {
@@ -52,7 +60,13 @@ class Search extends React.Component<SearchProps, SearchState> {
     }
     this.setState({ state: 'loading' })
     const self = this
-    Axios.get(`search/api/search/?qText=${encodeURIComponent(qText)}&qImage=${encodeURIComponent(qImage)}`).then(function(response) {
+    const headers = this.state.self ? {
+      Authorization: `Token ${Funcs.getToken()}`
+    } : {}
+    const api = this.state.self ? 'search/api/search/own' : 'search/api/search'
+    Axios.get(`${api}/?qText=${encodeURIComponent(qText)}&qImage=${encodeURIComponent(qImage)}`, {
+      headers
+    }).then(function(response) {
       self.setState({
         state: 'done',
         results: response.data.map((item: any) => {
@@ -108,10 +122,10 @@ class Search extends React.Component<SearchProps, SearchState> {
                 </Grid>
               :
                 <TextField value={this.state.query} onChange={e => this.setState({ query: e.target.value })}
-                  fullWidth />
+                  fullWidth autoFocus label='Какой мем ищете?' />
               }
               <FormControlLabel control={
-                <Switch checked={this.state.extended}
+                <Switch checked={this.state.extended} color='primary'
                   onChange={e => {
                     const checked = e.target.checked
                     if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
@@ -121,6 +135,20 @@ class Search extends React.Component<SearchProps, SearchState> {
                   }} />
               } label={
                 <Typography color={this.state.extended ? 'textPrimary' : 'textSecondary'}>Расширенный поиск</Typography>
+              } />
+              <FormControlLabel control={
+                <Switch checked={this.state.self} color='primary'
+                  onChange={e => {
+                    const checked = e.target.checked
+                    if (checked && this.state.authState.status !== 'yes') {
+                      this.props.enqueueSnackbar('Это опция доступна только при наличии аккаунта. ' +
+                      'Войдите, и вы сможете искать по своим мемам')
+                    } else {
+                      this.setState({ self: checked })
+                    }
+                  }} />
+              } label={
+                <Typography color={this.state.self ? 'textPrimary' : "textSecondary"}>Поиск по личной коллекции</Typography>
               } />
             </Grid>
             <Grid item>

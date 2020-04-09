@@ -26,7 +26,7 @@ class MemesViewSet(viewsets.ModelViewSet):
 
 
 class UnMarkedMemesViewSet(viewsets.ModelViewSet):
-    queryset = Memes.objects.filter(textDescription="").order_by('?')[0:1]
+    queryset = Memes.objects.filter(textDescription="", imageDescription="").order_by('?')[0:1]
     permission_classes = [
         permissions.AllowAny
     ]
@@ -34,7 +34,7 @@ class UnMarkedMemesViewSet(viewsets.ModelViewSet):
 
 
 class MarkedMemesViewSet(viewsets.ModelViewSet):
-    queryset = Memes.objects.exclude(textDescription="")
+    queryset = Memes.objects.exclude(textDescription="", imageDescription="")
     permission_classes = [
         permissions.AllowAny
     ]
