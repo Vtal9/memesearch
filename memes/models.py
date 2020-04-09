@@ -3,7 +3,6 @@ from django.db.models import F, Q
 from django.conf import settings
 from django.contrib.auth.models import User
 
-
 import re
 import time
 import yadisk
@@ -86,7 +85,6 @@ class Memes(models.Model):
     textDescription = models.TextField(blank=True, null=True)
     imageDescription = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="ownImages")
-
 
     def delete(self):
         pass

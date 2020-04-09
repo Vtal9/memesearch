@@ -9,5 +9,5 @@ router.register('api/memes', MemesViewSet, 'memes')
 router.register('api/unmarkedmemes', UnMarkedMemesViewSet, 'unmarkedmemes')
 router.register('api/markedmemes', MarkedMemesViewSet, 'markedmemes')
 router.register('api/new_meme_url', NewURLMemesViewSet, 'newurl')
-router.register('api/memes/own', OwnMemesViewSet, 'ownMemes')
+router.register('api/memes/own/', OwnMemesViewSet, 'ownMemes')
 urlpatterns = router.urls
