@@ -189,13 +189,13 @@ export default class Home extends React.Component<HomeProps, HomeState> {
               <Link to='upload'>Закинуть</Link> нам пачку своих мемов
             </C>
             <C>
-              <Link to='markup'>Разметить</Link> имеющиеся у нас мемы
+              <Link to='markup'>Разметить</Link> уже имеющиеся у нас мемы
             </C>
             <C>
               <a href='#' onClick={e => {
                 e.preventDefault()
                 this.setState({ donateOpen: true })
-              }}>Задонатить</a> нам на индуса, который будет размечать мемы за вас
+              }}>Задонатить</a> нам на индуса (скорость разработки &times;2)
             </C>
             <C>
               <a href={google_form} target='_blank'>Сообщить</a> нам любые свои идеи на этот счёт
@@ -207,9 +207,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
             alignItems: 'center'
           }}>
             <Typography>
-              Если хотите первыми получать доступ ко всем крупным обновлениям и новым фичам,
-              можете записаться в команду тестировки
-              (вскоре мы скинем вам ссылочку на закрытую для остальных раннюю версию поисковика):
+              Если вы хотите первыми получать доступ ко всем крупным обновлениям и новым фичам, можете записаться в команду тестирования:
             </Typography>
             <Subscription />
           </div>
