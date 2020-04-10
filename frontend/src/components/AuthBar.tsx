@@ -65,7 +65,11 @@ function LoginWindow(props: LoginWindowProps) {
         const { id, username } = response.data.user
         loginSuccess(id, username, response.data.token)
       }).catch(error => {
-        setError('Неправильный логин или пароль')
+        if (error.response && error.response.data) {
+          setError('Неправильный логин или пароль')
+        } else {
+          setError('Нет Интернета')
+        }
         setLoading(false)
         return
       })
@@ -107,12 +111,12 @@ function LoginWindow(props: LoginWindowProps) {
           <Grid container spacing={2}>
             {props.dialog === 'register' &&
               <Grid item xs={12}>
-                <TextField fullWidth label='Email' type='email'
+                <TextField fullWidth label='Email' type='email' autoFocus={props.dialog === 'register'}
                   value={email} onChange={e => setEmail(e.target.value)} />
               </Grid>
             }
             <Grid item xs={12}>
-              <TextField fullWidth label='Логин' autoFocus
+              <TextField fullWidth label='Логин' autoFocus={props.dialog === 'login'}
                 value={username} onChange={e => setUsername(e.target.value)} />
             </Grid>
             <Grid item xs={12}>
@@ -188,6 +192,10 @@ export default class AuthBar extends React.Component<AuthProps, AuthState> {
 
   componentDidMount() {
     Funcs.checkToken((u: Types.User) => this.setDone(u), () => this.setDone(null))
+  }
+
+  openRegister() {
+    this.setState(() => this.setState({ dialog: 'register' }))
   }
 
   render() {
