@@ -84,8 +84,7 @@ class OwnMemesAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         method = self.request.GET.get('method')
         id_meme = self.request.GET.get('id')
-        print(self.request.GET)
-        print("method", method)
+
         if method == "add":
             if self.request.user.is_authenticated:
                 print("add")
@@ -93,4 +92,22 @@ class OwnMemesAPI(generics.GenericAPIView):
         elif method == "remove":
             if self.request.user.is_authenticated:
                 self.request.user.ownImages.remove(id_meme)
+        return HttpResponse()
+
+
+class UpdateMemesAPI(generics.GenericAPIView):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def post(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            text_descr = self.request.GET.get('text')
+            image_descr = self.request.GET.get('image')
+            id_meme = self.request.GET.get('id')
+            meme = Memes.objects.get(pk=id_meme)
+            meme.textDescription += " " + text_descr
+            meme.imageDescription += " " + image_descr
+            meme.save(update_fields=['textDescription', 'imageDescription'])
         return HttpResponse()
