@@ -4,8 +4,8 @@ from ..models import ImageDescriptions
 from django.db.models import Q
 
 BIGRAM_WEIGHT = 3
-PHRASE_WEIGHT = 10
-DESCRIPTION_WEIGHT = 12
+PHRASE_WEIGHT = 30
+DESCRIPTION_WEIGHT = 14
 
 DB_INDEX_TEXT_SAMPLE = {'сапака': "{'url1': [0, 2], 'url2': [0, 2]}", 'ни': "{'url1': [1], 'url2': [1, 5]}",
                         'пака': "{'url1': [3], 'url2': [3]}", 'ана': "{'url1': [4], 'url2': [4]}",
@@ -121,15 +121,17 @@ def make_query_text_part(text):
 def make_query_descr_part(descr):
     sdescr = simplifier.simplify_string(descr)
     words = sdescr.split(' ')
-    print("descr=", descr)
 
-    try:
-        common_urls = db_result(words[0], is_descr=True)[words[0]]
-        if len(words) > 1:
-            for word in words:
+    common_urls = set()
+
+    for index, word in enumerate(words):
+        try:
+            if index == 0:
+                common_urls = db_result(words[0], is_descr=True)[word]
+            else:
                 common_urls.intersection(db_result(word, is_descr=True)[word])
-    except:
-        common_urls = set()
+        except:
+            pass
 
     return common_urls
 
@@ -156,6 +158,8 @@ def make_query(text_phrase="", descr_words=""):
             for url in common_urls_from_descr:
                 if url in urls_weight_from_text.keys():
                     urls_weight_from_text[url] += DESCRIPTION_WEIGHT
+                else:
+                    urls_weight_from_text[url] = DESCRIPTION_WEIGHT
 
         ranked_result = sorted(urls_weight_from_text, key=urls_weight_from_text.get, reverse=True)
         ranked_result = list(dict.fromkeys(ranked_result))  # delete duplicates

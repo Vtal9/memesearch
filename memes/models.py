@@ -6,41 +6,12 @@ from django.contrib.auth.models import User
 import re
 import time
 import yadisk
-import os.path
-# from .ocr_pipeline.recognition import getTextFromImage
 
-from importlib.machinery import SourceFileLoader
-
-# У всех разрабов этот код работает по-разному
-# Если сервер не запускается - закомментите код ниже *
 from searchEngine.indexer import indexer
 from searchEngine.indexer import info
 import searchEngine.models as indexer_models
 from searchEngine.indexer import simplifier
 from searchEngine.indexer import misc
-
-# * и раскомментите этот
-'''
-indexer = \
-    SourceFileLoader("module.name", "./searchEngine/indexer/indexer.py") \
-        .load_module()
-
-info = \
-    SourceFileLoader("module.name", "./searchEngine/indexer/info.py") \
-        .load_module()
-
-indexer_models = \
-    SourceFileLoader("module.name", "./searchEngine/models.py") \
-        .load_module()
-
-simplifier = \
-    SourceFileLoader("module.name", "./searchEngine/indexer/simplifier.py") \
-        .load_module()
-
-misc = \
-    SourceFileLoader("module.name", "./searchEngine/indexer/misc.py") \
-        .load_module()
-'''
 
 
 def update_index_in_db(text, descr, new_index_text, new_index_descr):
