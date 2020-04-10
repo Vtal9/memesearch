@@ -7,9 +7,14 @@ SIMPLIFIED_CHARACTERS = {'о': 'а', 'ё': 'и', 'е': 'и', 'з': 'с', 'ъ': '
 def simplify_string(ustr):
     pattern = re.compile(r'[\W_]+')
     result = str(ustr).lower()
-    result = pattern.sub(' ', result)
+    temp = pattern.sub(' ', result)
 
-    for ch in SIMPLIFIED_CHARACTERS:
-        result = result.replace(ch, SIMPLIFIED_CHARACTERS[ch])
+    words = temp.split(' ')
+    res_words = []
+    for word in words:
+        if len(word) > 3:
+            for ch in SIMPLIFIED_CHARACTERS:
+                word = word.replace(ch, SIMPLIFIED_CHARACTERS[ch])
+        res_words.append(word)
 
-    return result
+    return " ".join(res_words)
