@@ -109,5 +109,6 @@ class UpdateMemesAPI(generics.GenericAPIView):
             meme = Memes.objects.get(pk=id_meme)
             meme.textDescription += " " + text_descr
             meme.imageDescription += " " + image_descr
-            meme.save(update_fields=['textDescription', 'imageDescription'])
+            meme.is_mark_up_added = True
+            meme.save(update_fields=['textDescription', 'imageDescription', 'is_mark_up_added'])
         return HttpResponse()
