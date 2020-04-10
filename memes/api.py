@@ -1,6 +1,7 @@
 import yadisk
 from django.conf import settings
-from rest_framework import viewsets, permissions
+from django.http import HttpResponse
+from rest_framework import viewsets, permissions, generics
 
 from memes.models import Memes
 from .serializers import MemesSerializer
@@ -10,7 +11,7 @@ class OwnMemesViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
 
     def get_queryset(self):
-        queryset = Memes.objects.all()
+        queryset = self.request.user.ownImages.all()
         permission_classes = [
             permissions.AllowAny
         ]
@@ -18,7 +19,7 @@ class OwnMemesViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_authenticated:
-            serializer.save(owner=self.request.user)
+            self.request.user.ownImages.add(serializer.save().id)
 
 
 class MemesViewSet(viewsets.ModelViewSet):
@@ -30,7 +31,6 @@ class MemesViewSet(viewsets.ModelViewSet):
             permissions.AllowAny
         ]
         return queryset
-
 
     # def patch(self, request, pk):
     #     print("patch")
@@ -73,3 +73,24 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
             super(Memes, queryset).save(update_fields=['url'])
 
             return [queryset]
+
+
+class OwnMemesAPI(generics.GenericAPIView):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def post(self, request, *args, **kwargs):
+        method = self.request.GET.get('method')
+        id_meme = self.request.GET.get('id')
+        print(self.request.GET)
+        print("method", method)
+        if method == "add":
+            if self.request.user.is_authenticated:
+                print("add")
+                self.request.user.ownImages.add(id_meme)
+        elif method == "remove":
+            if self.request.user.is_authenticated:
+                self.request.user.ownImages.remove(id_meme)
+        return HttpResponse()

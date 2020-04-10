@@ -1,3 +1,4 @@
+from memes.models import Memes
 from .indexer.simplifier import simplify_string
 from .models import Images
 from .models import TextDescriptions
@@ -119,6 +120,8 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         query_image = self.request.GET.get('qImage')
         result = search(query_text, query_image)
         queryset = request.user.ownImages.filter(Q(id__in=result[0]))
+        print(request.user.ownImages)
+        print(Memes.objects.filter(imageDescription="моймем")[0].owner)
 
         # записываем их в  response
         if result[1] == "":
