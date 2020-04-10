@@ -113,7 +113,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     this.state = {
       items: [],
       authState: props.authStore.getState(),
-      toOwnRepo: 0
+      toOwnRepo: props.authStore.getState().status === 'yes' ? 1 : 0
     }
     props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
   }
@@ -121,6 +121,9 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
   componentDidUpdate(_: any, prevState: UploadState) {
     if (prevState.authState.status === "yes" && this.state.authState.status !== "yes") {
       this.setState({ toOwnRepo: 0 })
+    }
+    if (prevState.authState.status !== "yes" && this.state.authState.status === "yes") {
+      this.setState({ toOwnRepo: 1 })
     }
   }
 

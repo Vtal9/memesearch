@@ -16,14 +16,6 @@ const store = createStore(authState)
 
 const Main = () => <Redirect to='/search' />
 
-const pages = [
-  { url: '/', title: 'Главная', cmp: Main },
-  { url: '/about', title: 'О проекте', cmp: Home },
-  { url: '/upload', title: 'Загрузить', cmp: Upload },
-  { url: '/markup', title: 'Разметить', cmp: Markup },
-  { url: '/search', title: 'Поиск', cmp: Search }
-]
-
 const TitleSetter = (props: { title: string }) => {
   document.title = props.title + '. MemeSearch'
   return null
@@ -58,6 +50,16 @@ const FastSearchForm = (props: { onSearch: (q: string) => void }) => {
 
 const App = withRouter(props => {
   const [ searchQuery, search ] = React.useState('')
+  const [ authBar, setAuthBar ] = React.useState<AuthBar | null>(null)
+
+  const pages = [
+    { url: '/', title: 'Главная', cmp: <Main /> },
+    { url: '/search', title: 'Поиск', cmp: <Search query={searchQuery} authStore={store} /> },
+    { url: '/about', title: 'О проекте', cmp: <Home authStore={store} onRegisterClick={() => (authBar as AuthBar).openRegister()} /> },
+    { url: '/upload', title: 'Загрузить', cmp: <Upload authStore={store} /> },
+    { url: '/markup', title: 'Разметить', cmp: <Markup /> }
+  ]
+
   return (
     <div>
       <Center className='header'>
@@ -68,13 +70,13 @@ const App = withRouter(props => {
               onSearch={q => search(q)} />
           }
           <div style={{ justifySelf: 'flex-end' }}>
-            <AuthBar store={store} />
+            <AuthBar store={store} ref={ref => setAuthBar(ref)} />
           </div>
         </div>
         <div className="header-bottom">
           {pages.filter(page => page.url !== '/').map(page =>
             props.location.pathname === page.url ?
-              <div className='header-link active'><Typography>{page.title}</Typography></div>
+              <div className='header-link active' key={page.url}><Typography>{page.title}</Typography></div>
             :
               <Link className='header-link clickable' key={page.url} to={page.url}><Typography>{page.title}</Typography></Link>
           )}
@@ -83,7 +85,7 @@ const App = withRouter(props => {
       {pages.map(page =>
         <Route path={page.url} key={page.url} exact>
           <TitleSetter title={page.title} />
-          {page.url === '/search' ? <Search query={searchQuery} authStore={store} /> : <page.cmp authStore={store} />}
+          {page.cmp}
         </Route>
       )}
     </div>
