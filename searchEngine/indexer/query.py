@@ -121,15 +121,17 @@ def make_query_text_part(text):
 def make_query_descr_part(descr):
     sdescr = simplifier.simplify_string(descr)
     words = sdescr.split(' ')
-    print("descr=", descr)
 
-    try:
-        common_urls = db_result(words[0], is_descr=True)[words[0]]
-        if len(words) > 1:
-            for word in words:
+    common_urls = set()
+
+    for index, word in enumerate(words):
+        try:
+            if index == 0:
+                common_urls = db_result(words[0], is_descr=True)[word]
+            else:
                 common_urls.intersection(db_result(word, is_descr=True)[word])
-    except:
-        common_urls = set()
+        except:
+            pass
 
     return common_urls
 
