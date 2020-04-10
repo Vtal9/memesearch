@@ -17,4 +17,4 @@ def simplify_string(ustr):
                 word = word.replace(ch, SIMPLIFIED_CHARACTERS[ch])
         res_words.append(word)
 
-    return " ".join(res_words).replace('ё', 'и').replace('й', 'и')
+    return " ".join(res_words).replace('ё', 'и').replace('й', 'и') # костылим
