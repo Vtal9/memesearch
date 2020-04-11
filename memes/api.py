@@ -2,6 +2,7 @@ import yadisk
 from django.conf import settings
 from django.http import HttpResponse
 from rest_framework import viewsets, permissions, generics
+from rest_framework.response import Response
 
 from memes.models import Memes
 from .serializers import MemesSerializer
@@ -87,7 +88,6 @@ class OwnMemesAPI(generics.GenericAPIView):
 
         if method == "add":
             if self.request.user.is_authenticated:
-                print("add")
                 self.request.user.ownImages.add(id_meme)
         elif method == "remove":
             if self.request.user.is_authenticated:
@@ -112,3 +112,16 @@ class UpdateMemesAPI(generics.GenericAPIView):
             meme.is_mark_up_added = True
             meme.save(update_fields=['textDescription', 'imageDescription', 'is_mark_up_added'])
         return HttpResponse()
+
+
+class AddTagToMemeAPI(generics.GenericAPIView):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
+
+    def post(self, request, *args, **kwargs):
+        id_meme = self.request.GET.get('id')
+        id_tag = self.request.GET.get('tag')
+        Memes.objects.get(pk=id_meme).tags.add(id_tag)
+        return Response("ok")

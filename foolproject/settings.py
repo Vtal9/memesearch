@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'searchEngine',
     'knox',
     'accounts',
+    'tags'
 ]
 
 MIDDLEWARE = [

@@ -14,6 +14,7 @@ from searchEngine.indexer import info
 import searchEngine.models as indexer_models
 from searchEngine.indexer import simplifier
 from searchEngine.indexer import misc
+from tags.models import Tags
 
 
 def update_index_in_db(text, descr, new_index_text, new_index_descr):
@@ -49,7 +50,6 @@ def update_index_in_db(text, descr, new_index_text, new_index_descr):
             indexer_models.ImageDescriptions.objects.create(word=dword, index=new_index_descr[dword])
 
 
-# Create your models here.
 class Memes(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     image = models.ImageField(blank=True, null=True)
@@ -58,8 +58,8 @@ class Memes(models.Model):
     textDescription = models.TextField(blank=True, null=True)
     imageDescription = models.TextField(blank=True, null=True)
     owner = models.ManyToManyField(User, related_name="ownImages", blank=True)
-    # owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="ownImages")
     is_mark_up_added = models.NullBooleanField()
+    tags = models.ManyToManyField(Tags, related_name="taggedMemes", blank=True)
 
     def delete(self, **kwargs):
         pass
