@@ -7,16 +7,11 @@ import Form from '../components/Form'
 import Icon from '@material-ui/core/Icon'
 import Funcs from '../util/Funcs';
 import Gluejar from '../components/Gluejar'
-import { Store } from 'redux';
-import Types from '../util/Types';
+import { Repo, AuthState } from '../util/Types';
 
 
-export interface FileGetterProps {
-  handleFiles: Function
-}
-
-function FileGetter(props: FileGetterProps) {
-  function handleFiles(files: Array<File>) {
+function FileGetter(props: { handleFiles: (files: File[]) => void }) {
+  function handleFiles(files: File[]) {
     if (!files || files.length === 0) return
     props.handleFiles(files)
   }
@@ -42,192 +37,193 @@ function FileGetter(props: FileGetterProps) {
   )
 }
 
-const EmptyForm = (props: React.PropsWithChildren<{}>) => (
+const EmptyForm: React.FC = (props) => (
   <Card className='meme-form extra'>{props.children}</Card>
 )
 
 class UploadItem {
-  private _file: File
-  get file() {
-    return this._file
-  }
-
-  private _id: number
-  get id() {
-    return this._id
-  }
-
-  private _img: HTMLImageElement
-  get img() {
-    return this._img
-  }
-
-  private _state: 'uploading' | 'uploaded' | 'done' | 'error' | 'none'
-  get state() {
-    return this._state
-  }
-
-  private _error_text: string
-  get error_text() {
-    return this._error_text
-  }
+  file: File
+  status:
+  | { readonly type: 'uploading' | 'done' | 'none' }
+  | { type: 'uploaded', img: HTMLImageElement, id: number }
+  | { type: 'error', text: string }
 
   constructor(file: File) {
-    this._file = file
-    this._state = 'uploading'
-  }
-
-  setContent(id: number, img: HTMLImageElement) {
-    this._state = 'uploaded'
-    this._img = img
-    this._id = id
+    this.file = file
+    this.status = { type: 'uploading' }
   }
 
   setError(text: string) {
-    this._state = 'error'
-    this._error_text = text
-  }
-
-  close() {
-    this._state = 'none'
-  }
-
-  done() {
-    this._state = 'done'
+    this.status = { type: 'error', text }
   }
 }
 
-interface UploadState {
-  items: Array<UploadItem>
-  authState: Types.AuthState
-  toOwnRepo: 1 | 0
+type UploadState = {
+  items: UploadItem[]
+  desiredDestination: Repo
 }
 
-interface UploadProps {
-  authStore: Store<Types.AuthState>
+type UploadProps = {
+  authState: AuthState
+}
+
+type UploadServerResponse = {
+  id: number
+  url: string
+}
+
+function upload(destination: Repo, file: File) {
+  const formdata = new FormData()
+  formdata.append('image', file)
+  formdata.append("textDescription", "")
+  formdata.append("imageDescription", "")
+
+  const headers = destination === Repo.Own ? {
+    'Content-Type': 'multipart/form-data',
+    'Authorization': `Token ${Funcs.getToken()}`
+  } : {
+    'Content-Type': 'multipart/form-data'
+  }
+  const url = destination === Repo.Own ? 'api/ownMemes/' : 'api/memes/'
+  return new Promise<UploadServerResponse>((resolve, reject) => {
+    Axios.post<UploadServerResponse>(url, formdata, {
+      headers
+    }).then(response => {
+      resolve(response.data)
+    }).catch(function(error) {
+      if (error.response && error.response.data) {
+        resolve(error.response.data)
+      } else {
+        reject()
+      }
+    })
+  })
 }
 
 export default class Upload extends React.Component<UploadProps, UploadState> {
-  constructor(props: UploadProps) {
-    super(props)
-    this.state = {
-      items: [],
-      authState: props.authStore.getState(),
-      toOwnRepo: props.authStore.getState().status === 'yes' ? 1 : 0
-    }
-    props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
+  state: UploadState = {
+    items: [] as UploadItem[],
+    desiredDestination: this.props.authState.status === 'yes' ? Repo.Own : Repo.Public
   }
 
-  componentDidUpdate(_: any, prevState: UploadState) {
-    if (prevState.authState.status === "yes" && this.state.authState.status !== "yes") {
-      this.setState({ toOwnRepo: 0 })
-    }
-    if (prevState.authState.status !== "yes" && this.state.authState.status === "yes") {
-      this.setState({ toOwnRepo: 1 })
+  get destination(): Repo {
+    return this.props.authState.status === 'yes' ? this.state.desiredDestination : Repo.Public
+  }
+
+  componentDidUpdate(prevProps: UploadProps) {
+    if (prevProps.authState.status !== 'yes' && this.props.authState.status === 'yes') {
+      this.setState({ desiredDestination: Repo.Own })
     }
   }
 
-  handleFiles(files: Array<File>) {
+  withItem(index: number, map: (item: UploadItem) => UploadItem) {
+    const items = this.state.items
+    items[index] = map(items[index])
+    this.setState({ items })
+  }
+
+  setError(index: number, text: string) {
+    this.withItem(index, item => {
+      item.setError(text)
+      return item
+    })
+  }
+
+  handleFiles(files: File[]) {
     const initial_length = this.state.items.length
-    const new_items = this.state.items.concat(...files.map(file => new UploadItem(file)))
+    const new_items =  [ ...this.state.items, ...files.map(file => new UploadItem(file)) ]
     this.setState({ items: new_items })
-    const self = this
-    files.forEach((file, index) => {
-      const formdata = new FormData()
+    files.forEach((file, i) => {
+      const current_index = initial_length + i
       if (file.size > 10 * 1024 * 1024) {
-        new_items[initial_length + index].setError('Превышен лимит в 10 МБ')
-        self.setState({ items: new_items })
+        this.setError(current_index, 'Превышен лимит в 10 МБ')
         return
       }
-      formdata.append('image', file)
-      formdata.append("textDescription", "")
-      formdata.append("imageDescription", "")
-
-      const headers = this.state.toOwnRepo ? {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Token ${Funcs.getToken()}`
-      } : {
-        'Content-Type': 'multipart/form-data'
-      }
-      const url = this.state.toOwnRepo ? 'api/ownMemes/' : 'api/memes/'
-      Axios.post(url, formdata, {
-        headers
-      }).then(function(response) {
-        Funcs.loadImage(response.data.id, response.data.url, image => {
-          new_items[initial_length + index].setContent(response.data.id, image)
-          self.setState({ items: new_items })
+      upload(this.destination, file).then(response => {
+        Funcs.loadImage(response.id, response.url, image => {
+          this.withItem(current_index, item => {
+            item.status = { type: 'uploaded', id: response.id, img: image }
+            return item
+          })
         }, () => {
-          new_items[initial_length + index].setError('Ошибка при загрузке')
-          self.setState({ items: new_items })
+          this.setError(current_index, 'Ошибка при отображении картинки')
         })
-      }).catch(function(error) {
-        const errorObj = Funcs.axiosError(error)
-        if (!errorObj.resolved) {
-          if (error.response && error.response.status === 400) {
-            errorObj.msg = 'Файл должен быть картинкой'
-          } else {
-            errorObj.msg = 'Неизвестная ошибка'
-          }
-        }
-        new_items[initial_length + index].setError(errorObj.msg)
-        self.setState({ items: new_items })
+      }).catch(() => {
+        this.setError(current_index, 'Нет интернета')
       })
     })
   }
 
   close(index: number) {
-    this.state.items[index].close()
-    this.setState({ items: this.state.items })
+    this.withItem(index, item => {
+      item.status = { type: 'none' }
+      return item
+    })
   }
 
   render() {
     const { items } = this.state
-    console.log(this.state.authState.status)
     return (
       <Center>
-        {items.map((item, index) =>
-          item.state === 'uploaded' ? (
-            <Form
-              meme={{ id: item.id, img: item.img, imageDescription: '', textDescription: '' }} key={index}
-              onDone={() => {
-                items[index].done()
-                this.setState({ items })
-              }}
-            />
-          ) : item.state === 'uploading' ? (
-            <EmptyForm key={index}>
-              <CircularProgress />
-            </EmptyForm>
-          ) : item.state === 'error' ? (
-            <EmptyForm key={index}>
-              <div className='vmiddle'>
-                <Typography color='error'>
-                  Загрузка {item.file.name} не удалась.<br />
-                  {item.error_text}
-                </Typography>
-                <Button color='primary' onClick={() => this.close(index)}>Ладно</Button>
-              </div>
-            </EmptyForm>
-          ) : item.state === 'done' ? (
-            <EmptyForm key={index}>
-              <div className='vmiddle'>
-                <Typography>Данные сохранены, спасибо за помощь!</Typography>
-                <Button color='primary' onClick={() => this.close(index)}>ОК</Button>
-              </div>
-            </EmptyForm>
-          ) : null
-        )}
+        {items.map((item, index) => {
+          switch (item.status.type) {
+          case 'uploaded':
+            return (
+              <Form key={index}
+                meme={{
+                  id: item.status.id,
+                  img: item.status.img,
+                  imageDescription: '',
+                  textDescription: ''
+                }}
+                onDone={() => {
+                  items[index].status = { type: 'done' }
+                  this.setState({ items })
+                }}
+              />
+            )
+          case 'uploading':
+            return (
+              <EmptyForm key={index}>
+                <CircularProgress />
+              </EmptyForm>
+            )
+          case 'error':
+            return (
+              <EmptyForm key={index}>
+                <div className='vmiddle'>
+                  <Typography color='error'>
+                    Загрузка {item.file.name} не удалась.<br />
+                    {item.status.text}
+                  </Typography>
+                  <Button color='primary' onClick={() => this.close(index)}>Ладно</Button>
+                </div>
+              </EmptyForm>
+            )
+          case 'done':
+            return (
+              <EmptyForm key={index}>
+                <div className='vmiddle'>
+                  <Typography>Данные сохранены, спасибо за помощь!</Typography>
+                  <Button color='primary' onClick={() => this.close(index)}>ОК</Button>
+                </div>
+              </EmptyForm>
+            )
+          }
+        })}
         <FileGetter handleFiles={(files: Array<File>) => this.handleFiles(files)} />
-        {this.state.authState.status === 'yes' &&
+        {this.props.authState.status === 'yes' &&
           <div>
             <div className='spacing' />
             <Typography>Мемы буду загружаться</Typography>
             <Select
-              value={this.state.toOwnRepo}
-              onChange={e => this.setState({ toOwnRepo: e.target.value as 0 | 1 })}
+              value={this.state.desiredDestination}
+              onChange={e => this.setState({
+                desiredDestination: e.target.value as Repo
+              })}
             >
-              <MenuItem value={0}>в общее хранилище</MenuItem>
-              <MenuItem value={1}>в личное хранилище</MenuItem>
+              <MenuItem value={Repo.Public}>в общее хранилище</MenuItem>
+              <MenuItem value={Repo.Own}>в личное хранилище</MenuItem>
             </Select>
           </div>
         }

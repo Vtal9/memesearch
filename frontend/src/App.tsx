@@ -9,10 +9,9 @@ import logo from './img/logo.svg'
 import './style.sass'
 import { TextField, Typography, InputAdornment, Icon, IconButton } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
-import AuthBar, { authState } from './components/AuthBar';
-import { createStore } from 'redux'
+import AuthBar from './components/AuthBar';
+import { AuthState } from './util/Types'
 
-const store = createStore(authState)
 
 const Main = () => <Redirect to='/search' />
 
@@ -51,12 +50,13 @@ const FastSearchForm = (props: { onSearch: (q: string) => void }) => {
 const App = withRouter(props => {
   const [ searchQuery, search ] = React.useState('')
   const [ authBar, setAuthBar ] = React.useState<AuthBar | null>(null)
+  const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
 
   const pages = [
     { url: '/', title: 'Главная', cmp: <Main /> },
-    { url: '/search', title: 'Поиск', cmp: <Search query={searchQuery} authStore={store} /> },
-    { url: '/about', title: 'О проекте', cmp: <Home authStore={store} onRegisterClick={() => (authBar as AuthBar).openRegister()} /> },
-    { url: '/upload', title: 'Загрузить', cmp: <Upload authStore={store} /> },
+    { url: '/search', title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} /> },
+    { url: '/about', title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} /> },
+    { url: '/upload', title: 'Загрузить', cmp: <Upload authState={authState} /> },
     { url: '/markup', title: 'Разметить', cmp: <Markup /> }
   ]
 
@@ -70,7 +70,13 @@ const App = withRouter(props => {
               onSearch={q => search(q)} />
           }
           <div style={{ justifySelf: 'flex-end' }}>
-            <AuthBar store={store} ref={ref => setAuthBar(ref)} />
+            <AuthBar authState={authState} ref={ref => setAuthBar(ref)} onAuthStateChange={u => {
+              if (u === null) {
+                setAuthState({ status: 'no' })
+              } else {
+                setAuthState({ status: 'yes', user: u })
+              }
+            }} />
           </div>
         </div>
         <div className="header-bottom">

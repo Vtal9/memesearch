@@ -22,7 +22,7 @@ export default withSnackbar(function Subscription(props: WithSnackbarProps) {
       }).then(function(response) {
         setDone(true)
       }).catch(function(error) {
-        Funcs.showSnackbarAxiosError(props, Funcs.axiosError(error))
+        Funcs.showSnackbarError(props, { short: true, msg: 'Неизвестная ошибка' })
       })
     }
   }

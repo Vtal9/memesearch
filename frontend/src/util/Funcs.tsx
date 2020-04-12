@@ -1,5 +1,5 @@
 import React from 'react'
-import Types from "./Types";
+import { User, SnackbarError } from "./Types";
 import { WithSnackbarProps } from "notistack";
 import { Button } from "@material-ui/core";
 import Axios from 'axios';
@@ -8,36 +8,7 @@ import Axios from 'axios';
 const TOKEN_KEY = 'memesearch_token'
 
 export default {
-  axiosError(error: any) {
-    let msg: string = error.message
-    const snackbarError: Types.SnackbarError = { msg, short: true, resolved: false }
-
-    switch (msg) {
-    case 'Network Error':
-      msg = 'Нет связи с сервером'
-      snackbarError.resolved = true
-      break
-    }
-    if (error.response) {
-      let more = error.response.data
-      const type = error.response.headers['content-type']
-      if (typeof type === 'string') {
-        const [ mime, ] = type.split(';')
-        switch (mime.trim()) {
-        case 'application/json':
-          more = JSON.stringify(more)
-          break
-        }
-      }
-      msg += ': ' + more
-      snackbarError.short = false
-    }
-
-    snackbarError.msg = msg
-    return snackbarError
-  },
-
-  showSnackbarAxiosError(context: WithSnackbarProps, error: Types.SnackbarError) {
+  showSnackbarError(context: WithSnackbarProps, error: SnackbarError) {
     console.log(error)
     context.enqueueSnackbar(error.msg, {
       autoHideDuration: 5000,
@@ -66,7 +37,7 @@ export default {
     return localStorage.getItem(TOKEN_KEY)
   },
 
-  checkToken(success: (u: Types.User) => void, failure: () => void) {
+  checkToken(success: (u: User) => void, failure: () => void) {
     const token = this.getToken()
     Axios.get('accounts/api/auth/user', {
       headers: {

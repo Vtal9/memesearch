@@ -1,36 +1,18 @@
 import React, { FormEvent } from 'react'
 import Axios from 'axios'
 import Funcs from '../util/Funcs';
-import Types from '../util/Types';
+import { AuthState, User } from '../util/Types';
 import { Typography, Button, Dialog, DialogContent, Grid, TextField, Icon, MenuItem, MenuList, Popover } from '@material-ui/core'
-import { Store } from 'redux';
 
 
 const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-interface AuthAction {
-  type: 'login' | 'logout'
-  user?: Types.User
-}
-
-type AuthStore = Store<Types.AuthState, AuthAction>
-
-export function authState(state: Types.AuthState = { status: 'unknown' }, action: AuthAction): Types.AuthState {
-  switch (action.type) {
-  case 'login':
-    return { status: 'yes', user: action.user }
-  case 'logout':
-    return { status: 'no' }
-  default:
-    return state
-  }
-}
 
 interface LoginWindowProps {
   dialog: 'none' | 'login' | 'register'
   closeMe: Function
   openRegister: Function
-  handleUser: (u: Types.User) => void
+  handleUser: (u: User) => void
 }
 
 function LoginWindow(props: LoginWindowProps) {
@@ -161,37 +143,28 @@ function LoginWindow(props: LoginWindowProps) {
 }
 
 
-interface AuthState {
-  authState: Types.AuthState
+type AuthBarState = {
   dialog: 'none' | 'login' | 'register'
   userMenuAnchor: HTMLElement | null
 }
 
-interface AuthProps {
-  store: AuthStore
+interface AuthBarProps {
+  authState: AuthState
+  onAuthStateChange: (user: User | null) => void
 }
 
-export default class AuthBar extends React.Component<AuthProps, AuthState> {
-  constructor(props: AuthProps) {
-    super(props)
-    this.state = {
-      authState: props.store.getState(),
-      dialog: 'none',
-      userMenuAnchor: null
-    }
-    props.store.subscribe(() => this.setState({ authState: props.store.getState() }))
-  }
-
-  setDone(u: Types.User | null) {
-    if (u !== null) {
-      this.props.store.dispatch({ type: 'login', user: u })
-    } else {
-      this.props.store.dispatch({ type: 'logout' })
-    }
+export default class AuthBar extends React.Component<AuthBarProps, AuthBarState> {
+  state: AuthBarState = {
+    dialog: 'none',
+    userMenuAnchor: null
   }
 
   componentDidMount() {
-    Funcs.checkToken((u: Types.User) => this.setDone(u), () => this.setDone(null))
+    Funcs.checkToken(u => {
+      this.props.onAuthStateChange(u)
+    }, () => {
+      this.props.onAuthStateChange(null)
+    })
   }
 
   openRegister() {
@@ -199,36 +172,41 @@ export default class AuthBar extends React.Component<AuthProps, AuthState> {
   }
 
   render() {
-    return (
-      this.state.authState.status === 'unknown' ?
+    switch (this.props.authState.status) {
+    case 'unknown':
+      return (
         <Typography>...</Typography>
-      :
-        this.state.authState.user === undefined ?
-          <div>
-            <Button color='primary' onClick={() => this.setState({ dialog: 'login' })}>Войти</Button>
-            <LoginWindow dialog={this.state.dialog}
-              openRegister={() => this.setState({ dialog: 'register' })}
-              closeMe={() => this.setState({ dialog: 'none' })}
-              handleUser={u => this.setDone(u)} />
-          </div>
-        :
-          <div>
-            <Button color='primary' startIcon={<Icon>account_circle</Icon>}
-              onClick={e => this.setState({ userMenuAnchor: e.currentTarget })}
-            >{this.state.authState.user.username}</Button>
-            <Popover open={this.state.userMenuAnchor !== null} anchorEl={this.state.userMenuAnchor}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              onClose={() => this.setState({ userMenuAnchor: null })}
-            >
-              <MenuList>
-                <MenuItem onClick={() => {
-                  Funcs.unsetToken()
-                  this.setDone(null)
-                  this.setState({ userMenuAnchor: null })
-                }}>Выйти</MenuItem>
-              </MenuList>
-            </Popover>
-          </div>
-    )
+      )
+    case 'no':
+      return (
+        <div>
+          <Button color='primary' onClick={() => this.setState({ dialog: 'login' })}>Войти</Button>
+          <LoginWindow dialog={this.state.dialog}
+            openRegister={() => this.setState({ dialog: 'register' })}
+            closeMe={() => this.setState({ dialog: 'none' })}
+            handleUser={u => this.props.onAuthStateChange(u)} />
+        </div>
+      )
+    case 'yes':
+      return (
+        <div>
+          <Button color='primary' startIcon={<Icon>account_circle</Icon>}
+            onClick={e => this.setState({ userMenuAnchor: e.currentTarget })}
+          >{this.props.authState.user.username}</Button>
+          <Popover open={this.state.userMenuAnchor !== null} anchorEl={this.state.userMenuAnchor}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            onClose={() => this.setState({ userMenuAnchor: null })}
+          >
+            <MenuList>
+              <MenuItem onClick={() => {
+                Funcs.unsetToken()
+                this.props.onAuthStateChange(null)
+                this.setState({ userMenuAnchor: null })
+              }}>Выйти</MenuItem>
+            </MenuList>
+          </Popover>
+        </div>
+      )
+    }
   }
 }

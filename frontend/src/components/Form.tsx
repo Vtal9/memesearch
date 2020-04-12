@@ -1,17 +1,29 @@
 import React from 'react'
 import { TextField, Card, CardMedia, CardContent, Grid, Button, Icon, Typography } from '@material-ui/core';
 import Axios from 'axios'
-import Types from '../util/Types'
+import { Meme } from '../util/Types'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import Funcs from '../util/Funcs';
 
 
-function badDescription(d: string) {
-  return d.trim() === ''
+function updateDescription(id: number, textDescription: string, imageDescription: string) {
+  return new Promise<{}>((resolve, reject) => {
+    Axios.patch(`api/memes/${id}/`, {
+      imageDescription, textDescription
+    }).then(function(response) {
+      resolve()
+    }).catch(function(error) {
+      if (error.response && error.response.data) {
+        resolve()
+      } else {
+        reject()
+      }
+    })
+  })
 }
 
 export interface FormProps extends React.Attributes, WithSnackbarProps {
-  meme: Types.Meme
+  meme: Meme
   onDone?: () => void
   signle?: boolean
 }
@@ -38,27 +50,22 @@ class Form extends React.Component<FormProps, FormState> {
 
     if (!this.props.meme) return
 
-    if (badDescription(this.state.imageDescription)) {
+    if (this.state.imageDescription.trim() === '') {
       this.setState({ descriptionError: true })
       return
     }
 
     this.setState({ state: 'saving' })
-    const self = this
-    Axios.patch('api/memes/' + this.props.meme.id + '/', {
-      imageDescription: this.state.imageDescription,
-      textDescription: this.state.textDescription
-    }).then(function(response) {
-      self.setState({ state: 'saved' })
-      if (self.props.onDone) self.props.onDone()
-    }).catch(function(error) {
-      self.setState({ state: 'initial' })
-      const errorObj = Funcs.axiosError(error)
-      if (!errorObj.resolved) {
-        errorObj.msg = 'Неизвестная ошибка'
-        errorObj.short = true
-      }
-      Funcs.showSnackbarAxiosError(self.props, Funcs.axiosError(error))
+    updateDescription(
+      this.props.meme.id,
+      this.state.textDescription,
+      this.state.imageDescription
+    ).then(() => {
+      this.setState({ state: 'saved' })
+      if (this.props.onDone) this.props.onDone()
+    }).catch(() => {
+      this.setState({ state: 'initial' })
+      Funcs.showSnackbarError(this.props, { short: true, msg: 'Нет интернета' })
     })
   }
 
@@ -80,8 +87,7 @@ class Form extends React.Component<FormProps, FormState> {
               <TextField fullWidth multiline error={this.state.descriptionError} autoFocus={signle}
                 value={this.state.imageDescription}
                 onChange={e => {
-                  const d = e.target.value
-                  this.setState({ imageDescription: d, descriptionError: badDescription(d) })
+                  this.setState({ imageDescription: e.target.value })
                 }}
                 onKeyDown={e => {
                   if (e.ctrlKey && e.keyCode == 13) {

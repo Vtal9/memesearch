@@ -1,26 +1,24 @@
-declare namespace Types {
-  interface Meme {
-    img: HTMLImageElement
-    id: number
-    imageDescription: string
-    textDescription: string
-  }
-
-  interface SnackbarError {
-    msg: string
-    resolved: boolean
-    short?: boolean
-  }
-
-  interface User {
-    id: number
-    username: string
-  }
-
-  interface AuthState {
-    status: 'unknown' | 'no' | 'yes'
-    user?: User
-  }
+export type Meme = {
+  img: HTMLImageElement
+  id: number
+  imageDescription: string
+  textDescription: string
 }
 
-export default Types
+export type SnackbarError = {
+  msg: string
+  short: boolean
+}
+
+export type User = {
+  id: number
+  username: string
+}
+
+export type AuthState =
+| { readonly status: 'unknown' | 'no' }
+| { status: 'yes', user: User }
+
+export enum Repo {
+  Own, Public
+}

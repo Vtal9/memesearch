@@ -1,13 +1,12 @@
 import React from 'react'
 import Center from '../layout/Center'
 import { Link } from 'react-router-dom'
-import { Typography, Stepper, StepLabel, Step, StepContent, Card, CardContent, Dialog, DialogContent, List, ListItem } from '@material-ui/core';
+import { Typography, Card, CardContent, Dialog, DialogContent } from '@material-ui/core';
 import BigFont from '../layout/BigFont';
 import Subscription from '../components/Subscription'
 import tactics from '../img/tactics.jpg'
 import musk from '../img/musk.jpg'
-import Types from '../util/Types';
-import { Store } from 'redux';
+import { AuthState } from '../util/Types'
 
 
 const Heading = (props: React.PropsWithChildren<{}>) => (
@@ -60,23 +59,17 @@ const smeshariki = 'https://sun9-35.userapi.com/IuO4PcE7HUqo1XF7W3MlMHIXdRnP73c9
 const google_form = 'https://forms.gle/vtsFXmXxnqeh245U6'
 
 interface HomeProps {
-  authStore: Store<Types.AuthState>
+  authState: AuthState
   onRegisterClick: () => void
 }
 
 interface HomeState {
-  authState: Types.AuthState
   donateOpen: boolean
 }
 
 export default class Home extends React.Component<HomeProps, HomeState> {
-  constructor(props: HomeProps) {
-    super(props)
-    this.state = {
-      authState: props.authStore.getState(),
-      donateOpen: false
-    }
-    props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
+  state = {
+    donateOpen: false
   }
 
   render() {
@@ -135,7 +128,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
           <ul style={{ marginTop: 20 }}>
             <li>
               <Typography>
-                {this.state.authState.status === "no" ?
+                {this.props.authState.status === "no" ?
                   <a href="#" onClick={e => {
                     e.preventDefault()
                     this.props.onRegisterClick()

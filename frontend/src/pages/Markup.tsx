@@ -3,7 +3,7 @@ import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon } from '@material-ui/core';
 import Axios from 'axios';
 import Form from '../components/Form'
-import Types from '../util/Types'
+import { Meme } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
@@ -16,7 +16,7 @@ const EmptyForm = (props: React.PropsWithChildren<{}>) => (
 
 interface MarkState {
   state: 'loading' | 'ready' | 'error' | 'nojob'
-  meme?: Types.Meme
+  meme?: Meme
 }
 
 class Markup extends React.Component<WithSnackbarProps, MarkState> {
@@ -52,13 +52,7 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
         })
       }
     }).catch(function(error) {
-      self.setState({ state: 'error' })
-      const errorObj = Funcs.axiosError(error)
-      if (!errorObj.resolved) {
-        errorObj.msg = 'Неизвестная ошибка'
-        errorObj.short = true
-      }
-      Funcs.showSnackbarAxiosError(self.props, errorObj)
+      Funcs.showSnackbarError(self.props, { msg: 'Неизвестная ошибка', short: true })
     })
   }
 

@@ -14,8 +14,6 @@ export interface GluejarProps {
   acceptedFiles: string[]
 }
 
-type BlobLikeFile = File | null
-
 export default class Gluejar extends React.Component<GluejarProps, {}> {
   static displayName = 'Gluejar'
 

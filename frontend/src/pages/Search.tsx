@@ -4,15 +4,41 @@ import { Typography, TextField, Grid, Button, FormControlLabel, Switch, FormCont
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import Types from '../util/Types';
+import { Repo, AuthState } from '../util/Types';
 import BigFont from '../layout/BigFont';
 import FlexCenter from '../layout/FlexCenter';
-import { Store } from 'redux';
-import { authState } from '../components/AuthBar';
 
 
-export interface SearchProps extends React.Attributes, WithSnackbarProps {
-  authStore: Store<Types.AuthState>
+type SearchServerResponse = { id: number }[]
+
+type Request =
+| { extended: false, q: string }
+| { extended: true, qText: string, qImage: string }
+
+function search(request: Request, repo: Repo) {
+  const qText = request.extended ? request.qText : request.q
+  const qImage = request.extended ? request.qImage : request.q
+  const headers = repo === Repo.Own ? {
+    Authorization: `Token ${Funcs.getToken()}`
+  } : {}
+  const api = repo === Repo.Own ? 'search/api/search/own' : 'search/api/search'
+  return new Promise<SearchServerResponse>((resolve, reject) => {
+    Axios.get(`${api}/?qText=${encodeURIComponent(qText)}&qImage=${encodeURIComponent(qImage)}`, {
+      headers
+    }).then(response => {
+      resolve(response.data)
+    }).catch(function(error) {
+      if (error.response && error.response.data) {
+        resolve(error.response.data)
+      } else {
+        reject()
+      }
+    })
+  })
+}
+
+interface SearchProps extends React.Attributes, WithSnackbarProps {
+  authState: AuthState
   query: string
 }
 
@@ -28,78 +54,64 @@ interface SearchState {
   extended: boolean
   state: 'initial' | 'loading' | 'done'
   results: OnlyMeme[]
-  authState: Types.AuthState
-  self: boolean
+  amongOwnFlag: boolean
 }
 
 class Search extends React.Component<SearchProps, SearchState> {
-  constructor(props: SearchProps) {
-    super(props)
-    this.state = {
-      query: props.query,
-      imageQuery: '',
-      textQuery: '',
-      extended: false,
-      state: 'initial',
-      results: [],
-      self: false,
-      authState: props.authStore.getState()
-    }
-    props.authStore.subscribe(() => this.setState({ authState: props.authStore.getState() }))
+  state: SearchState = {
+    query: this.props.query,
+    imageQuery: '',
+    textQuery: '',
+    extended: false,
+    state: 'initial',
+    results: [],
+    amongOwnFlag: false
   }
 
-  componentDidUpdate(_: any, prevState: SearchState) {
-    if (prevState.authState.status === "yes" && this.state.authState.status !== "yes") {
-      this.setState({ self: false })
-    }
+  get repo() {
+    return (this.props.authState.status === 'yes' && this.state.amongOwnFlag) ? Repo.Own : Repo.Public
   }
 
   performSearch(e: FormEvent | null = null) {
-    console.log('test')
     if (e) {
       e.preventDefault()
     }
-    const qText = this.state.extended ? this.state.textQuery : this.state.query
-    const qImage = this.state.extended ? this.state.imageQuery : this.state.query
-    if (qText.trim() === '' && qImage.trim() === '') {
-      return
+    if (this.state.extended) {
+      if (this.state.imageQuery.trim() === '' || this.state.textQuery.trim() === '') {
+        return
+      }
+    } else {
+      if (this.state.query.trim() === '') {
+        return
+      }
     }
+    const request: Request = this.state.extended ? {
+      extended: true, qImage: this.state.imageQuery, qText: this.state.textQuery
+    } : {
+      extended: false, q: this.state.query
+    }
+    
     this.setState({ state: 'loading' })
-    const self = this
-    const headers = this.state.self ? {
-      Authorization: `Token ${Funcs.getToken()}`
-    } : {}
-    const api = this.state.self ? 'search/api/search/own' : 'search/api/search'
-    Axios.get(`${api}/?qText=${encodeURIComponent(qText)}&qImage=${encodeURIComponent(qImage)}`, {
-      headers
-    }).then(function(response) {
-      self.setState({
+    search(request, this.repo).then(items => {
+      this.setState({
         state: 'done',
-        results: response.data.map((item: any) => {
+        results: items.map(item => {
+          Axios.get(`api/memes/${item.id}/`).then(response => {
+            Funcs.loadImage(response.data.id, response.data.url, img => {
+              this.setState(oldState => {
+                return {
+                  results: oldState.results.map(meme =>
+                    meme.id === item.id ? {...meme, img: img} : meme
+                  )
+                }
+              })
+            }, () => {})
+          })
           return { id: item.id, img: null }
         })
       })
-      response.data.forEach((item: any) => {
-        Axios.get(`api/memes/${item.id}/`).then(response => {
-          Funcs.loadImage(response.data.id, response.data.url, img => {
-            self.setState(oldState => {
-              return {
-                results: oldState.results.map(meme =>
-                  meme.id === item.id ? {...meme, img: img} : meme
-                )
-              }
-            })
-          }, () => {})
-        })
-      })
-    }).catch(function(error) {
-      // const errorObj = Funcs.axiosError(error)
-      // if (!errorObj.resolved) {
-      //   errorObj.msg = 'Неизвестная ошибка'
-      //   errorObj.short = true
-      // }
-      // Funcs.showSnackbarAxiosError(self.props, Funcs.axiosError(error))
-      self.setState({ state: 'done', results: [] })
+    }).catch(() => {
+      this.setState({ state: 'done', results: [] })
     })
   }
 
@@ -143,18 +155,20 @@ class Search extends React.Component<SearchProps, SearchState> {
                 <Typography color={this.state.extended ? 'textPrimary' : 'textSecondary'}>Расширенный поиск</Typography>
               } />
               <FormControlLabel control={
-                <Switch checked={this.state.self} color='primary'
+                <Switch
+                  checked={this.state.amongOwnFlag && this.props.authState.status === 'yes'}
+                  color='primary'
                   onChange={e => {
                     const checked = e.target.checked
-                    if (checked && this.state.authState.status !== 'yes') {
+                    if (checked && this.props.authState.status !== 'yes') {
                       this.props.enqueueSnackbar('Это опция доступна только при наличии аккаунта. ' +
                       'Войдите, и вы сможете искать по своим мемам')
                     } else {
-                      this.setState({ self: checked })
+                      this.setState({ amongOwnFlag: checked })
                     }
                   }} />
               } label={
-                <Typography color={this.state.self ? 'textPrimary' : "textSecondary"}>Поиск по личной коллекции</Typography>
+                <Typography color={this.state.amongOwnFlag ? 'textPrimary' : "textSecondary"}>Поиск по личной коллекции</Typography>
               } />
             </Grid>
             <Grid item>
