@@ -9,7 +9,6 @@ const TOKEN_KEY = 'memesearch_token'
 
 export default {
   showSnackbarError(context: WithSnackbarProps, error: SnackbarError) {
-    console.log(error)
     context.enqueueSnackbar(error.msg, {
       autoHideDuration: 5000,
       persist: !error.short,

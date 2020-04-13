@@ -1,13 +1,14 @@
 import React from 'react'
 import Axios from 'axios'
 import { useDropzone } from 'react-dropzone';
-import { Typography, ButtonBase, CircularProgress, Button, Card, Select, MenuItem } from '@material-ui/core'
+import { Typography, ButtonBase, CircularProgress, Button, Card, Select, MenuItem, FormControlLabel, Switch } from '@material-ui/core'
 import Center from '../layout/Center'
-import Form from '../components/Form'
+import Form from '../components/DescriptionForm'
 import Icon from '@material-ui/core/Icon'
 import Funcs from '../util/Funcs';
 import Gluejar from '../components/Gluejar'
 import { Repo, AuthState } from '../util/Types';
+import MySwitch from '../components/MySwitch';
 
 
 function FileGetter(props: { handleFiles: (files: File[]) => void }) {
@@ -215,16 +216,13 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         {this.props.authState.status === 'yes' &&
           <div>
             <div className='spacing' />
-            <Typography>Мемы буду загружаться</Typography>
-            <Select
-              value={this.state.desiredDestination}
-              onChange={e => this.setState({
-                desiredDestination: e.target.value as Repo
+            <MySwitch
+              value={this.state.desiredDestination === Repo.Own}
+              onChange={checked => this.setState({
+                desiredDestination: checked ? Repo.Own : Repo.Public
               })}
-            >
-              <MenuItem value={Repo.Public}>в общее хранилище</MenuItem>
-              <MenuItem value={Repo.Own}>в личное хранилище</MenuItem>
-            </Select>
+              label='Сразу добавить мемы в личное хранилище'
+            />
           </div>
         }
         <div className='spacing' />

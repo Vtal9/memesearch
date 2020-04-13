@@ -2,7 +2,7 @@ import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon } from '@material-ui/core';
 import Axios from 'axios';
-import Form from '../components/Form'
+import Form from '../components/DescriptionForm'
 import { Meme } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';

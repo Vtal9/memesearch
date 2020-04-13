@@ -7,6 +7,7 @@ import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { Repo, AuthState } from '../util/Types';
 import BigFont from '../layout/BigFont';
 import FlexCenter from '../layout/FlexCenter';
+import MySwitch from '../components/MySwitch';
 
 
 type SearchServerResponse = { id: number }[]
@@ -142,34 +143,24 @@ class Search extends React.Component<SearchProps, SearchState> {
                 <TextField value={this.state.query} onChange={e => this.setState({ query: e.target.value })}
                   fullWidth autoFocus label='Какой мем ищете?' />
               }
-              <FormControlLabel control={
-                <Switch checked={this.state.extended} color='primary'
-                  onChange={e => {
-                    const checked = e.target.checked
-                    if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
-                      this.setState({ textQuery: this.state.query, imageQuery: this.state.query })
-                    }
-                    this.setState({ extended: checked })
-                  }} />
-              } label={
-                <Typography color={this.state.extended ? 'textPrimary' : 'textSecondary'}>Расширенный поиск</Typography>
-              } />
-              <FormControlLabel control={
-                <Switch
-                  checked={this.state.amongOwnFlag && this.props.authState.status === 'yes'}
-                  color='primary'
-                  onChange={e => {
-                    const checked = e.target.checked
-                    if (checked && this.props.authState.status !== 'yes') {
-                      this.props.enqueueSnackbar('Это опция доступна только при наличии аккаунта. ' +
-                      'Войдите, и вы сможете искать по своим мемам')
-                    } else {
-                      this.setState({ amongOwnFlag: checked })
-                    }
-                  }} />
-              } label={
-                <Typography color={this.state.amongOwnFlag ? 'textPrimary' : "textSecondary"}>Поиск по личной коллекции</Typography>
-              } />
+              <MySwitch value={this.state.extended} label='Расширенный поиск'
+                onChange={checked => {
+                  if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
+                    this.setState({ textQuery: this.state.query, imageQuery: this.state.query })
+                  }
+                  this.setState({ extended: checked })
+                }} />
+              <MySwitch
+                value={this.state.amongOwnFlag && this.props.authState.status === 'yes'}
+                label='Поиск по личной коллекции'
+                onChange={checked => {
+                  if (checked && this.props.authState.status !== 'yes') {
+                    this.props.enqueueSnackbar('Пожалуйста, авторизуйтесь')
+                  } else {
+                    this.setState({ amongOwnFlag: checked })
+                  }
+                }}
+              />
             </Grid>
             <Grid item>
               <Button variant='contained' color='primary' type='submit'
