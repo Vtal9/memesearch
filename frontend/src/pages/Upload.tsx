@@ -1,9 +1,9 @@
 import React from 'react'
 import Axios from 'axios'
 import { useDropzone } from 'react-dropzone';
-import { Typography, ButtonBase, CircularProgress, Button, Card, Select, MenuItem, FormControlLabel, Switch } from '@material-ui/core'
+import { Typography, ButtonBase, CircularProgress, Button, Card, Select, MenuItem, FormControlLabel, Switch, CardMedia, CardContent } from '@material-ui/core'
 import Center from '../layout/Center'
-import Form from '../components/DescriptionForm'
+import Form, { CenterPadding } from '../components/DescriptionForm'
 import Icon from '@material-ui/core/Icon'
 import Funcs from '../util/Funcs';
 import Gluejar from '../components/Gluejar'
@@ -38,9 +38,6 @@ function FileGetter(props: { handleFiles: (files: File[]) => void }) {
   )
 }
 
-const EmptyForm: React.FC = (props) => (
-  <Card className='meme-form extra'>{props.children}</Card>
-)
 
 class UploadItem {
   file: File
@@ -86,14 +83,14 @@ function upload(destination: Repo, file: File) {
     'Content-Type': 'multipart/form-data'
   }
   const url = destination === Repo.Own ? 'api/ownMemes/' : 'api/memes/'
-  return new Promise<UploadServerResponse>((resolve, reject) => {
+  return new Promise<UploadServerResponse | null>((resolve, reject) => {
     Axios.post<UploadServerResponse>(url, formdata, {
       headers
     }).then(response => {
       resolve(response.data)
     }).catch(function(error) {
       if (error.response && error.response.data) {
-        resolve(error.response.data)
+        resolve(null)
       } else {
         reject()
       }
@@ -141,14 +138,18 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         return
       }
       upload(this.destination, file).then(response => {
-        Funcs.loadImage(response.id, response.url, image => {
-          this.withItem(current_index, item => {
-            item.status = { type: 'uploaded', id: response.id, img: image }
-            return item
+        if (response !== null) {
+          Funcs.loadImage(response.id, response.url, image => {
+            this.withItem(current_index, item => {
+              item.status = { type: 'uploaded', id: response.id, img: image }
+              return item
+            })
+          }, () => {
+            this.setError(current_index, 'Ошибка при отображении картинки')
           })
-        }, () => {
-          this.setError(current_index, 'Ошибка при отображении картинки')
-        })
+        } else {
+          this.setError(current_index, 'Ошибка сервера')
+        }
       }).catch(() => {
         this.setError(current_index, 'Нет интернета')
       })
@@ -166,52 +167,56 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     const { items } = this.state
     return (
       <Center>
-        {items.map((item, index) => {
-          switch (item.status.type) {
-          case 'uploaded':
-            return (
-              <Form key={index}
-                meme={{
-                  id: item.status.id,
-                  img: item.status.img,
-                  imageDescription: '',
-                  textDescription: ''
-                }}
-                onDone={() => {
-                  items[index].status = { type: 'done' }
-                  this.setState({ items })
-                }}
-              />
-            )
-          case 'uploading':
-            return (
-              <EmptyForm key={index}>
-                <CircularProgress />
-              </EmptyForm>
-            )
-          case 'error':
-            return (
-              <EmptyForm key={index}>
-                <div className='vmiddle'>
-                  <Typography color='error'>
-                    Загрузка {item.file.name} не удалась.<br />
-                    {item.status.text}
-                  </Typography>
-                  <Button color='primary' onClick={() => this.close(index)}>Ладно</Button>
-                </div>
-              </EmptyForm>
-            )
-          case 'done':
-            return (
-              <EmptyForm key={index}>
-                <div className='vmiddle'>
-                  <Typography>Данные сохранены, спасибо за помощь!</Typography>
-                  <Button color='primary' onClick={() => this.close(index)}>ОК</Button>
-                </div>
-              </EmptyForm>
-            )
-          }
-        })}
+        {items.map((item, index) => (
+          <Card className='meme-form' key={index} {...(item.status.type === 'none' && {
+            style: { display: 'none' }
+          })}>
+            {(() => {
+              switch (item.status.type) {
+              case 'uploaded':
+                return [
+                  <CardMedia component='img' className='img' image={item.status.img.src} />,
+                  <CardContent className='content'>
+                    <Form key={index}
+                      memeId={item.status.id}
+                      onDone={() => {
+                        items[index].status = { type: 'done' }
+                        this.setState({ items })
+                      }}
+                    />
+                  </CardContent>
+                ]
+              case 'uploading':
+                return (
+                  <CenterPadding>
+                    <CircularProgress />
+                  </CenterPadding>
+                )
+              case 'error':
+                return (
+                  <CenterPadding>
+                    <div className='vmiddle'>
+                      <Typography color='error'>
+                        Загрузка {item.file.name} не удалась.<br />
+                        {item.status.text}
+                      </Typography>
+                      <Button color='primary' onClick={() => this.close(index)}>Ладно</Button>
+                    </div>
+                  </CenterPadding>
+                )
+              case 'done':
+                return (
+                  <CenterPadding>
+                    <div className='vmiddle'>
+                      <Typography>Данные сохранены, спасибо за помощь!</Typography>
+                      <Button color='primary' onClick={() => this.close(index)}>ОК</Button>
+                    </div>
+                  </CenterPadding>
+                )
+              }
+            })()}
+          </Card>
+        ))}
         <FileGetter handleFiles={(files: Array<File>) => this.handleFiles(files)} />
         {this.props.authState.status === 'yes' &&
           <div>

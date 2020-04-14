@@ -1,7 +1,6 @@
-import React from 'react'
-import { TextField, Card, CardMedia, CardContent, Grid, Button, Icon, Typography } from '@material-ui/core';
+import React, { FormEvent } from 'react'
+import { TextField, Grid, Button, Icon, Typography } from '@material-ui/core';
 import Axios from 'axios'
-import { Meme } from '../util/Types'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import Funcs from '../util/Funcs';
 
@@ -22,33 +21,31 @@ function updateDescription(id: number, textDescription: string, imageDescription
   })
 }
 
-export interface FormProps extends React.Attributes, WithSnackbarProps {
-  meme: Meme
+interface FormProps extends WithSnackbarProps {
+  memeId: number
   onDone?: () => void
-  signle?: boolean
+  initialImageDescription?: string
+  initialTextDescription?: string
+  autofocus?: boolean
 }
 
 interface FormState {
   imageDescription: string
   textDescription: string
-  descriptionError?: boolean
+  descriptionError: boolean
   state: 'initial' | 'saving' | 'saved'
 }
 
 class Form extends React.Component<FormProps, FormState> {
-  constructor(props: FormProps) {
-    super(props)
-    this.state = {
-      state: 'initial',
-      imageDescription: props.meme.imageDescription,
-      textDescription: props.meme.textDescription
-    }
+  state: FormState = {
+    state: 'initial',
+    imageDescription: this.props.initialImageDescription || '',
+    textDescription: this.props.initialTextDescription || '',
+    descriptionError: false
   }
 
-  handleSubmit(e: React.FormEvent | undefined) {
+  handleSubmit(e: React.FormEvent | undefined = undefined) {
     if (e) e.preventDefault()
-
-    if (!this.props.meme) return
 
     if (this.state.imageDescription.trim() === '') {
       this.setState({ descriptionError: true })
@@ -57,7 +54,7 @@ class Form extends React.Component<FormProps, FormState> {
 
     this.setState({ state: 'saving' })
     updateDescription(
-      this.props.meme.id,
+      this.props.memeId,
       this.state.textDescription,
       this.state.imageDescription
     ).then(() => {
@@ -70,70 +67,71 @@ class Form extends React.Component<FormProps, FormState> {
   }
 
   render() {
-    const { meme, signle } = this.props
     return (
-      <Card className={signle ? 'meme-form single' : 'meme-form'}
-        component='form' onSubmit={e => this.handleSubmit(e)}
-      >
-        <CardMedia component='img' className='img' image={meme.img.src} style={{ objectFit: 'contain' }} />
-        <CardContent className='control'>
-          {!this.props.signle &&
-            <div className='caption'>
-              <Typography variant='caption'>Мем загружен на сервер. Вы можете сразу же его здесь разметить.</Typography>
-            </div>
-          }
-          <Grid container className='inputs' spacing={2}>
-            <Grid item xs>
-              <TextField fullWidth multiline error={this.state.descriptionError} autoFocus={signle}
-                value={this.state.imageDescription}
-                onChange={e => {
-                  this.setState({ imageDescription: e.target.value })
-                }}
-                onKeyDown={e => {
-                  if (e.ctrlKey && e.keyCode == 13) {
-                    this.handleSubmit(undefined)
-                  }
-                }}
-                label='Что изображено?' helperText={<span>
-                  Описание картинки, ключевые объекты, важные для поиска.<br />
-                  Например: &laquo;негр; бегущий школьник; постирония&raquo;.<br />
-                  Разные сущности разделяйте переносом строки
-                </span>} />
-            </Grid>
-            <Grid item xs>
-              <TextField fullWidth multiline
-                value={this.state.textDescription}
-                onChange={e => this.setState({ textDescription: e.target.value })}
-                onKeyDown={e => {
-                  if (e.ctrlKey && e.keyCode == 13) {
-                    this.handleSubmit(undefined)
-                  }
-                }}
-                label='Что написано?' helperText='Разные надписи разделяйте переносом строки' />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2} justify='flex-end' alignItems='center'>
-            <Grid item>
-              <Typography variant='caption'>Ctrl + Enter</Typography>
-              {/* <Button variant='contained' onClick={() => {
-                this.setState({ imageDescription: 'Это не мем' }, () => {
-                  this.handleSubmit(undefined)
-                })
+      <form onSubmit={(e: FormEvent) => this.handleSubmit(e)}>
+        <Grid container className='inputs' spacing={2}>
+          <Grid item xs>
+            <TextField fullWidth multiline
+              error={this.state.descriptionError}
+              autoFocus={this.props.autofocus}
+              value={this.state.imageDescription}
+              onChange={e => {
+                this.setState({ imageDescription: e.target.value })
               }}
-                {...(this.state.state === 'saving' && { disabled: true })}
-              >Это не мем</Button> */}
-            </Grid>
-            <Grid item>
-              <Button variant='contained' color='primary' type='submit'
-                {...(this.state.state === 'saving' && { disabled: true })}
-                startIcon={<Icon>done</Icon>}
-              >Готово</Button>
-            </Grid>
+              onKeyDown={e => {
+                if (e.ctrlKey && e.keyCode == 13) {
+                  this.handleSubmit()
+                }
+              }}
+              label='Что изображено?' helperText={<span>
+                Например: &laquo;негр; бегущий школьник; постирония&raquo;.<br />
+                Разные сущности разделяйте переносом строки
+              </span>} />
           </Grid>
-        </CardContent>
-      </Card>
+          <Grid item xs>
+            <TextField fullWidth multiline
+              value={this.state.textDescription}
+              onChange={e => this.setState({ textDescription: e.target.value })}
+              onKeyDown={e => {
+                if (e.ctrlKey && e.keyCode == 13) {
+                  this.handleSubmit()
+                }
+              }}
+              label='Что написано?' helperText='Разные надписи разделяйте переносом строки' />
+          </Grid>
+        </Grid>
+        <Grid container spacing={2} justify='flex-end' alignItems='center'>
+          <Grid item>
+            <Typography variant='caption'>Ctrl + Enter</Typography>
+            {/* <Button variant='contained' onClick={() => {
+              this.setState({ imageDescription: 'Это не мем' }, () => {
+                this.handleSubmit(undefined)
+              })
+            }}
+              {...(this.state.state === 'saving' && { disabled: true })}
+            >Это не мем</Button> */}
+          </Grid>
+          <Grid item>
+            <Button variant='contained' color='primary' type='submit'
+              {...(this.state.state === 'saving' && { disabled: true })}
+              startIcon={<Icon>done</Icon>}
+            >Готово</Button>
+          </Grid>
+        </Grid>
+      </form>
     )
   }
 }
+
+export const CenterPadding: React.FC = props => (
+  <div style={{
+    justifyContent: 'center',
+    padding: 20,
+    display: 'flex',
+    width: '100%'
+  }}>
+    {props.children}
+  </div>
+)
 
 export default withSnackbar(Form)
