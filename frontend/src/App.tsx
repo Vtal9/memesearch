@@ -11,6 +11,8 @@ import { TextField, Typography, InputAdornment, Icon, IconButton } from '@materi
 import { SnackbarProvider } from 'notistack'
 import AuthBar from './components/AuthBar';
 import { AuthState } from './util/Types'
+import AddTag from './pages/AddTag'
+import MyMemes from './pages/MyMemes'
 
 
 const Main = () => <Redirect to='/search' />
@@ -53,11 +55,13 @@ const App = withRouter(props => {
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
 
   const pages = [
-    { url: '/', title: 'Главная', cmp: <Main /> },
-    { url: '/search', title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} /> },
-    { url: '/about', title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} /> },
-    { url: '/upload', title: 'Загрузить', cmp: <Upload authState={authState} /> },
-    { url: '/markup', title: 'Разметить', cmp: <Markup /> }
+    { url: '/', title: 'Главная', cmp: <Main />, tab: false },
+    { url: '/search', title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
+    { url: '/about', title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} />, tab: true },
+    { url: '/upload', title: 'Загрузить', cmp: <Upload authState={authState} />, tab: true },
+    { url: '/markup', title: 'Разметить', cmp: <Markup />, tab: true },
+    { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
+    { url: '/mymemes', title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false }
   ]
 
   return (
@@ -80,7 +84,7 @@ const App = withRouter(props => {
           </div>
         </div>
         <div className="header-bottom">
-          {pages.filter(page => page.url !== '/').map(page =>
+          {pages.filter(page => page.tab).map(page =>
             props.location.pathname === page.url ?
               <div className='header-link active' key={page.url}><Typography>{page.title}</Typography></div>
             :

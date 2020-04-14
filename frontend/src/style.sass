@@ -109,8 +109,19 @@ a
   margin-top: 20px
   .gallery-item
     margin: 0 20px 20px 0
-  img.gallery-item
-    height: 200px
+    display: inline-block
+    position: relative
+    img
+      height: 200px
+    .actions
+      display: none
+      position: absolute
+      top: 0
+      left: 0
+      background: white
+    &:hover
+      .actions
+        display: block
 .spacing
   height: 20px
 li

@@ -199,6 +199,9 @@ export default class AuthBar extends React.Component<AuthBarProps, AuthBarState>
           >
             <MenuList>
               <MenuItem onClick={() => {
+                location.href = '#/mymemes'
+              }}>Коллекция</MenuItem>
+              <MenuItem onClick={() => {
                 Funcs.unsetToken()
                 this.props.onAuthStateChange(null)
                 this.setState({ userMenuAnchor: null })

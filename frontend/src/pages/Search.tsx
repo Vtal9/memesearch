@@ -161,7 +161,7 @@ class Search extends React.Component<SearchProps, SearchState> {
           {this.state.results.length === 0 && this.state.state === 'done' &&
             <BigFont>Таких мемов не нашлось</BigFont>
           }
-          <Gallery list={this.state.results} />
+          <Gallery list={this.state.results} authState={this.props.authState} />
         </div>
       </Center>
     )

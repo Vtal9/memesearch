@@ -19,7 +19,7 @@ app.use(
   })
 );
 
-['/api', '/media', '/emails', '/search', '/accounts'].forEach(path => {
+['/api', '/media', '/emails', '/search', '/accounts', '/tags'].forEach(path => {
   app.use(path, proxy('localhost:8000', {
     proxyReqPathResolver: req => path + req.url
   }))
