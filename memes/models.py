@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.db.models import F, Q
 from django.conf import settings
@@ -12,6 +14,7 @@ from searchEngine.indexer import info
 import searchEngine.models as indexer_models
 from searchEngine.indexer import simplifier
 from searchEngine.indexer import misc
+from tags.models import Tags
 
 
 def update_index_in_db(text, descr, new_index_text, new_index_descr):
@@ -47,7 +50,6 @@ def update_index_in_db(text, descr, new_index_text, new_index_descr):
             indexer_models.ImageDescriptions.objects.create(word=dword, index=new_index_descr[dword])
 
 
-# Create your models here.
 class Memes(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     image = models.ImageField(blank=True, null=True)
@@ -55,9 +57,11 @@ class Memes(models.Model):
     url = models.URLField(blank=True, null=True, max_length=500)
     textDescription = models.TextField(blank=True, null=True)
     imageDescription = models.TextField(blank=True, null=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="ownImages")
+    owner = models.ManyToManyField(User, related_name="ownImages", blank=True)
+    is_mark_up_added = models.NullBooleanField()
+    tags = models.ManyToManyField(Tags, related_name="taggedMemes", blank=True)
 
-    def delete(self):
+    def delete(self, **kwargs):
         pass
 
     def save(self, *args, **kwargs):
@@ -71,7 +75,8 @@ class Memes(models.Model):
             self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + "." + name[-1]
             y.upload(self.image, self.fileName)
             self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
-
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
             self.image = None
 
         # Построение нового индекса по добавленному мему

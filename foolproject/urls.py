@@ -28,6 +28,7 @@ urlpatterns = [
     path('emails/', include('emails.urls')),
     path('search/', include('searchEngine.urls')),
     path('accounts/', include('accounts.urls')),
+    path('tags/', include('tags.urls')),
 ]
 
 
