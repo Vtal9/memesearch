@@ -3,9 +3,11 @@ from ..models import TextDescriptions
 from ..models import ImageDescriptions
 from django.db.models import Q
 
-BIGRAM_WEIGHT = 3
+from memes.models import Memes
+
+BIGRAM_WEIGHT = 1
 PHRASE_WEIGHT = 30
-DESCRIPTION_WEIGHT = 14
+DESCRIPTION_WEIGHT = 5
 
 DB_INDEX_TEXT_SAMPLE = {'сапака': "{'url1': [0, 2], 'url2': [0, 2]}", 'ни': "{'url1': [1], 'url2': [1, 5]}",
                         'пака': "{'url1': [3], 'url2': [3]}", 'ана': "{'url1': [4], 'url2': [4]}",
@@ -29,10 +31,8 @@ def parse_db_index(db_index_str, is_descr=False):
 
 
 def db_query(word, is_descr=False):
-    result = []
-    result = ImageDescriptions.objects.get(Q(word=word)).index if is_descr else \
+    return ImageDescriptions.objects.get(Q(word=word)).index if is_descr else \
         TextDescriptions.objects.get(Q(word=word)).index
-    return result
 
 
 def db_result(word, is_descr=False):
@@ -47,6 +47,9 @@ def __intersection(*args):
 
 
 def _one_word_query(word, word_index, urls_weight={}):
+    if len(word) == 1 and word != 'я':
+        return urls_weight
+
     for url in word_index[word].keys():
         if url in urls_weight:
             urls_weight[url] += len(word_index[word][url])
@@ -66,7 +69,7 @@ def _bigram_query(word1, word2, word_index, urls_weight={}):
             if url in urls_weight.keys():
                 urls_weight[url] += BIGRAM_WEIGHT
             else:
-                urls_weight[url] = BIGRAM_WEIGHT + 2  # + 2
+                urls_weight[url] = BIGRAM_WEIGHT  # + 2
 
     return urls_weight
 
@@ -100,7 +103,7 @@ def make_query_text_part(text):
         try:
             word_text_index.update(db_result(word, is_descr=False))
         except:
-            return None
+            pass
 
     if len(word_text_index) == 0:
         return None
@@ -109,6 +112,10 @@ def make_query_text_part(text):
 
     for word in words_set:
         urls_weight.update(_one_word_query(word, word_text_index, urls_weight))
+
+    rows = Memes.objects.filter(Q(id__in=list(urls_weight.keys())))
+    for row in rows:
+        urls_weight[str(row.id)] /= float(len(simplifier.simplify_string(row.textDescription).split(' ')))
 
     if len(words) > 2:
         i = 0
