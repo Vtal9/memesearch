@@ -4,10 +4,11 @@ import { Typography, TextField, Grid, Button, FormControlLabel, Switch, FormCont
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { Repo, AuthState } from '../util/Types';
+import { Repo, AuthState, UnloadedMeme } from '../util/Types';
 import BigFont from '../layout/BigFont';
 import FlexCenter from '../layout/FlexCenter';
 import MySwitch from '../components/MySwitch';
+import Gallery from '../components/Gallery';
 
 
 type SearchServerResponse = { id: number }[]
@@ -43,18 +44,13 @@ interface SearchProps extends React.Attributes, WithSnackbarProps {
   query: string
 }
 
-interface OnlyMeme {
-  id: number
-  img: HTMLImageElement | null
-}
-
 interface SearchState {
   query: string
   imageQuery: string
   textQuery: string
   extended: boolean
   state: 'initial' | 'loading' | 'done'
-  results: OnlyMeme[]
+  results: UnloadedMeme[]
   amongOwnFlag: boolean
 }
 
@@ -97,18 +93,7 @@ class Search extends React.Component<SearchProps, SearchState> {
       this.setState({
         state: 'done',
         results: items.map(item => {
-          Axios.get(`api/memes/${item.id}/`).then(response => {
-            Funcs.loadImage(response.data.id, response.data.url, img => {
-              this.setState(oldState => {
-                return {
-                  results: oldState.results.map(meme =>
-                    meme.id === item.id ? {...meme, img: img} : meme
-                  )
-                }
-              })
-            }, () => {})
-          })
-          return { id: item.id, img: null }
+          return { id: item.id }
         })
       })
     }).catch(() => {
@@ -176,12 +161,7 @@ class Search extends React.Component<SearchProps, SearchState> {
           {this.state.results.length === 0 && this.state.state === 'done' &&
             <BigFont>Таких мемов не нашлось</BigFont>
           }
-          {this.state.results.map(meme =>
-            meme.img !== null ?
-              <img src={meme.img.src} className='gallery-item' key={meme.id} />
-            :
-              <CircularProgress key={meme.id} className='gallery-item' />
-          )}
+          <Gallery list={this.state.results} />
         </div>
       </Center>
     )

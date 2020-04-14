@@ -5,6 +5,10 @@ export type Meme = {
   textDescription: string
 }
 
+export type UnloadedMeme = {
+  id: number
+}
+
 export type SnackbarError = {
   msg: string
   short: boolean
