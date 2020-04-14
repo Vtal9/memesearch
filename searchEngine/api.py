@@ -1,4 +1,5 @@
 from memes.models import Memes
+from tags.models import Tags
 from .indexer.simplifier import simplify_string
 from .models import Images
 from .models import TextDescriptions
@@ -52,20 +53,29 @@ def search(query_text, query_image):
 
     return result
 
+
 class SearchAPI(generics.GenericAPIView):
     serializer_class = ImagesSerializer
 
     def get(self, request, *args, **kwargs):
-
-        print(TextDescriptions.objects.all()[0].index)
         # приходит запрос в виде двух строк - слова через пробел, мб запятые, с ключевыми словами
         query_text = self.request.GET.get('qText')
         query_image = self.request.GET.get('qImage')
+
+        # поиск и ранжировка всех мемов подходящих под запрос
         result = search(query_text, query_image)
+
+        # фильтруем по тегам
+        query_tags = self.request.GET.get('tags')
+        res = result[0]
+        if query_tags is not None:
+            tags = query_tags.split(',')
+            for tag_id in tags:
+                res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
 
         # записываем их в  response
         if result[1] == "":
-            response = JsonResponse([{'id': i} for i in result[0]], safe=False)
+            response = JsonResponse([{'id': i} for i in res], safe=False)
         else:
             response = HttpResponse(result[1])
         return response
@@ -118,14 +128,24 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         # приходит запрос в виде двух строк - слова через пробел, мб запятые, с ключевыми словами
         query_text = self.request.GET.get('qText')
         query_image = self.request.GET.get('qImage')
+
+        # поиск и ранжировка всех мемов подходящих под запрос
         result = search(query_text, query_image)
+
+        # фильтруем по своим мемам
         queryset = request.user.ownImages.filter(Q(id__in=result[0]))
-        print(request.user.ownImages)
-        print(Memes.objects.filter(imageDescription="моймем")[0].owner)
+
+        # фильтруем по тегам
+        query_tags = self.request.GET.get('tags')
+        res = [i.id for i in queryset]
+        if query_tags is not None:
+            tags = query_tags.split(',')
+            for tag_id in tags:
+                res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
 
         # записываем их в  response
         if result[1] == "":
-            response = JsonResponse([{'id': i.id} for i in queryset], safe=False)
+            response = JsonResponse([{'id': i} for i in res], safe=False)
         else:
             response = HttpResponse(result[1])
 

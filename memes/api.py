@@ -33,13 +33,6 @@ class MemesViewSet(viewsets.ModelViewSet):
         ]
         return queryset
 
-    # def patch(self, request, pk):
-    #     print("patch")
-    #     queryset = Memes.objects.get(pk=pk)
-    #     queryset.textDescription += " " + request.textDescription
-    #     queryset.imageDescription += " " + request.imageDescription
-    #     super(Memes, queryset).save(update_fields=['textDescription, imageDescription'])
-
 
 class UnMarkedMemesViewSet(viewsets.ModelViewSet):
     queryset = Memes.objects.filter(textDescription="", imageDescription="").order_by('?')[0:1]
