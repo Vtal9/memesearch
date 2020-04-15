@@ -169,7 +169,10 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
 
         # записываем их в  response
         if result[1] == "":
-            response = JsonResponse([{'url': i} for i in res], safe=False)
+            response = JsonResponse([{
+                'id': i,
+                'url': Memes.objects.get(pk=i).url
+            } for i in res], safe=False)
         else:
             response = HttpResponse(result[1])
 
