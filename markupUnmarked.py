@@ -23,9 +23,11 @@ def markUp():
     # TextDescriptions.objects.all().delete()
     for meme in un_marked_up_memes:
         y = settings.Y
-        y.download(meme.fileName, 'media/toMarkup') # по идее по этому адрсу и будет лежать картинка, можешь поменять адрес как тебе надо
-        textDescription, imageDescription = ARTEM_RAZMET_MEM('media/toMarkup')
-
+        path = 'media/toMarkup'   # по идее по этому адрсу и будет лежать картинка, можешь поменять адрес как тебе надо
+        y.download(meme.fileName, path)
+        textDescription, imageDescription = ARTEM_RAZMET_MEM(path)
+        if os.path.isfile(path):
+            os.remove(path)
         # # Построение нового индекса по добавленному мему
         meme_index = indexer.full_index([info.MemeInfo(meme.id, textDescription, imageDescription)])
         update_index_in_db(meme.textDescription, meme.imageDescription, meme_index.text_words, meme_index.descr_words)
