@@ -53,7 +53,7 @@ interface SearchState {
   imageQuery: string
   textQuery: string
   extended: boolean
-  state: 'initial' | 'loading' | 'done'
+  state: 'initial' | 'loading' | 'done' | 'error'
   results: (UnloadedMeme | UnloadedForeignMeme)[]
   amongOwnFlag: boolean
 }
@@ -105,7 +105,7 @@ class Search extends React.Component<SearchProps, SearchState> {
         })
       })
     }).catch(() => {
-      this.setState({ state: 'done', results: [] })
+      this.setState({ state: 'error' })
     })
   }
 
@@ -168,6 +168,9 @@ class Search extends React.Component<SearchProps, SearchState> {
           }
           {this.state.results.length === 0 && this.state.state === 'done' &&
             <BigFont>Таких мемов не нашлось</BigFont>
+          }
+          {this.state.state === 'error' &&
+            <BigFont>Ошибка сервера, попробуйте ещё раз</BigFont>
           }
           <Gallery list={this.state.results} authState={this.props.authState} />
         </div>

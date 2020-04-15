@@ -83,6 +83,10 @@ function convertToPng(imgBlob: Blob) {
         }
       }, "image/png", 1);
     }
+    imageEl.onerror = e => {
+      console.log(e)
+      reject()
+    }
     imageEl.src = imageUrl
   })
 }
@@ -102,12 +106,16 @@ class _Copy extends React.Component<CopyProps, CopyState> {
 
   async copy() {
     this.setState({ disabled: true })
-    const img = await fetch(this.props.img.src)
-    let blob = await img.blob()
     try {
+      const url = /*'https://cors-anywhere.herokuapp.com/' + */this.props.img.src
+      const img = await fetch(url)
+      console.log('fetched')
+      let blob = await img.blob()
+      console.log('blobbed', blob)
       const ClipboardItem: any = window['ClipboardItem' as any]
       if (blob.type !== 'image/png') {
         blob = await convertToPng(blob)
+        console.log('converted')
       }
       await (navigator.clipboard as any).write([
         new ClipboardItem({
@@ -119,7 +127,7 @@ class _Copy extends React.Component<CopyProps, CopyState> {
     } catch (error) {
       this.setState({ disabled: false })
       console.log(error)
-      this.props.enqueueSnackbar('Ваш браузер не поддерживает автоматическое копирование. Скопируйте вручную')
+      this.props.enqueueSnackbar('Этак кнопка работает не во всех случаях, например, сейчас :(')
     }
   }
 
