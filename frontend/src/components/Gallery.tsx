@@ -1,14 +1,10 @@
 import React from 'react'
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
-import { UnloadedMeme, AuthState, User, UnloadedForeignMeme } from '../util/Types'
+import { UnloadedMeme, AuthState, User } from '../util/Types'
 import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 
-
-function isForeign(meme: UnloadedMeme | UnloadedForeignMeme): meme is UnloadedForeignMeme {
-  return (meme as UnloadedMeme).id === undefined
-}
 
 type AddRemoveProps = WithSnackbarProps & {
   id: number
@@ -107,15 +103,17 @@ class _Copy extends React.Component<CopyProps, CopyState> {
   async copy() {
     this.setState({ disabled: true })
     try {
-      const url = /*'https://cors-anywhere.herokuapp.com/' + */this.props.img.src
-      const img = await fetch(url)
-      console.log('fetched')
+      const cors_proxy = 'https://cors-anywhere.herokuapp.com/'
+      let img: Response
+      try {
+        img = await fetch(this.props.img.src)
+      } catch (e) {
+        img = await fetch(cors_proxy + this.props.img.src)
+      }
       let blob = await img.blob()
-      console.log('blobbed', blob)
       const ClipboardItem: any = window['ClipboardItem' as any]
       if (blob.type !== 'image/png') {
         blob = await convertToPng(blob)
-        console.log('converted')
       }
       await (navigator.clipboard as any).write([
         new ClipboardItem({
@@ -127,7 +125,7 @@ class _Copy extends React.Component<CopyProps, CopyState> {
     } catch (error) {
       this.setState({ disabled: false })
       console.log(error)
-      this.props.enqueueSnackbar('Этак кнопка работает не во всех случаях, например, сейчас :(')
+      this.props.enqueueSnackbar('Не удалось скопировать, но вы можете сделать это вручную')
     }
   }
 
@@ -146,7 +144,7 @@ class _Copy extends React.Component<CopyProps, CopyState> {
 const Copy = withSnackbar(_Copy)
 
 type GalleryItemProps = {
-  unloadedMeme: UnloadedMeme | UnloadedForeignMeme
+  unloadedMeme: UnloadedMeme
   openDialog: (img: HTMLImageElement) => void
   authState: AuthState
   onDelete?: () => void
@@ -182,7 +180,7 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
   }
 
   load() {
-    if (isForeign(this.props.unloadedMeme)) {
+    if (this.props.unloadedMeme.type === 'external') {
       const image = new Image()
       image.onload = () => {
         this.setState({
@@ -249,7 +247,7 @@ function imageSize(img: HTMLImageElement) {
 }
 
 type GalleryProps = {
-  list: (UnloadedMeme | UnloadedForeignMeme)[]
+  list: UnloadedMeme[]
   authState: AuthState
 }
 
@@ -280,7 +278,7 @@ export default class Gallery extends React.Component<GalleryProps, GalleryState>
           ]}
         </Dialog>
         {this.props.list.map(item => (
-          <GalleryItem key={isForeign(item) ? item.url : item.id} unloadedMeme={item}
+          <GalleryItem key={item.url} unloadedMeme={item}
             authState={this.props.authState}
             openDialog={(img: HTMLImageElement) => {
               this.setState({ dialogImg: img })

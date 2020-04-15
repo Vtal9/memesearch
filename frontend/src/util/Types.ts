@@ -5,13 +5,9 @@ export type Meme = {
   textDescription: string
 }
 
-export type UnloadedMeme = {
-  id: number
-}
-
-export type UnloadedForeignMeme = {
-  url: string
-}
+export type UnloadedMeme =
+| { type: 'native', id: number, url: string }
+| { type: 'external', url: string }
 
 export type SnackbarError = {
   msg: string
