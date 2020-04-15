@@ -167,7 +167,10 @@ class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
         }}
         title='Доразметить'
       ><Icon>edit</Icon></IconButton>,
-      <Dialog open={this.state.dialogOpen}>
+      <Dialog
+        open={this.state.dialogOpen}
+        onClose={() => this.setState({ dialogOpen: false })}
+      >
         <DialogContent>
           <DescriptionForm
             memeId={this.props.id}
@@ -175,7 +178,7 @@ class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
             onDone={() => {
               this.setState({ dialogOpen: false })
             }}
-            update={true}
+            concat={true}
           />
         </DialogContent>
       </Dialog>
