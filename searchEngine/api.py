@@ -21,13 +21,16 @@ def split_query(q):
             res.append(j)
     return res
 
+
 DEV_API_KEY = 'AIzaSyD1Na311j0BcW2_xw8IJwxic3GB1f-x_vo'
 PROJECT_CX = '002908623333556470340:g0fw495dowk'
+
 
 def google_search(query_text, num=10):
     gis = GoogleImagesSearch(DEV_API_KEY, PROJECT_CX)
     gis.search({'q': '{query} meme'.format(query=query_text), 'num': 10})
     return [img._url for img in gis.results()]
+
 
 def search(query_text, query_image):
     # разбиваем запросы на отдельные слова.
@@ -72,6 +75,7 @@ class SearchAPI(generics.GenericAPIView):
 
         # поиск и ранжировка всех мемов подходящих под запрос
         result = search(query_text, query_image)
+        google_urls = []
 
         # фильтруем по тегам
         query_tags = self.request.GET.get('tags')
@@ -80,15 +84,23 @@ class SearchAPI(generics.GenericAPIView):
             tags = query_tags.split(',')
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
+        else:
+            if len(result[0]) < 5:
+                google_urls = list(google_search(query_text))
 
-        google_urls = []
-        if len(result[0]) < 5:
-            google_urls = list(google_search(query_text))
-            result = (result[0], result[1], google_urls)
-        
+
         # записываем их в  response
         if result[1] == "":
-            response = JsonResponse([{'id': i} for i in res + google_urls], safe=False)
+            response = JsonResponse([
+                                        {
+                                            'id': i,
+                                            'url': Memes.objects.get(pk=i).url
+                                        } for i in res
+                                    ] + [
+                                        {
+                                            'url': url
+                                        } for url in google_urls
+                                    ], safe=False)
         else:
             response = HttpResponse(result[1])
         return response
@@ -158,7 +170,7 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
 
         # записываем их в  response
         if result[1] == "":
-            response = JsonResponse([{'id': i} for i in res], safe=False)
+            response = JsonResponse([{'url': i} for i in res], safe=False)
         else:
             response = HttpResponse(result[1])
 
