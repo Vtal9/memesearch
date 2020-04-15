@@ -2,18 +2,17 @@ import React from 'react'
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
 import { UnloadedMeme, AuthState, User, UnloadedForeignMeme } from '../util/Types'
-import { CircularProgress, IconButton, Icon } from '@material-ui/core'
+import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 
 
 function isForeign(meme: UnloadedMeme | UnloadedForeignMeme): meme is UnloadedForeignMeme {
-  return (meme as UnloadedForeignMeme).url !== undefined
+  return (meme as UnloadedMeme).id === undefined
 }
 
 type AddRemoveProps = WithSnackbarProps & {
   id: number
   openDialog: (id: number, img: HTMLImageElement) => void
-  onDelete?: () => void
   own: boolean
   user: User
 }
@@ -43,9 +42,6 @@ class _AddRemove extends React.Component<AddRemoveProps, AddRemoveState> {
       this.props.enqueueSnackbar(
         method === 'remove' ? 'Мем удалён из вашей коллекции' : 'Мем добавлен в вашу коллекцию'
       )
-      if (method === 'remove' && this.props.onDelete) {
-        this.props.onDelete()
-      }
     }).catch(error => {
       this.setState({ disabled: false })
     })
@@ -54,6 +50,7 @@ class _AddRemove extends React.Component<AddRemoveProps, AddRemoveState> {
   render() {
     return (
       <IconButton
+        size='small'
         disabled={this.state.disabled}
         onClick={() => {
           this.addDelete(this.state.own ? 'remove' : 'add')
@@ -66,9 +63,83 @@ class _AddRemove extends React.Component<AddRemoveProps, AddRemoveState> {
 
 const AddRemove = withSnackbar(_AddRemove)
 
+
+function convertToPng(imgBlob: Blob) {
+  const imageUrl = window.URL.createObjectURL(imgBlob)
+  const canvas = document.createElement("canvas")
+  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D
+  const imageEl = new Image()
+  return new Promise<Blob>((resolve, reject) => {
+    imageEl.onload = e => {
+      const target = e.target as HTMLImageElement
+      canvas.width = target.width;
+      canvas.height = target.height;
+      ctx.drawImage(target, 0, 0, target.width, target.height);
+      canvas.toBlob(blob => {
+        if (blob !== null) {
+          resolve(blob)
+        } else {
+          reject()
+        }
+      }, "image/png", 1);
+    }
+    imageEl.src = imageUrl
+  })
+}
+
+type CopyProps = {
+  img: HTMLImageElement
+} & WithSnackbarProps
+
+type CopyState = {
+  disabled: boolean
+}
+
+class _Copy extends React.Component<CopyProps, CopyState> {
+  state: CopyState = {
+    disabled: false
+  }
+
+  async copy() {
+    this.setState({ disabled: true })
+    const img = await fetch(this.props.img.src)
+    let blob = await img.blob()
+    try {
+      const ClipboardItem: any = window['ClipboardItem' as any]
+      if (blob.type !== 'image/png') {
+        blob = await convertToPng(blob)
+      }
+      await (navigator.clipboard as any).write([
+        new ClipboardItem({
+            [blob.type]: blob
+        })
+      ]);
+      this.setState({ disabled: false })
+      this.props.enqueueSnackbar('Скопировано в буфер обмена')
+    } catch (error) {
+      this.setState({ disabled: false })
+      console.log(error)
+      this.props.enqueueSnackbar('Ваш браузер не поддерживает автоматическое копирование. Скопируйте вручную')
+    }
+  }
+
+  render() {
+    return (
+      <IconButton
+        disabled={this.state.disabled}
+        size='small'
+        onClick={() => this.copy()}
+        title='Копировать в буфер обмена'
+      ><Icon>file_copy</Icon></IconButton>
+    )
+  }
+}
+
+const Copy = withSnackbar(_Copy)
+
 type GalleryItemProps = {
   unloadedMeme: UnloadedMeme | UnloadedForeignMeme
-  openDialog: (id: number, img: HTMLImageElement) => void
+  openDialog: (img: HTMLImageElement) => void
   authState: AuthState
   onDelete?: () => void
 }
@@ -123,8 +194,8 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
   }
 
   openDialog() {
-    if (this.state.status.type === 'done') {
-      this.props.openDialog(this.state.status.id, this.state.status.img)
+    if (this.state.status.type !== 'loading') {
+      this.props.openDialog(this.state.status.img)
     }
   }
 
@@ -141,7 +212,7 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
             {this.props.authState.status === 'yes' && this.state.status.type === 'done' &&
               <AddRemove
                 user={this.props.authState.user}
-                openDialog={this.props.openDialog}
+                openDialog={this.openDialog}
                 id={this.state.status.id}
                 own={(() => {
                   const owners = this.state.status.owners
@@ -152,13 +223,21 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
                   }
                   return false
                 })()}
-                onDelete={this.props.onDelete}
               />
             }
+            <Copy img={this.state.status.img} />
           </div>
         </div>
     )
   }
+}
+
+function imageSize(img: HTMLImageElement) {
+  const [ imgW, imgH ] = [ img.width, img.height ]
+  const [ clientW, clientH ] = [ window.innerWidth, window.innerHeight ]
+  const [ availableW, availableH ] = [ clientW - 64, clientH - 110 ]
+  const scale = Math.min(1, availableW / imgW, availableH / imgH)
+  return { width: imgW * scale, height: imgH * scale }
 }
 
 type GalleryProps = {
@@ -166,15 +245,37 @@ type GalleryProps = {
   authState: AuthState
 }
 
-export default class Gallery extends React.Component<GalleryProps> {
+type GalleryState = {
+  dialogImg: HTMLImageElement | null
+}
+
+export default class Gallery extends React.Component<GalleryProps, GalleryState> {
+  state: GalleryState = {
+    dialogImg: null
+  }
+
   render() {
     return (
       <div className="gallery">
+        <Dialog
+          maxWidth={false}
+          open={this.state.dialogImg !== null}
+          onClose={() => this.setState({ dialogImg: null })}
+        >
+          {this.state.dialogImg !== null && [
+            <img src={this.state.dialogImg.src} {...imageSize(this.state.dialogImg)} key={1} />,
+            <DialogActions key={2}>
+              <a href={this.state.dialogImg.src} target='_blank'>
+                <Typography>Открыть оригинал</Typography>
+              </a>
+            </DialogActions>
+          ]}
+        </Dialog>
         {this.props.list.map(item => (
-          <GalleryItem key={item + ''} unloadedMeme={item}
+          <GalleryItem key={isForeign(item) ? item.url : item.id} unloadedMeme={item}
             authState={this.props.authState}
-            openDialog={(id: number, img: HTMLImageElement) => {
-            
+            openDialog={(img: HTMLImageElement) => {
+              this.setState({ dialogImg: img })
           }} />
         ))}
       </div>

@@ -7,6 +7,7 @@ const app = express();
 
 webpackConfig.mode = 'development'
 webpackConfig.output.publicPath = '/'
+webpackConfig.entry = './main.tsx'
 const compiler = webpack(webpackConfig);
 
 app.use(

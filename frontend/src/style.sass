@@ -8,6 +8,7 @@ $medium-screen: 800px
   padding: 0
 body
   background: #eeeeee
+  min-height: 100%
 a, a:visited
   color: $color
 a
@@ -113,12 +114,14 @@ a
     position: relative
     img
       height: 200px
+      display: block
+      cursor: pointer
     .actions
       display: none
       position: absolute
-      top: 0
-      left: 0
-      background: white
+      bottom: 0
+      right: 0
+      background: rgba(255, 255, 255, .9)
     &:hover
       .actions
         display: block
