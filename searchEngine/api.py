@@ -1,17 +1,18 @@
-from memes.models import Memes
-from tags.models import Tags
-from .indexer.simplifier import simplify_string
-from .models import Images
-from .models import TextDescriptions
-from .models import ImageDescriptions
-from rest_framework import viewsets, permissions, generics
-from .serializers import ImagesSerializer
-from .serializers import TextDescriptionsSerializer
-from .serializers import ImagesDescriptionsSerializer
 from django.db.models import Q
-from .indexer import indexer, info, query, simplifier
 from django.http import HttpResponse, JsonResponse
 from google_images_search import GoogleImagesSearch
+from rest_framework import viewsets, permissions, generics
+
+from memes.models import Memes
+from tags.models import Tags
+from .indexer import query
+from .indexer.simplifier import simplify_string
+from .models import ImageDescriptions
+from .models import Images
+from .models import TextDescriptions
+from .serializers import ImagesDescriptionsSerializer
+from .serializers import ImagesSerializer
+from .serializers import TextDescriptionsSerializer
 
 
 def split_query(q):
@@ -26,9 +27,9 @@ DEV_API_KEY = 'AIzaSyD1Na311j0BcW2_xw8IJwxic3GB1f-x_vo'
 PROJECT_CX = '002908623333556470340:g0fw495dowk'
 
 
-def google_search(query_text, num=10):
+def google_search(query_text, num=5):
     gis = GoogleImagesSearch(DEV_API_KEY, PROJECT_CX)
-    gis.search({'q': '{query} meme'.format(query=query_text), 'num': 10})
+    gis.search({'q': '{query} meme'.format(query=query_text), 'num': num})
     return [img._url for img in gis.results()]
 
 
@@ -85,22 +86,20 @@ class SearchAPI(generics.GenericAPIView):
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
         else:
-            if len(result[0]) < 5:
-                google_urls = list(google_search(query_text))
-
+            try:
+                if len(result[0]) < 5:
+                    google_urls = list(google_search(query_text))
+            except:
+                pass
 
         # записываем их в  response
         if result[1] == "":
-            response = JsonResponse([
-                                        {
-                                            'id': i,
-                                            'url': Memes.objects.get(pk=i).url
-                                        } for i in res
-                                    ] + [
-                                        {
-                                            'url': url
-                                        } for url in google_urls
-                                    ], safe=False)
+            response = JsonResponse([{
+                'id': i,
+                'url': Memes.objects.get(pk=i).url
+            } for i in res] + [{
+                'url': url
+            } for url in google_urls], safe=False)
         else:
             response = HttpResponse(result[1])
         return response
