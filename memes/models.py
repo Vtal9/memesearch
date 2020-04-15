@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 import re
 import time
 import yadisk
+from datetime import datetime
 
 from searchEngine.indexer import indexer
 from searchEngine.indexer import info
@@ -22,6 +23,7 @@ def update_index_in_db(text, descr, new_index_text, new_index_descr):
     sdescr = simplifier.simplify_string(descr)
 
     text_words = stext.split(' ')
+    print(text_words)
     descr_words = sdescr.split(' ')
 
     text_index = indexer_models.TextDescriptions.objects.filter(Q(word__in=text_words))
@@ -89,5 +91,6 @@ class Memes(models.Model):
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
 
         super(Memes, self).save(*args, **kwargs)
+
         if self.id % 100 == 0:
             y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))

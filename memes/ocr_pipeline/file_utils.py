@@ -2,7 +2,7 @@
 import os
 import numpy as np
 import cv2
-from . import imgproc
+# from . import imgproc
 
 # borrowed from https://github.com/lengstrom/fast-style-transfer/blob/master/src/utils.py
 def list_images(in_path, formats=[".jpg", ".jpeg", ".gif", ".png", ".pgm", ".bmp"]):
