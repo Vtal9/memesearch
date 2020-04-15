@@ -19,14 +19,19 @@ DB_INDEX_DESCR_SAMPLE = {"сапака": "{'url1', 'url2'}", "фалк": "{'url2
 def parse_db_index(db_index_str, is_descr=False):
     if is_descr:
         sstr = db_index_str.replace('\'', '')[1:-1].replace(',', '')
-        return set(sstr.split(' '))
+        result = set(sstr.split(' '))
+        if 'None' in result:
+            result.remove('None')
+        return result
     else:
         url_poss = {}
         s = db_index_str.replace('\'', '')[1:-1].replace('],', ']')
 
         for token in s.split(']')[:-1]:  # -1 because after ']', next is empty
             temp = token.split(': ')
-            url_poss[temp[0].replace(' ', '')] = [int(num) for num in temp[1][1:].split(',')]
+            url = temp[0].replace(' ', '')
+            if url != 'None':
+                url_poss[temp[0].replace(' ', '')] = [int(num) for num in temp[1][1:].split(',')]
         return url_poss
 
 
@@ -143,7 +148,7 @@ def make_query_descr_part(descr):
                 common_urls = db_result(words[0], is_descr=True)[word]
             else:
                 common_urls.intersection(db_result(word, is_descr=True)[word])
-        except:
+        except Exception as ex:
             pass
 
     return common_urls
