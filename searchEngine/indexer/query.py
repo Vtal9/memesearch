@@ -95,10 +95,14 @@ def _phrase_query(phrase, word_index, urls_weight={}):
 def make_query_text_part(text):
     stext = simplifier.simplify_string(text)
 
-    word_text_index = {}
-
     words = stext.split(' ')
     words_set = set(words)
+
+    if '' in words_set:
+        words_set.remove('')
+
+    word_text_index = {}
+
     for word in words_set:  # optimisation
         try:
             word_text_index.update(db_result(word, is_descr=False))
@@ -110,7 +114,7 @@ def make_query_text_part(text):
 
     urls_weight = {}
 
-    for word in words_set:
+    for word in word_text_index.keys():
         urls_weight.update(_one_word_query(word, word_text_index, urls_weight))
 
     rows = Memes.objects.filter(Q(id__in=list(urls_weight.keys())))
