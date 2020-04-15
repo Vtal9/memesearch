@@ -9,3 +9,4 @@ scikit-image
 pytesseract
 torch
 torchvision
+Google-Images-Search
