@@ -5,11 +5,11 @@ import { withSnackbar, WithSnackbarProps } from 'notistack';
 import Funcs from '../util/Funcs';
 
 
-function updateDescription(id: number, textDescription: string, imageDescription: string, update?: boolean) {
+function updateDescription(id: number, textDescription: string, imageDescription: string, concat?: boolean) {
   return new Promise<{}>((resolve, reject) => {
     let promise: Promise<AxiosResponse>
 
-    if (update) {
+    if (concat) {
       const urlData = new URLSearchParams()
       urlData.append('image', imageDescription)
       urlData.append('text', textDescription)
@@ -43,7 +43,7 @@ interface FormProps extends WithSnackbarProps {
   initialImageDescription?: string
   initialTextDescription?: string
   autofocus?: boolean
-  update?: boolean
+  concat?: boolean
 }
 
 interface FormState {
@@ -64,7 +64,7 @@ class Form extends React.Component<FormProps, FormState> {
   handleSubmit(e: React.FormEvent | undefined = undefined) {
     if (e) e.preventDefault()
 
-    if (!this.props.update && this.state.imageDescription.trim() === '') {
+    if (!this.props.concat && this.state.imageDescription.trim() === '') {
       this.setState({ descriptionError: true })
       return
     }
@@ -74,7 +74,7 @@ class Form extends React.Component<FormProps, FormState> {
       this.props.memeId,
       this.state.textDescription,
       this.state.imageDescription,
-      this.props.update
+      this.props.concat
     ).then(() => {
       this.setState({ state: 'saved' })
       if (this.props.onDone) this.props.onDone()
