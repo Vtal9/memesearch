@@ -5,11 +5,25 @@ import { withSnackbar, WithSnackbarProps } from 'notistack';
 import Funcs from '../util/Funcs';
 
 
-function updateDescription(id: number, textDescription: string, imageDescription: string) {
+function updateDescription(id: number, textDescription: string, imageDescription: string, update?: boolean) {
   return new Promise<{}>((resolve, reject) => {
-    Axios.patch(`api/memes/${id}/`, {
+    let promise = Axios.patch(`api/memes/${id}/`, {
       imageDescription, textDescription
-    }).then(function(response) {
+    })
+
+    if (update) {
+      const urlData = new URLSearchParams()
+      urlData.append('image', imageDescription)
+      urlData.append('text', textDescription)
+      urlData.append('id', id + '')
+      promise = Axios.post(`api/updateMeme?` + urlData, {}, {
+        headers: {
+          Authorization: `Token ${Funcs.getToken()}`
+        }
+      })
+    }
+    
+    promise.then(function(response) {
       resolve()
     }).catch(function(error) {
       if (error.response && error.response.data) {
@@ -27,6 +41,7 @@ interface FormProps extends WithSnackbarProps {
   initialImageDescription?: string
   initialTextDescription?: string
   autofocus?: boolean
+  update?: boolean
 }
 
 interface FormState {
@@ -47,7 +62,7 @@ class Form extends React.Component<FormProps, FormState> {
   handleSubmit(e: React.FormEvent | undefined = undefined) {
     if (e) e.preventDefault()
 
-    if (this.state.imageDescription.trim() === '') {
+    if (!this.props.update && this.state.imageDescription.trim() === '') {
       this.setState({ descriptionError: true })
       return
     }
@@ -56,7 +71,8 @@ class Form extends React.Component<FormProps, FormState> {
     updateDescription(
       this.props.memeId,
       this.state.textDescription,
-      this.state.imageDescription
+      this.state.imageDescription,
+      this.props.update
     ).then(() => {
       this.setState({ state: 'saved' })
       if (this.props.onDone) this.props.onDone()

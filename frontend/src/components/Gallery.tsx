@@ -4,6 +4,7 @@ import Funcs from '../util/Funcs'
 import { UnloadedMeme, AuthState, User } from '../util/Types'
 import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
+import DescriptionForm from './DescriptionForm'
 
 
 type AddRemoveProps = WithSnackbarProps & {
@@ -143,6 +144,47 @@ class _Copy extends React.Component<CopyProps, CopyState> {
 
 const Copy = withSnackbar(_Copy)
 
+
+type ExtraMarkupProps = {
+  id: number
+} & WithSnackbarProps
+
+type ExtraMarkupState = {
+  dialogOpen: boolean
+}
+
+class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
+  state: ExtraMarkupState = {
+    dialogOpen: false
+  }
+
+  render() {
+    return ([
+      <IconButton
+        size='small'
+        onClick={() => {
+          this.setState({ dialogOpen: true })
+        }}
+        title='Доразметить'
+      ><Icon>edit</Icon></IconButton>,
+      <Dialog open={this.state.dialogOpen}>
+        <DialogContent>
+          <DescriptionForm
+            memeId={this.props.id}
+            autofocus={true}
+            onDone={() => {
+              this.setState({ dialogOpen: false })
+            }}
+            update={true}
+          />
+        </DialogContent>
+      </Dialog>
+    ])
+  }
+}
+
+const ExtraMarkup = withSnackbar(_ExtraMarkup)
+
 type GalleryItemProps = {
   unloadedMeme: UnloadedMeme
   openDialog: (img: HTMLImageElement) => void
@@ -232,6 +274,11 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
               />
             }
             <Copy img={this.state.status.img} />
+            {this.props.authState.status === 'yes' && this.state.status.type === 'done' &&
+              <ExtraMarkup
+                id={this.state.status.id}
+              />
+            }
           </div>
         </div>
     )

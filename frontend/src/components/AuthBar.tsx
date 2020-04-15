@@ -199,6 +199,7 @@ export default class AuthBar extends React.Component<AuthBarProps, AuthBarState>
           >
             <MenuList>
               <MenuItem onClick={() => {
+                this.setState({ userMenuAnchor: null })
                 location.href = '#/mymemes'
               }}>Коллекция</MenuItem>
               <MenuItem onClick={() => {
