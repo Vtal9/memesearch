@@ -1,15 +1,13 @@
 import React, { FormEvent } from 'react'
 import { TextField, Grid, Button, Icon, Typography } from '@material-ui/core';
-import Axios from 'axios'
+import Axios, { AxiosResponse } from 'axios'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import Funcs from '../util/Funcs';
 
 
 function updateDescription(id: number, textDescription: string, imageDescription: string, update?: boolean) {
   return new Promise<{}>((resolve, reject) => {
-    let promise = Axios.patch(`api/memes/${id}/`, {
-      imageDescription, textDescription
-    })
+    let promise: Promise<AxiosResponse>
 
     if (update) {
       const urlData = new URLSearchParams()
@@ -20,6 +18,10 @@ function updateDescription(id: number, textDescription: string, imageDescription
         headers: {
           Authorization: `Token ${Funcs.getToken()}`
         }
+      })
+    } else {
+      promise = Axios.patch(`api/memes/${id}/`, {
+        imageDescription, textDescription
       })
     }
     
