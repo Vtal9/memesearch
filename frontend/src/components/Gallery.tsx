@@ -1,10 +1,14 @@
 import React from 'react'
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
-import { UnloadedMeme, AuthState, User } from '../util/Types'
+import { UnloadedMeme, AuthState, User, UnloadedForeignMeme } from '../util/Types'
 import { CircularProgress, IconButton, Icon } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 
+
+function isForeign(meme: UnloadedMeme | UnloadedForeignMeme): meme is UnloadedForeignMeme {
+  return (meme as UnloadedForeignMeme).url !== undefined
+}
 
 type AddRemoveProps = WithSnackbarProps & {
   id: number
@@ -63,7 +67,7 @@ class _AddRemove extends React.Component<AddRemoveProps, AddRemoveState> {
 const AddRemove = withSnackbar(_AddRemove)
 
 type GalleryItemProps = {
-  id: number
+  unloadedMeme: UnloadedMeme | UnloadedForeignMeme
   openDialog: (id: number, img: HTMLImageElement) => void
   authState: AuthState
   onDelete?: () => void
@@ -79,6 +83,7 @@ type GalleryItemState = {
   status:
   | { type: 'loading' }
   | { type: 'done', img: HTMLImageElement, owners: Owner[], id: number }
+  | { type: 'foreign', img: HTMLImageElement }
 }
 
 class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
@@ -91,25 +96,35 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
   }
 
   componentDidUpdate(prevProps: GalleryItemProps) {
-    if (prevProps.id !== this.props.id) {
+    if (prevProps.unloadedMeme !== this.props.unloadedMeme) {
       this.setState({ status: { type: 'loading' } })
       this.load()
     }
   }
 
   load() {
-    Axios.get(`api/memes/${this.props.id}/`).then(response => {
-      Funcs.loadImage(response.data.id, response.data.url, img => {
+    if (isForeign(this.props.unloadedMeme)) {
+      const image = new Image()
+      image.onload = () => {
         this.setState({
-          status: { type: 'done', img: img, owners: response.data.owner, id: response.data.id }
+          status: { type: 'foreign', img: image }
         })
-      }, () => {})
-    })
+      }
+      image.src = this.props.unloadedMeme.url
+    } else {
+      Axios.get(`api/memes/${this.props.unloadedMeme.id}/`).then(response => {
+        Funcs.loadImage(response.data.id, response.data.url, img => {
+          this.setState({
+            status: { type: 'done', img: img, owners: response.data.owner, id: response.data.id }
+          })
+        }, () => {})
+      })
+    }
   }
 
   openDialog() {
     if (this.state.status.type === 'done') {
-      this.props.openDialog(this.props.id, this.state.status.img)
+      this.props.openDialog(this.state.status.id, this.state.status.img)
     }
   }
 
@@ -123,7 +138,7 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
             onClick={() => this.openDialog()}
           />
           <div className='actions'>
-            {this.props.authState.status === 'yes' &&
+            {this.props.authState.status === 'yes' && this.state.status.type === 'done' &&
               <AddRemove
                 user={this.props.authState.user}
                 openDialog={this.props.openDialog}
@@ -146,27 +161,17 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
   }
 }
 
-
 type GalleryProps = {
-  list: UnloadedMeme[]
+  list: (UnloadedMeme | UnloadedForeignMeme)[]
   authState: AuthState
 }
 
-type GalleryState = {
-
-}
-
 export default class Gallery extends React.Component<GalleryProps> {
-  constructor(props: GalleryProps) {
-    super(props)
-
-  }
-
   render() {
     return (
       <div className="gallery">
         {this.props.list.map(item => (
-          <GalleryItem key={item.id} id={item.id}
+          <GalleryItem key={item + ''} unloadedMeme={item}
             authState={this.props.authState}
             openDialog={(id: number, img: HTMLImageElement) => {
             

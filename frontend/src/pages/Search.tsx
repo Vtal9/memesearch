@@ -1,17 +1,21 @@
 import React, { FormEvent } from 'react'
 import Center from '../layout/Center';
-import { Typography, TextField, Grid, Button, FormControlLabel, Switch, FormControl, CircularProgress } from '@material-ui/core';
+import { TextField, Grid, Button, CircularProgress } from '@material-ui/core';
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { Repo, AuthState, UnloadedMeme } from '../util/Types';
+import { Repo, AuthState, UnloadedMeme, UnloadedForeignMeme } from '../util/Types';
 import BigFont from '../layout/BigFont';
 import FlexCenter from '../layout/FlexCenter';
 import MySwitch from '../components/MySwitch';
 import Gallery from '../components/Gallery';
 
 
-type SearchServerResponse = { id: number }[]
+function isNumber(s: string) {
+  return /^\d+$/.test(s)
+}
+
+type SearchServerResponse = { id: string }[]
 
 type Request =
 | { extended: false, q: string }
@@ -50,7 +54,7 @@ interface SearchState {
   textQuery: string
   extended: boolean
   state: 'initial' | 'loading' | 'done'
-  results: UnloadedMeme[]
+  results: (UnloadedMeme | UnloadedForeignMeme)[]
   amongOwnFlag: boolean
 }
 
@@ -93,7 +97,11 @@ class Search extends React.Component<SearchProps, SearchState> {
       this.setState({
         state: 'done',
         results: items.map(item => {
-          return { id: item.id }
+          if (isNumber(item.id)) {
+            return { id: parseInt(item.id) }
+          } else {
+            return { url: item.id }
+          }
         })
       })
     }).catch(() => {

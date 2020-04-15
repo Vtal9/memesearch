@@ -9,6 +9,10 @@ export type UnloadedMeme = {
   id: number
 }
 
+export type UnloadedForeignMeme = {
+  url: string
+}
+
 export type SnackbarError = {
   msg: string
   short: boolean
