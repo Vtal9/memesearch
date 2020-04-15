@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework import routers
-from .api import OwnMemesViewSet, MemesViewSet, OwnMemesAPI, UpdateMemesAPI, AddTagToMemeAPI
+from .api import OwnMemesViewSet, MemesViewSet, OwnMemesAPI, UpdateMemesAPI, AddTagToMemeAPI, \
+    NewURLMemesCompressedViewSet
 from .api import UnMarkedMemesViewSet
 from .api import MarkedMemesViewSet
 from .api import NewURLMemesViewSet
@@ -10,6 +11,7 @@ router.register('api/memes', MemesViewSet, 'memes')
 router.register('api/unmarkedmemes', UnMarkedMemesViewSet, 'unmarkedmemes')
 router.register('api/markedmemes', MarkedMemesViewSet, 'markedmemes')
 router.register('api/new_meme_url', NewURLMemesViewSet, 'newurl')
+# router.register('api/new_meme_compressed_url', NewURLMemesCompressedViewSet, 'newurl_compressed')
 router.register('api/ownMemes', OwnMemesViewSet, 'ownMemes')
 urlpatterns = router.urls
 urlpatterns.append(path('api/configureOwnMemes', OwnMemesAPI.as_view()))

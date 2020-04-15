@@ -55,6 +55,8 @@ class Memes(models.Model):
     image = models.ImageField(blank=True, null=True)
     fileName = models.TextField(blank=True, null=True)
     url = models.URLField(blank=True, null=True, max_length=500)
+    fileName_compressed = models.TextField(blank=True, null=True)
+    url_compressed = models.URLField(blank=True, null=True, max_length=500)
     textDescription = models.TextField(blank=True, null=True)
     imageDescription = models.TextField(blank=True, null=True)
     owner = models.ManyToManyField(User, related_name="ownImages", blank=True)
@@ -73,8 +75,11 @@ class Memes(models.Model):
             y = settings.Y
             name = self.image.url.split(".")
             self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + "." + name[-1]
+            self.fileName_compressed = self.fileName + "_compressed"
             y.upload(self.image, self.fileName)
+            # y.upload(self.image, self.fileName_compressed)  # тут надо заменить self.image на сжатую картинку
             self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
+            # self.url_compressed = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName_compressed)
             if os.path.isfile(self.image.path):
                 os.remove(self.image.path)
             self.image = None
