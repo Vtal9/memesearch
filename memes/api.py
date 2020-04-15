@@ -69,6 +69,26 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
             return [queryset]
 
 
+class NewURLMemesCompressedViewSet(viewsets.ModelViewSet):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
+
+    def get_queryset(self):
+        y = settings.Y
+        id_meme = self.request.GET.get('id')
+
+        if id_meme is not None:
+            queryset = Memes.objects.get(pk=id_meme)
+
+            queryset.url_compressed = yadisk.functions.resources.get_download_link(y.get_session(),
+                                                                                   queryset.fileName_compressed)
+            super(Memes, queryset).save(update_fields=['url_compressed'])
+
+            return [queryset]
+
+
 class OwnMemesAPI(generics.GenericAPIView):
     serializer_class = MemesSerializer
     permission_classes = [

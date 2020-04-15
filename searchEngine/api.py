@@ -96,7 +96,7 @@ class SearchAPI(generics.GenericAPIView):
         if result[1] == "":
             response = JsonResponse([{
                 'id': i,
-                'url': Memes.objects.get(pk=i).url
+                'url': Memes.objects.get(pk=i).url#_compressed
             } for i in res] + [{
                 'url': url
             } for url in google_urls], safe=False)
@@ -171,7 +171,7 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         if result[1] == "":
             response = JsonResponse([{
                 'id': i,
-                'url': Memes.objects.get(pk=i).url
+                'url': Memes.objects.get(pk=i).url#_compressed
             } for i in res], safe=False)
         else:
             response = HttpResponse(result[1])
