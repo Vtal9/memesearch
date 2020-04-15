@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   context: path.join(__dirname, "src"),
-  entry: ["./main-gtm.tsx"],
+  entry: ["./main-gtm.js"],
   output: {
     path: path.join(__dirname, "dist"),
     publicPath: 'static/',
