@@ -64,17 +64,20 @@ def _one_word_query(word, word_index, urls_weight={}):
 
 
 def _bigram_query(word1, word2, word_index, urls_weight={}):
-    common_urls = __intersection(word_index[word1].keys(), word_index[word2].keys())
+    try: # throws exception if word_i not contains in word_index
+        common_urls = __intersection(word_index[word1].keys(), word_index[word2].keys())
 
-    for url in common_urls:
-        poss1 = word_index[word1][url]
-        poss2 = [pos - 1 for pos in word_index[word2][url]]
+        for url in common_urls:
+            poss1 = word_index[word1][url]
+            poss2 = [pos - 1 for pos in word_index[word2][url]]
 
-        if len(__intersection(poss1, poss2)) != 0:
-            if url in urls_weight.keys():
-                urls_weight[url] += BIGRAM_WEIGHT
-            else:
-                urls_weight[url] = BIGRAM_WEIGHT  # + 2
+            if len(__intersection(poss1, poss2)) != 0:
+                if url in urls_weight.keys():
+                    urls_weight[url] += BIGRAM_WEIGHT
+                else:
+                    urls_weight[url] = BIGRAM_WEIGHT  # + 2
+    except:
+        pass
 
     return urls_weight
 
