@@ -3,12 +3,12 @@ import { Grid, Typography, Button, Chip, Select, MenuItem, InputLabel, FormContr
 import Axios from 'axios'
 
 
-type Tag = {
+export type Tag = {
   id: number
   tag: string
 }
 
-function getTags() {
+export function getTags() {
   return new Promise<Tag[]>((resolve, reject) => {
     Axios.get<Tag[]>(`tags/api/all`).then(response => {
       resolve(response.data)
@@ -49,12 +49,6 @@ class TagsForm extends React.Component<TagsFormProps, TagsFormState> {
 
   componentDidMount() {
     this.load()
-  }
-
-  componentDidUpdate(prevProps: TagsFormProps) {
-    if (prevProps.id !== this.props.id) {
-      this.load()
-    }
   }
 
   render() {

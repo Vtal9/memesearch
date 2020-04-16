@@ -2,7 +2,7 @@ import React from 'react'
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
 import { UnloadedMeme, AuthState, User } from '../util/Types'
-import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography } from '@material-ui/core'
+import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography, DialogTitle } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 import DescriptionForm from './DescriptionForm'
 import TagsForm from './TagsForm'
@@ -174,6 +174,7 @@ class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
         open={this.state.dialogOpen}
         onClose={() => this.setState({ dialogOpen: false })}
       >
+        <DialogTitle>Добавление разметки к уже имеющейся</DialogTitle>
         <DialogContent>
           <DescriptionForm
             memeId={this.props.id}
@@ -234,6 +235,14 @@ class TagsEdit extends React.Component<TagsEditProps, TagsEditState> {
     ])
   }
 }
+
+const FakeAdd = withSnackbar((props: WithSnackbarProps) => (
+  <IconButton
+    size='small'
+    title='Добавить в свою коллекцию'
+    onClick={() => props.enqueueSnackbar('Авторизуйтесь, и вы сможете сохранять мемы в свою коллекцию')}
+  ><Icon>add</Icon></IconButton>
+))
 
 type GalleryItemProps = {
   unloadedMeme: UnloadedMeme
@@ -322,6 +331,9 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
                   return false
                 })()}
               />
+            }
+            {this.props.authState.status !== 'yes' && this.state.status.type === 'done' &&
+              <FakeAdd />
             }
             <Copy img={this.state.status.img} />
             {this.props.authState.status === 'yes' && this.state.status.type === 'done' &&
