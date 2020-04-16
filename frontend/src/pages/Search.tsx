@@ -74,7 +74,7 @@ class Search extends React.Component<SearchProps, SearchState> {
       e.preventDefault()
     }
     if (this.state.extended) {
-      if (this.state.imageQuery.trim() === '' || this.state.textQuery.trim() === '') {
+      if (this.state.imageQuery.trim() === '' && this.state.textQuery.trim() === '') {
         return
       }
     } else {

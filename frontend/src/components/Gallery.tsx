@@ -5,6 +5,7 @@ import { UnloadedMeme, AuthState, User } from '../util/Types'
 import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 import DescriptionForm from './DescriptionForm'
+import TagsForm from './TagsForm'
 
 
 type AddRemoveProps = WithSnackbarProps & {
@@ -166,8 +167,10 @@ class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
           this.setState({ dialogOpen: true })
         }}
         title='Доразметить'
+        key={1}
       ><Icon>edit</Icon></IconButton>,
       <Dialog
+        key={2}
         open={this.state.dialogOpen}
         onClose={() => this.setState({ dialogOpen: false })}
       >
@@ -181,12 +184,56 @@ class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
             concat={true}
           />
         </DialogContent>
+        <DialogActions />
       </Dialog>
     ])
   }
 }
 
 const ExtraMarkup = withSnackbar(_ExtraMarkup)
+
+type TagsEditProps = {
+  id: number
+}
+
+type TagsEditState = {
+  dialogOpen: boolean
+}
+
+class TagsEdit extends React.Component<TagsEditProps, TagsEditState> {
+  state: TagsEditState = {
+    dialogOpen: false
+  }
+
+  close() {
+    this.setState({ dialogOpen: false })
+  }
+
+  render() {
+    return ([
+      <IconButton
+        size='small'
+        title='Добавить тег'
+        onClick={() => {
+          this.setState({ dialogOpen: true })
+        }}
+        key={1}
+      >
+        <Icon>local_offer</Icon>
+      </IconButton>,
+      <Dialog
+        open={this.state.dialogOpen}
+        onClose={() => this.close()}
+        key={2}
+      >
+        <DialogContent>
+          <TagsForm id={this.props.id} onDone={() => this.close()} />
+        </DialogContent>
+        <DialogActions />
+      </Dialog>
+    ])
+  }
+}
 
 type GalleryItemProps = {
   unloadedMeme: UnloadedMeme
@@ -281,6 +328,9 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
               <ExtraMarkup
                 id={this.state.status.id}
               />
+            }
+            {this.state.status.type === 'done' &&
+              <TagsEdit id={this.state.status.id} />
             }
           </div>
         </div>
