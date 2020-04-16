@@ -26,7 +26,6 @@ def update_index_in_db(text, descr, new_index_text, new_index_descr):
         return
 
     text_words = stext.split(' ')
-    print(text_words)
     descr_words = sdescr.split(' ')
 
     if stext != '':
