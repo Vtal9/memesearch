@@ -82,7 +82,7 @@ class SearchAPI(generics.GenericAPIView):
         # фильтруем по тегам
         query_tags = self.request.GET.get('tags')
         res = result[0]
-        if query_tags is not None:
+        if query_tags is not None and query_tags != '':
             tags = query_tags.split(',')
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
@@ -164,7 +164,7 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         # фильтруем по тегам
         query_tags = self.request.GET.get('tags')
         res = [i.id for i in queryset]
-        if query_tags is not None:
+        if query_tags is not None and query_tags != '':
             tags = query_tags.split(',')
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]

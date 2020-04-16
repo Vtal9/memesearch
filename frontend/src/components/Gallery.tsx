@@ -2,9 +2,10 @@ import React from 'react'
 import Axios from 'axios'
 import Funcs from '../util/Funcs'
 import { UnloadedMeme, AuthState, User } from '../util/Types'
-import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography } from '@material-ui/core'
+import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography, DialogTitle } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 import DescriptionForm from './DescriptionForm'
+import TagsForm from './TagsForm'
 
 
 type AddRemoveProps = WithSnackbarProps & {
@@ -166,11 +167,14 @@ class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
           this.setState({ dialogOpen: true })
         }}
         title='Доразметить'
+        key={1}
       ><Icon>edit</Icon></IconButton>,
       <Dialog
+        key={2}
         open={this.state.dialogOpen}
         onClose={() => this.setState({ dialogOpen: false })}
       >
+        <DialogTitle>Добавление разметки к уже имеющейся</DialogTitle>
         <DialogContent>
           <DescriptionForm
             memeId={this.props.id}
@@ -181,12 +185,64 @@ class _ExtraMarkup extends React.Component<ExtraMarkupProps, ExtraMarkupState> {
             concat={true}
           />
         </DialogContent>
+        <DialogActions />
       </Dialog>
     ])
   }
 }
 
 const ExtraMarkup = withSnackbar(_ExtraMarkup)
+
+type TagsEditProps = {
+  id: number
+}
+
+type TagsEditState = {
+  dialogOpen: boolean
+}
+
+class TagsEdit extends React.Component<TagsEditProps, TagsEditState> {
+  state: TagsEditState = {
+    dialogOpen: false
+  }
+
+  close() {
+    this.setState({ dialogOpen: false })
+  }
+
+  render() {
+    return ([
+      <IconButton
+        size='small'
+        title='Добавить тег'
+        onClick={() => {
+          this.setState({ dialogOpen: true })
+        }}
+        key={1}
+      >
+        <Icon>local_offer</Icon>
+      </IconButton>,
+      <Dialog
+        open={this.state.dialogOpen}
+        onClose={() => this.close()}
+        key={2}
+      >
+        <DialogContent>
+          <TagsForm id={this.props.id} onDone={() => this.close()} />
+        </DialogContent>
+        <DialogActions />
+      </Dialog>
+    ])
+  }
+}
+
+const FakeAdd = withSnackbar((props: WithSnackbarProps) => (
+  <IconButton
+    size='small'
+    title='Добавить в свою коллекцию'
+    onClick={() => props.enqueueSnackbar('Авторизуйтесь, и вы сможете сохранять мемы в свою коллекцию')}
+  ><Icon>add</Icon></IconButton>
+))
 
 type GalleryItemProps = {
   unloadedMeme: UnloadedMeme
@@ -276,11 +332,17 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
                 })()}
               />
             }
+            {this.props.authState.status !== 'yes' && this.state.status.type === 'done' &&
+              <FakeAdd />
+            }
             <Copy img={this.state.status.img} />
             {this.props.authState.status === 'yes' && this.state.status.type === 'done' &&
               <ExtraMarkup
                 id={this.state.status.id}
               />
+            }
+            {this.state.status.type === 'done' &&
+              <TagsEdit id={this.state.status.id} />
             }
           </div>
         </div>

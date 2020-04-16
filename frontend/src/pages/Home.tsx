@@ -147,7 +147,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
           </ul>
         </Section>
         <Section style={backImg(tactics)}>
-          <Heading>Наши планы на неделю (до 14 апреля)</Heading>
+          <Heading>Наши планы на неделю (до 19 апреля)</Heading>
             <WhiteList>
               <li>
                 <Typography>Возможность размечать и добавлять себе мемы из поиска.</Typography>

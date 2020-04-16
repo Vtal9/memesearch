@@ -9,23 +9,31 @@ import BigFont from '../layout/BigFont';
 import FlexCenter from '../layout/FlexCenter';
 import MySwitch from '../components/MySwitch';
 import Gallery from '../components/Gallery';
+import TagsPicker from '../components/TagsPicker';
+import { Tag } from '../components/TagsForm';
 
 
 type SearchServerResponse = { id?: string, url: string }[]
 
 type Request =
 | { extended: false, q: string }
-| { extended: true, qText: string, qImage: string }
+| { extended: true, tags: Tag[], qText: string, qImage: string }
 
 function search(request: Request, repo: Repo) {
   const qText = request.extended ? request.qText : request.q
   const qImage = request.extended ? request.qImage : request.q
+  const usp = new URLSearchParams()
+  usp.append('qText', qText)
+  usp.append('qImage', qImage)
+  if (request.extended) {
+    usp.append('tags', request.tags.map(tag => tag.id).join(','))
+  }
   const headers = repo === Repo.Own ? {
     Authorization: `Token ${Funcs.getToken()}`
   } : {}
   const api = repo === Repo.Own ? 'search/api/search/own' : 'search/api/search'
   return new Promise<SearchServerResponse>((resolve, reject) => {
-    Axios.get(`${api}/?qText=${encodeURIComponent(qText)}&qImage=${encodeURIComponent(qImage)}`, {
+    Axios.get(api + '/?' + usp, {
       headers
     }).then(response => {
       resolve(response.data)
@@ -50,7 +58,8 @@ interface SearchState {
   textQuery: string
   extended: boolean
   state: 'initial' | 'loading' | 'done' | 'error'
-  results: UnloadedMeme[]
+  results: UnloadedMeme[],
+  tags: Tag[],
   amongOwnFlag: boolean
 }
 
@@ -62,6 +71,7 @@ class Search extends React.Component<SearchProps, SearchState> {
     extended: false,
     state: 'initial',
     results: [],
+    tags: [],
     amongOwnFlag: false
   }
 
@@ -74,7 +84,9 @@ class Search extends React.Component<SearchProps, SearchState> {
       e.preventDefault()
     }
     if (this.state.extended) {
-      if (this.state.imageQuery.trim() === '' || this.state.textQuery.trim() === '') {
+      if (this.state.imageQuery.trim() === ''
+        && this.state.textQuery.trim() === ''
+        && this.state.tags.length === 0) {
         return
       }
     } else {
@@ -83,7 +95,10 @@ class Search extends React.Component<SearchProps, SearchState> {
       }
     }
     const request: Request = this.state.extended ? {
-      extended: true, qImage: this.state.imageQuery, qText: this.state.textQuery
+      extended: true,
+      qImage: this.state.imageQuery,
+      qText: this.state.textQuery,
+      tags: this.state.tags
     } : {
       extended: false, q: this.state.query
     }
@@ -127,6 +142,12 @@ class Search extends React.Component<SearchProps, SearchState> {
                       onChange={e => this.setState({ textQuery: e.target.value })}
                       label='Что написано?' fullWidth />
                   </Grid>
+                  <Grid item xs={12}>
+                    <TagsPicker
+                      tags={this.state.tags}
+                      onChange={tags => this.setState({ tags }, this.performSearch)}
+                    />
+                  </Grid>
                 </Grid>
               :
                 <TextField value={this.state.query} onChange={e => this.setState({ query: e.target.value })}
@@ -137,7 +158,7 @@ class Search extends React.Component<SearchProps, SearchState> {
                   if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
                     this.setState({ textQuery: this.state.query, imageQuery: this.state.query })
                   }
-                  this.setState({ extended: checked })
+                  this.setState({ extended: checked }, this.performSearch)
                 }} />
               <MySwitch
                 value={this.state.amongOwnFlag && this.props.authState.status === 'yes'}
@@ -146,7 +167,7 @@ class Search extends React.Component<SearchProps, SearchState> {
                   if (checked && this.props.authState.status !== 'yes') {
                     this.props.enqueueSnackbar('Пожалуйста, авторизуйтесь')
                   } else {
-                    this.setState({ amongOwnFlag: checked })
+                    this.setState({ amongOwnFlag: checked }, this.performSearch)
                   }
                 }}
               />
