@@ -10,7 +10,7 @@ export type Tag = {
 
 export function getTags() {
   return new Promise<Tag[]>((resolve, reject) => {
-    Axios.get<Tag[]>(`tags/api/all`).then(response => {
+    Axios.get<Tag[]>(`tags/api/all/`).then(response => {
       resolve(response.data)
     }).catch(() => {
       reject()
