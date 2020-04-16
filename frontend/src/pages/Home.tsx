@@ -121,7 +121,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
             </li>
             <li>
               <Typography>
-                Можно покекать с забавных случайных мемов, нажимая следующий мем в разделе <Link to='/markup' style={{ color: bright_link_color }}>разметки</Link>.
+                Можно покекать с забавных случайных мемов в разделе <Link to='/random' style={{ color: bright_link_color }}>&laquo;Рандом&raquo;</Link>.
               </Typography>
             </li>
           </ul>

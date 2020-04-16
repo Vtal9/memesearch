@@ -32,6 +32,25 @@ function search(request: Request, repo: Repo) {
     Authorization: `Token ${Funcs.getToken()}`
   } : {}
   const api = repo === Repo.Own ? 'search/api/search/own' : 'search/api/search'
+
+  // costyl begins
+  if (request.extended && qText.trim() === '' && qImage.trim() === ''
+  && repo === Repo.Public && request.tags.length === 1) {
+    const tag = request.tags[0]
+    return new Promise<SearchServerResponse>((resolve, reject) => {
+      Axios.get(`tags/api/tagged?id=${tag.id}`).then(response => {
+        resolve(response.data)
+      }).catch(error => {
+        if (error.response && error.response.data) {
+          resolve(error.response.data)
+        } else {
+          reject()
+        }
+      })
+    })
+  }
+  // costyl ends
+
   return new Promise<SearchServerResponse>((resolve, reject) => {
     Axios.get(api + '/?' + usp, {
       headers
