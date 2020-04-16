@@ -27,9 +27,13 @@ def split_query(q):
 DEV_API_KEY = 'AIzaSyD1Na311j0BcW2_xw8IJwxic3GB1f-x_vo'
 PROJECT_CX = '002908623333556470340:g0fw495dowk'
 
+DEV_API_KEY2 = 'AIzaSyCO2yyysGGjapfwBJsbkoBeQtquFKd0pGQ'
+PROJECT_CX2 = '011864322947619024690:41q4kq6govb'
 
-def google_search(query_text, num=5):
-    gis = GoogleImagesSearch(DEV_API_KEY, PROJECT_CX)
+
+def google_search(query_text, num=5, again=False):
+    gis = \
+        GoogleImagesSearch(DEV_API_KEY, PROJECT_CX) if not again else GoogleImagesSearch(DEV_API_KEY2, PROJECT_CX2)
     gis.search({'q': '{query} meme'.format(query=query_text), 'num': num})
     return [img._url for img in gis.results()]
 
@@ -89,10 +93,14 @@ class SearchAPI(generics.GenericAPIView):
         else:
             try:
                 if len(result[0]) < 10 and not settings.DEBUG:
-                    google_urls = list(google_search(query_text))
+                    google_urls = list(google_search(query_text, again=False))
             except Exception as ex:
                 print("GOOGLE SEARCH ERROR: " + str(ex))
-                pass
+                try:
+                    google_urls = list(google_search(query_text, again=True))
+                except:
+                    pass
+
 
         # записываем их в  response
         if result[1] == "":
