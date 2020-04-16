@@ -13,6 +13,7 @@ import AuthBar from './components/AuthBar';
 import { AuthState } from './util/Types'
 import AddTag from './pages/AddTag'
 import MyMemes from './pages/MyMemes'
+import Random from './pages/Random'
 
 
 const Main = () => <Redirect to='/search' />
@@ -61,7 +62,8 @@ const App = withRouter(props => {
     { url: '/upload', title: 'Загрузить', cmp: <Upload authState={authState} />, tab: true },
     { url: '/markup', title: 'Разметить', cmp: <Markup />, tab: true },
     { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
-    { url: '/mymemes', title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false }
+    { url: '/mymemes', title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
+    { url: '/random', title: 'Рандом', cmp: <Random />, tab: true }
   ]
 
   return (
