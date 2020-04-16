@@ -5,6 +5,9 @@ SIMPLIFIED_CHARACTERS = {'о': 'а', 'ё': 'и', 'е': 'и', 'з': 'с', 'ъ': '
 
 
 def simplify_string(ustr):
+    if ustr is None or ustr.replace(' ', '') == '':
+        return ''
+
     pattern = re.compile(r'[\W_]+')
     result = str(ustr).lower()
     temp = pattern.sub(' ', result)
@@ -18,6 +21,10 @@ def simplify_string(ustr):
         res_words.append(word)
 
     res = " ".join(res_words).replace('ё', 'и').replace('й', 'и') # костылим
+
+    if res == ' ':  # костылим
+        return ''
+
     if res[0] == ' ':
         res = res[1:]
     if res[-1] == ' ':
