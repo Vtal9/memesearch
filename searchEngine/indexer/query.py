@@ -64,7 +64,7 @@ def _one_word_query(word, word_index, urls_weight={}):
 
 
 def _bigram_query(word1, word2, word_index, urls_weight={}):
-    try: # throws exception if word_i not contains in word_index
+    try: # it throws exception if word_i not contains in word_index
         common_urls = __intersection(word_index[word1].keys(), word_index[word2].keys())
 
         for url in common_urls:
@@ -83,19 +83,22 @@ def _bigram_query(word1, word2, word_index, urls_weight={}):
 
 
 def _phrase_query(phrase, word_index, urls_weight={}):
-    words = phrase.split(' ')
-    common_urls = __intersection(*word_index.values())
+    try:  # it throws exception if word_i not contains in word_index
+        words = phrase.split(' ')
+        common_urls = __intersection(*word_index.values())
 
-    for url in common_urls:
-        words_pos = []
-        for i, word in enumerate(words):
-            words_pos.append(pos - i for pos in word_index[word][url])
+        for url in common_urls:
+            words_pos = []
+            for i, word in enumerate(words):
+                words_pos.append(pos - i for pos in word_index[word][url])
 
-        if len(__intersection(*words_pos)) != 0:
-            if url in urls_weight.keys():
-                urls_weight[url] += PHRASE_WEIGHT * len(words)
-            else:
-                urls_weight[url] = PHRASE_WEIGHT * len(words) + len(words)
+            if len(__intersection(*words_pos)) != 0:
+                if url in urls_weight.keys():
+                    urls_weight[url] += PHRASE_WEIGHT * len(words)
+                else:
+                    urls_weight[url] = PHRASE_WEIGHT * len(words) + len(words)
+    except:
+        pass
 
     return urls_weight
 
