@@ -16,7 +16,6 @@ interface LoginWindowProps {
 }
 
 function LoginWindow(props: LoginWindowProps) {
-  const [ email, setEmail ] = React.useState('')
   const [ username, setUsername ] = React.useState('')
   const [ password, setPassword ] = React.useState('')
   const [ password2, setPassword2 ] = React.useState('')
@@ -57,10 +56,6 @@ function LoginWindow(props: LoginWindowProps) {
       })
       break
     case 'register':
-      if (!email.match(EMAIL_REGEX)) {
-        setError('Введите корректный email')
-        return
-      }
       if (username.trim().length < 2) {
         setError('Логин должен иметь хотя бы 2 символа')
         return
@@ -70,7 +65,7 @@ function LoginWindow(props: LoginWindowProps) {
         return
       }
       setLoading(true)
-      Axios.post('accounts/api/auth/register', { username, password, email }).then(response => {
+      Axios.post('accounts/api/auth/register', { username, password, email: '' }).then(response => {
         const { id, username } = response.data.user
         loginSuccess(id, username, response.data.token)
         setLoading(false)
@@ -91,14 +86,8 @@ function LoginWindow(props: LoginWindowProps) {
       <DialogContent>
         <form onSubmit={handleSubmit} style={{ maxWidth: 300, marginBottom: 8 }}>
           <Grid container spacing={2}>
-            {props.dialog === 'register' &&
-              <Grid item xs={12}>
-                <TextField fullWidth label='Email' type='email' autoFocus={props.dialog === 'register'}
-                  value={email} onChange={e => setEmail(e.target.value)} />
-              </Grid>
-            }
             <Grid item xs={12}>
-              <TextField fullWidth label='Логин' autoFocus={props.dialog === 'login'}
+              <TextField fullWidth label='Логин' autoFocus
                 value={username} onChange={e => setUsername(e.target.value)} />
             </Grid>
             <Grid item xs={12}>
