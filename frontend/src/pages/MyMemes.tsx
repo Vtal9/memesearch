@@ -24,7 +24,7 @@ export default class MyMemes extends React.Component<MyMemesProps, MyMemesState>
     this.state = {
       status: { type: 'loading' }
     }
-    Axios.get<UnloadedMeme[]>('/api/ownMemes/', {
+    Axios.get<UnloadedMeme[]>('api/ownMemes/', {
       headers: {
         Authorization: `Token ${Funcs.getToken()}`
       }
