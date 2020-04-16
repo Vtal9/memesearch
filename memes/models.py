@@ -22,34 +22,38 @@ def update_index_in_db(text, descr, new_index_text, new_index_descr):
     stext = simplifier.simplify_string(text)
     sdescr = simplifier.simplify_string(descr)
 
+    if stext == '' and sdescr == '':
+        return
+
     text_words = stext.split(' ')
     print(text_words)
     descr_words = sdescr.split(' ')
 
-    text_index = indexer_models.TextDescriptions.objects.filter(Q(word__in=text_words))
-    descr_index = indexer_models.ImageDescriptions.objects.filter(Q(word__in=descr_words))
+    if stext != '':
+        text_index = indexer_models.TextDescriptions.objects.filter(Q(word__in=text_words))
+        updated_text_words = []
+        if not (text_index is None):  # otherwise no need to update
+            for row in text_index:
+                updated_text_words.append(row.word)
+                row.index = str(misc.union_text(row.index, new_index_text[row.word]))
+                row.save()
 
-    updated_text_words = []
-    if not (text_index is None):  # otherwise no need to update
-        for row in text_index:
-            updated_text_words.append(row.word)
-            row.index = str(misc.union_text(row.index, new_index_text[row.word]))
-            row.save()
+        for tword in text_words: # create for new words
+            if not (tword in updated_text_words):
+                indexer_models.TextDescriptions.objects.create(word=tword, index=new_index_text[tword])
 
-    for tword in text_words:
-        if not (tword in updated_text_words):
-            indexer_models.TextDescriptions.objects.create(word=tword, index=new_index_text[tword])
+    if sdescr != '':
+        descr_index = indexer_models.ImageDescriptions.objects.filter(Q(word__in=descr_words))
+        updated_descr_words = []
+        if not (descr_index is None):  # otherwise no need to update
+            for row in descr_index:
+                updated_descr_words.append(row.word)
+                row.index = str(misc.union_descr(row.index, new_index_descr[row.word]))
+                row.save()
 
-    updated_descr_words = []
-    if not (descr_index is None):  # otherwise no need to update
-        for row in descr_index:
-            updated_descr_words.append(row.word)
-            row.index = str(misc.union_descr(row.index, new_index_descr[row.word]))
-            row.save()
-
-    for dword in descr_words:
-        if not (dword in updated_descr_words):
-            indexer_models.ImageDescriptions.objects.create(word=dword, index=new_index_descr[dword])
+        for dword in descr_words: # create for new words
+            if not (dword in updated_descr_words):
+                indexer_models.ImageDescriptions.objects.create(word=dword, index=new_index_descr[dword])
 
 
 class Memes(models.Model):

@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from google_images_search import GoogleImagesSearch
 from rest_framework import viewsets, permissions, generics
 
+from django.conf import settings
 from memes.models import Memes
 from tags.models import Tags
 from .indexer import query
@@ -87,16 +88,17 @@ class SearchAPI(generics.GenericAPIView):
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
         else:
             try:
-                if len(result[0]) < 5:
+                if len(result[0]) < 10 and not settings.DEBUG:
                     google_urls = list(google_search(query_text))
-            except:
+            except Exception as ex:
+                print("GOOGLE SEARCH ERROR: " + str(ex))
                 pass
 
         # записываем их в  response
         if result[1] == "":
             response = JsonResponse([{
                 'id': i,
-                'url': Memes.objects.get(pk=i).url#_compressed
+                'url': Memes.objects.get(pk=i).url  # _compressed
             } for i in res] + [{
                 'url': url
             } for url in google_urls], safe=False)
@@ -171,7 +173,7 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         if result[1] == "":
             response = JsonResponse([{
                 'id': i,
-                'url': Memes.objects.get(pk=i).url#_compressed
+                'url': Memes.objects.get(pk=i).url  # _compressed
             } for i in res], safe=False)
         else:
             response = HttpResponse(result[1])
