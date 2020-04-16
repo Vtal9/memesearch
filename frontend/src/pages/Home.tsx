@@ -6,8 +6,11 @@ import BigFont from '../layout/BigFont';
 import Subscription from '../components/Subscription'
 import tactics from '../img/tactics.jpg'
 import musk from '../img/musk.jpg'
+import steve from '../img/steve.jpg'
 import { AuthState } from '../util/Types'
 
+
+const bright_link_color = '#5ff2ff'
 
 const Heading = (props: React.PropsWithChildren<{}>) => (
   <Typography variant='h4' align='center' style={{ fontWeight: 100 }}>
@@ -100,25 +103,25 @@ export default class Home extends React.Component<HomeProps, HomeState> {
             </div>
           </div>
         </Section>
-        <Section style={{ background: 'white' }}>
+        <Section style={backImg(steve)}>
           <Heading>
             Наши фичи:
           </Heading>
           <ul style={{ marginTop: 20 }}>
             <li>
               <Typography>
-                <Link to='/upload'>Создание/перенос</Link> на наш сайт своей коллекции мемов, с возможностью добавить им описания,
+                <Link to='/upload' style={{ color: bright_link_color }}>Создание/перенос</Link> на наш сайт своей коллекции мемов, с возможностью добавить им описания,
                 что существенно облегчит поиск по ней, а также синхронизирует её для всех ваших устройств.
               </Typography>
             </li>
             <li>
               <Typography>
-                Возможность <Link to='/search'>поиска</Link> (в т.ч. по мемам всех пользователей, если нужный не нашелся среди ваших).
+                Возможность <Link to='/search' style={{ color: bright_link_color }}>поиска</Link> (в т.ч. по мемам всех пользователей, если нужный не нашелся среди ваших).
               </Typography>
             </li>
             <li>
               <Typography>
-                Можно покекать с забавных случайных мемов, нажимая следующий мем в разделе <Link to='/markup'>разметки</Link>.
+                Можно покекать с забавных случайных мемов, нажимая следующий мем в разделе <Link to='/markup' style={{ color: bright_link_color }}>разметки</Link>.
               </Typography>
             </li>
           </ul>
@@ -164,7 +167,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
               <li>
                 <Typography>
                   Анализ всех предложений и замечаний, присланных&nbsp;
-                  <a href={google_form} target='_blank' style={{ color: '#5ff2ff' }}>сюда</a> (лучшие обязательно реализуем).
+                  <a href={google_form} target='_blank' style={{ color: bright_link_color }}>сюда</a> (лучшие обязательно реализуем).
                   О багах, если таковые встретите, можно сообщить туда же.
                 </Typography>
               </li>
