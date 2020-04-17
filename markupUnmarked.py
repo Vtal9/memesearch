@@ -16,10 +16,6 @@ from memes.ocr_pipeline.craft import CRAFT
 from memes.ocr_pipeline.recognition import netInference, copyStateDict
 
 
-
-def ARTEM_RAZMET_MEM():
-    pass
-
 def markUp():
     un_marked_up_memes = Memes.objects.filter(textDescription="")
 
@@ -36,13 +32,14 @@ def markUp():
         path = 'media/toMarkup'   # по идее по этому адрсу и будет лежать картинка, можешь поменять адрес как тебе надо
         y.download(meme.fileName, path)
         textDescription, imageDescription = " ".join(netInference(net, path)), ""
-        print(textDescription)
         if os.path.isfile(path):
             os.remove(path)
-        # # Построение нового индекса по добавленному мему
-        meme_index = indexer.full_index([info.MemeInfo(meme.id, textDescription, imageDescription)])
+        # Построение нового индекса по добавленному мему
+        meme.textDescription += " " + textDescription
+        meme_index = indexer.full_index([info.MemeInfo(meme.id, meme.textDescription, meme.чimageDescription)])
         update_index_in_db(meme.textDescription, meme.imageDescription, meme_index.text_words, meme_index.descr_words)
 
+        meme.is_mark_up_added = False
         meme.save()
 
 
