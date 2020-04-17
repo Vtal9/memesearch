@@ -91,10 +91,10 @@ class Memes(models.Model):
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
 
         super(Memes, self).save(*args, **kwargs)
-        if os.path.isfile(self.image.path):
-            os.remove(self.image.path)
-            self.image = None
-            super(Memes, self).save(update_fields=['image'])
+        # if os.path.isfile(self.image.path):
+        #     os.remove(self.image.path)
+        #     self.image = None
+        #     super(Memes, self).save(update_fields=['image'])
 
         if self.id % 100 == 0:
             y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
