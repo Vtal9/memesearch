@@ -86,7 +86,7 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
             <Card className='meme-form single'>
               <CardMedia component='img' className='img' image={status.meme.img.src} />
               <CardContent className='content'>
-                <Form memeId={status.meme.id}
+                <Form memeId={status.meme.id} autofocus
                   initialImageDescription={status.meme.imageDescription}
                   initialTextDescription={status.meme.textDescription}
                   onDone={() => {
