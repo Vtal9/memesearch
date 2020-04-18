@@ -37,7 +37,7 @@ def update_index_in_db(text, descr, new_index_text, new_index_descr):
                 row.index = str(misc.union_text(row.index, new_index_text[row.word]))
                 row.save()
 
-        for tword in text_words: # create for new words
+        for tword in text_words:  # create for new words
             if not (tword in updated_text_words):
                 indexer_models.TextDescriptions.objects.create(word=tword, index=new_index_text[tword])
 
@@ -50,7 +50,7 @@ def update_index_in_db(text, descr, new_index_text, new_index_descr):
                 row.index = str(misc.union_descr(row.index, new_index_descr[row.word]))
                 row.save()
 
-        for dword in descr_words: # create for new words
+        for dword in descr_words:  # create for new words
             if not (dword in updated_descr_words):
                 indexer_models.ImageDescriptions.objects.create(word=dword, index=new_index_descr[dword])
 
@@ -91,10 +91,11 @@ class Memes(models.Model):
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
 
         super(Memes, self).save(*args, **kwargs)
-        # if os.path.isfile(self.image.path):
-        #     os.remove(self.image.path)
-        #     self.image = None
-        #     super(Memes, self).save(update_fields=['image'])
+        if self.image is not None and self.image != '':
+            if os.path.isfile(self.image.path):
+                os.remove(self.image.path)
+                self.image = None
+                super(Memes, self).save(update_fields=['image'])
 
         if self.id % 100 == 0:
             y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
