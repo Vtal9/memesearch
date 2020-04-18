@@ -1,4 +1,3 @@
-from rest_framework import routers
 from .api import SearchAPI, MemesViewSet
 from .api import TextDescriptionsViewSet
 from .api import ImageDescriptionsViewSet

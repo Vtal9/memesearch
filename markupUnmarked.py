@@ -2,15 +2,14 @@ import os
 import django
 import torch
 
-from foolproject import settings
+from config import settings
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'foolproject.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
 from memes.models import Memes, update_index_in_db
 from searchEngine.indexer import indexer, info
-from searchEngine.indexer.info import MemeInfo
-from searchEngine.models import Images, TextDescriptions, ImageDescriptions
+
 
 from memes.ocr_pipeline.craft import CRAFT
 from memes.ocr_pipeline.recognition import netInference, copyStateDict
@@ -19,7 +18,6 @@ from memes.ocr_pipeline.recognition import netInference, copyStateDict
 def markUp():
     un_marked_up_memes = Memes.objects.filter(textDescription="")
 
-    # Images.objects.all().delete()
     # ImageDescriptions.objects.all().delete()
     # TextDescriptions.objects.all().delete()
 
