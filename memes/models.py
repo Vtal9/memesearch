@@ -13,6 +13,11 @@ from searchEngine.indexer import info
 from searchEngine.indexer import misc
 from searchEngine.indexer import simplifier
 from tags.models import Tags
+from PIL import Image
+
+
+def compress_image(img_path, output_path):
+    Image.open(img_path).convert('RGB').save(output_path)
 
 
 def update_index_in_db(text, description, new_index_text, new_index_description):
