@@ -26,6 +26,8 @@ def markUp():
     net.eval()
 
     for meme in un_marked_up_memes:
+        print("memes " + str(len(un_marked_up_memes)))
+        print("memeID: " + str(meme.id))
         y = settings.Y
         path = 'media/toMarkup'   # по идее по этому адрсу и будет лежать картинка, можешь поменять адрес как тебе надо
         y.download(meme.fileName, path)
@@ -33,12 +35,13 @@ def markUp():
         if os.path.isfile(path):
             os.remove(path)
         # Построение нового индекса по добавленному мему
-        meme.textDescription += " " + textDescription
-        meme_index = indexer.full_index([info.MemeInfo(meme.id, meme.textDescription, meme.imageDescription)])
-        update_index_in_db(meme.textDescription, meme.imageDescription, meme_index.text_words, meme_index.descr_words)
+        meme.textDescription = textDescription
+        meme_index = indexer.full_index(
+            [info.MemeInfo(meme.id, meme.textDescription, meme.imageDescription)]
+        )  # строим индекс по полученному мему
 
         meme.is_mark_up_added = False
-        meme.save()
+        meme.save() # при сохранении индекс сам обновляется для этого мема
 
 
 if __name__ == '__main__':
