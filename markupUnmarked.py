@@ -36,9 +36,6 @@ def markUp():
             os.remove(path)
         # Построение нового индекса по добавленному мему
         meme.textDescription = textDescription
-        meme_index = indexer.full_index(
-            [info.MemeInfo(meme.id, meme.textDescription, meme.imageDescription)]
-        )  # строим индекс по полученному мему
 
         meme.is_mark_up_added = False
         meme.save() # при сохранении индекс сам обновляется для этого мема
