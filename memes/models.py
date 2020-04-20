@@ -8,16 +8,12 @@ from django.db import models
 from django.db.models import Q
 
 import searchEngine.models as indexer_models
+from memes.compressor import compress_image
 from searchEngine.indexer import indexer
 from searchEngine.indexer import info
 from searchEngine.indexer import misc
 from searchEngine.indexer import simplifier
 from tags.models import Tags
-from PIL import Image
-
-
-def compress_image(img_path, output_path):
-    Image.open(img_path).convert('RGB').save(output_path)
 
 
 def update_index_in_db(text, description, new_index_text, new_index_description):
@@ -95,7 +91,7 @@ class Memes(models.Model):
 
     def save(self, *args, **kwargs):
         first_save = False
-        if self.image != '':
+        if self.image is not None and self.image != '':
             first_save = True
             # Разметка мема (текст)
             # self.textDescription = re.sub("[^а-яa-z0-9 ]+", "", " ".join(getTextFromImage(self.image)).lower())
@@ -103,12 +99,7 @@ class Memes(models.Model):
             # Сохранение мема на яндекс.диск
             y = settings.Y
             name = self.image.url.split(".")
-            self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + "." + name[-1]
-            self.fileName_compressed = self.fileName + "_compressed"
-            y.upload(self.image, self.fileName)
-            # y.upload(self.image, self.fileName_compressed)  # тут надо заменить self.image на сжатую картинку
-            self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
-            # self.url_compressed = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName_compressed)
+            self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + ".jpg"
 
         # Построение нового индекса по добавленному мему
         meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
@@ -117,7 +108,12 @@ class Memes(models.Model):
         super(Memes, self).save(*args, **kwargs)
         if self.image is not None and self.image != '':
             if os.path.isfile(self.image.path):
+                # сжатие картинки
+                compress_image(self.image.path, self.fileName[1:])
+                y.upload(self.fileName[1:], self.fileName)
+                self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
                 os.remove(self.image.path)
+                os.remove(self.fileName[1:])
                 self.image = None
                 super(Memes, self).save(update_fields=['image'])
 
