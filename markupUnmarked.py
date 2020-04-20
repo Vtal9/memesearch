@@ -34,7 +34,7 @@ def markUp():
             os.remove(path)
         # Построение нового индекса по добавленному мему
         meme.textDescription += " " + textDescription
-        meme_index = indexer.full_index([info.MemeInfo(meme.id, meme.textDescription, meme.чimageDescription)])
+        meme_index = indexer.full_index([info.MemeInfo(meme.id, meme.textDescription, meme.imageDescription)])
         update_index_in_db(meme.textDescription, meme.imageDescription, meme_index.text_words, meme_index.descr_words)
 
         meme.is_mark_up_added = False
