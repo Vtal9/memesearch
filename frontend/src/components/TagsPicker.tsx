@@ -1,6 +1,7 @@
 import React from 'react'
-import { getTags, Tag } from './TagsForm'
+import { getTags } from './TagsForm'
 import { Chip, Typography, Button, MenuItem, Menu, Icon } from '@material-ui/core'
+import { Tag } from '../util/Types'
 
 
 type Props = {
