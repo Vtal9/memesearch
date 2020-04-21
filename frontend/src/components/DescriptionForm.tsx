@@ -36,7 +36,7 @@ function updateDescription(id: number, textDescription: string, imageDescription
 }
 
 interface FormProps extends WithSnackbarProps {
-  memeId: number
+  memeId: number | false
   onDone?: () => void
   initialImageDescription?: string
   initialTextDescription?: string
@@ -61,6 +61,7 @@ class Form extends React.Component<FormProps, FormState> {
 
   handleSubmit(e: React.FormEvent | undefined = undefined) {
     if (e) e.preventDefault()
+    if (this.props.memeId === false) return
 
     if (!this.props.concat && this.state.imageDescription.trim() === '') {
       this.setState({ descriptionError: true })
@@ -129,7 +130,7 @@ class Form extends React.Component<FormProps, FormState> {
           </Grid>
           <Grid item>
             <Button variant='contained' color='primary' type='submit'
-              {...(this.state.state === 'saving' && { disabled: true })}
+              disabled={this.props.memeId === false || this.state.state === 'saving'}
               startIcon={<Icon>done</Icon>}
             >Готово</Button>
           </Grid>

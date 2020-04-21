@@ -12,13 +12,14 @@ import { uploadApi } from '../api/Upload';
 class UploadItem {
   file: File
   status:
-  | { readonly type: 'uploading' | 'done' | 'none' }
+  | { readonly type: 'rendering' | 'done' | 'none' }
+  | { type: 'uploading', img: HTMLImageElement }
   | { type: 'uploaded', img: HTMLImageElement, id: number }
   | { type: 'error', text: string }
 
   constructor(file: File) {
     this.file = file
-    this.status = { type: 'uploading' }
+    this.status = { type: 'rendering' }
   }
 
   setError(text: string) {
@@ -74,6 +75,22 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         this.setError(current_index, 'Превышен лимит в 10 МБ')
         return
       }
+      // rendering
+      try {
+        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const image = new Image()
+          image.onload = () => resolve(image)
+          image.onerror = reject
+          image.src = URL.createObjectURL(file)
+        })
+        this.withItem(current_index, item => {
+          item.status = { type: 'uploading', img: image }
+          return item
+        })
+      } catch {
+        this.setError(current_index, 'Ошибка при отображении картинки')
+      }
+      // uploading
       const result = await uploadApi(this.destination, file)
       try {
         if (result !== null) {
@@ -106,53 +123,60 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     return (
       <Center>
         {items.map((item, index) => (
-          <Card className='meme-form' key={index} {...(item.status.type === 'none' && {
-            style: { display: 'none' }
-          })}>
-            {(() => {
-              switch (item.status.type) {
-              case 'uploaded':
-                return [
-                  <CardMedia component='img' className='img' image={item.status.img.src} />,
-                  <CardContent className='content'>
-                    <Form key={index}
-                      memeId={item.status.id}
-                      onDone={() => {
-                        items[index].status = { type: 'done' }
-                        this.setState({ items })
-                      }}
-                    />
-                  </CardContent>
-                ]
-              case 'uploading':
-                return (
-                  <CenterPadding>
-                    <CircularProgress />
-                  </CenterPadding>
-                )
-              case 'error':
-                return (
-                  <CenterPadding>
-                    <div className='vmiddle'>
-                      <Typography color='error'>
-                        Загрузка {item.file.name} не удалась.<br />
-                        {item.status.text}
+          <Card className='meme-form' key={index} style={{
+            display: item.status.type === 'none' ? 'none' : ''
+          }}>
+            {item.status.type === 'done' ? (
+              <CenterPadding>
+                <div className='vmiddle'>
+                  <Typography>Данные сохранены, спасибо за помощь!</Typography>
+                  <Button color='primary' onClick={() => this.close(index)}>ОК</Button>
+                </div>
+              </CenterPadding>
+            ) : item.status.type === 'error' ? (
+              <CenterPadding>
+                <div className='vmiddle'>
+                  <Typography color='error'>
+                    Загрузка {item.file.name} не удалась.<br />
+                    {item.status.text}
+                  </Typography>
+                  <Button color='primary' onClick={() => this.close(index)}>Ладно</Button>
+                </div>
+              </CenterPadding>
+            ) : item.status.type === 'rendering' ? (
+              <CenterPadding>
+                <CircularProgress />
+              </CenterPadding>
+            ) : item.status.type === 'uploading' || item.status.type === 'uploaded' ? (
+              [
+                <CardMedia
+                  key={1}
+                  component='img'
+                  className='img'
+                  image={item.status.img.src}
+                />,
+                <CardContent className='content' key={2}>
+                  <Form key={index}
+                    memeId={item.status.type === 'uploaded' && item.status.id}
+                    onDone={() => {
+                      items[index].status = { type: 'done' }
+                      this.setState({ items })
+                    }}
+                  />
+                  {item.status.type === 'uploading' &&
+                    <div className='vmiddle' style={{
+                      marginTop: 16,
+                      justifyContent: 'flex-end'
+                    }}>
+                      <Typography style={{ marginRight: 16 }} align='right'>
+                        Можно будет сохранить описание,<br />когда картинка загрузится на сервер
                       </Typography>
-                      <Button color='primary' onClick={() => this.close(index)}>Ладно</Button>
+                      <CircularProgress />
                     </div>
-                  </CenterPadding>
-                )
-              case 'done':
-                return (
-                  <CenterPadding>
-                    <div className='vmiddle'>
-                      <Typography>Данные сохранены, спасибо за помощь!</Typography>
-                      <Button color='primary' onClick={() => this.close(index)}>ОК</Button>
-                    </div>
-                  </CenterPadding>
-                )
-              }
-            })()}
+                  }
+                </CardContent>
+              ]
+            ) : null}
           </Card>
         ))}
         <FilePicker handleFiles={(files: Array<File>) => this.handleFiles(files)} />
