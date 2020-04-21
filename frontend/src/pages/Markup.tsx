@@ -1,18 +1,18 @@
 import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardContent } from '@material-ui/core';
-import Axios from 'axios';
 import Form, { CenterPadding } from '../components/DescriptionForm'
 import { Meme } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import Funcs from '../util/Funcs';
+import { loadImage } from '../util/Funcs';
+import { unmarkedApi } from '../api/RandomMeme';
 
 
 interface MarkState {
   status:
-  | { readonly type: 'loading' | 'error' | 'nojob' }
+  | { readonly type: 'loading' | 'error' | 'cool' }
   | { type: 'ready', meme: Meme }
 }
 
@@ -21,11 +21,11 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
     status: { type: 'loading' }
   }
 
-  setMeme(img: HTMLImageElement, id: number, imageDescription: string, textDescription: string) {
+  setMeme(img: HTMLImageElement, id: number) {
     this.setState({
       status: {
         type: 'ready',
-        meme: { img, id, imageDescription, textDescription }
+        meme: { img, id, imageDescription: '', textDescription: '' }
       }
     })
   }
@@ -34,22 +34,21 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
     this.setState({ status: { type: 'loading' } })
   }
 
-  getNext() {
-    const self = this
-    Axios.get('api/unmarkedmemes/').then(function(response) {
-      if (response.data.length === 0) {
-        self.setState({ status: { type: 'nojob' } })
+  async getNext() {
+    try {
+      const result = await unmarkedApi()
+      if (result === null) {
+        this.setState({ status: { type: 'cool' } })
       } else {
-        const json = response.data[0]
-        Funcs.loadImage(json.id, json.url, image => {
-          self.setMeme(image, json.id, json.imageDescription, json.textDescription)
+        loadImage(result.id, result.url, image => {
+          this.setMeme(image, result.id)
         }, () => {
-          self.setState({ status: { type: 'error' } })
+          this.setState({ status: { type: 'error' } })
         })
       }
-    }).catch(function(error) {
-      Funcs.showSnackbarError(self.props, { msg: 'Неизвестная ошибка', short: true })
-    })
+    } catch(error) {
+      this.props.enqueueSnackbar('Нет интернета')
+    }
   }
 
   render() {
@@ -57,7 +56,7 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
     if (status.type === 'loading') {
       this.getNext()
     }
-    if (status.type === 'nojob') {
+    if (status.type === 'cool') {
       return (
         <Center>
           <BigFont>
@@ -87,8 +86,6 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
               <CardMedia component='img' className='img' image={status.meme.img.src} />
               <CardContent className='content'>
                 <Form memeId={status.meme.id} autofocus
-                  initialImageDescription={status.meme.imageDescription}
-                  initialTextDescription={status.meme.textDescription}
                   onDone={() => {
                     this.makeLoading()
                   }}

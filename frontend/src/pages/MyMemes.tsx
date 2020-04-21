@@ -1,11 +1,10 @@
 import React from 'react'
 import Gallery from '../components/Gallery'
 import { UnloadedMeme, AuthState } from '../util/Types'
-import Axios from 'axios'
-import Funcs from '../util/Funcs'
 import { CircularProgress } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
+import { myMemesApi } from '../api/RandomMeme'
 
 
 type MyMemesProps = {
@@ -24,14 +23,13 @@ export default class MyMemes extends React.Component<MyMemesProps, MyMemesState>
     this.state = {
       status: { type: 'loading' }
     }
-    Axios.get<UnloadedMeme[]>('api/ownMemes/', {
-      headers: {
-        Authorization: `Token ${Funcs.getToken()}`
-      }
-    }).then(response => {
-      this.setState({
-        status: { type: 'done', list: response.data }
-      })
+    this.load()
+  }
+
+  async load() {
+    this.setState({ status: { type: 'loading' } })
+    this.setState({
+      status: { type: 'done', list: await myMemesApi() }
     })
   }
 

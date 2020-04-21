@@ -2,7 +2,7 @@ import React, { FormEvent } from 'react'
 import { TextField, Grid, Button, Icon, Typography } from '@material-ui/core';
 import Axios, { AxiosResponse } from 'axios'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import Funcs from '../util/Funcs';
+import { authHeader } from '../util/Funcs';
 
 
 function updateDescription(id: number, textDescription: string, imageDescription: string, concat?: boolean) {
@@ -15,9 +15,7 @@ function updateDescription(id: number, textDescription: string, imageDescription
       urlData.append('text', textDescription)
       urlData.append('id', id + '')
       promise = Axios.post(`api/updateMeme?` + urlData, {}, {
-        headers: {
-          Authorization: `Token ${Funcs.getToken()}`
-        }
+        headers: authHeader()
       })
     } else {
       promise = Axios.patch(`api/memes/${id}/`, {
@@ -80,7 +78,7 @@ class Form extends React.Component<FormProps, FormState> {
       if (this.props.onDone) this.props.onDone()
     }).catch(() => {
       this.setState({ state: 'initial' })
-      Funcs.showSnackbarError(this.props, { short: true, msg: 'Нет интернета' })
+      this.props.enqueueSnackbar('Нет интернета')
     })
   }
 

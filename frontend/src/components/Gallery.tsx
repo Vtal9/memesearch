@@ -1,11 +1,11 @@
 import React from 'react'
 import Axios from 'axios'
-import Funcs from '../util/Funcs'
 import { UnloadedMeme, AuthState, User } from '../util/Types'
 import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography, DialogTitle } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 import DescriptionForm from './DescriptionForm'
 import TagsForm from './TagsForm'
+import { authHeader, loadImage } from '../util/Funcs'
 
 
 type AddRemoveProps = WithSnackbarProps & {
@@ -31,9 +31,7 @@ class _AddRemove extends React.Component<AddRemoveProps, AddRemoveState> {
     Axios.post(
       `api/configureOwnMemes?method=${method}&id=${this.props.id}`, {}, 
       {
-        headers: {
-          Authorization: `Token ${Funcs.getToken()}`
-        }
+        headers: authHeader()
       }
     ).then(response => {
       this.setState({ disabled: false, own: !this.state.own })
@@ -291,7 +289,7 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
       image.src = this.props.unloadedMeme.url
     } else {
       Axios.get(`api/memes/${this.props.unloadedMeme.id}/`).then(response => {
-        Funcs.loadImage(response.data.id, response.data.url, img => {
+        loadImage(response.data.id, response.data.url, img => {
           this.setState({
             status: { type: 'done', img: img, owners: response.data.owner, id: response.data.id }
           })
@@ -307,6 +305,7 @@ class GalleryItem extends React.Component<GalleryItemProps, GalleryItemState> {
   }
 
   render() {
+    const { authState, ...test } = this.props
     return (
       this.state.status.type === 'loading' ?
         <CircularProgress className='gallery-item' />

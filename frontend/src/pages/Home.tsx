@@ -8,6 +8,7 @@ import tactics from '../img/tactics.jpg'
 import musk from '../img/musk.jpg'
 import steve from '../img/steve.jpg'
 import { AuthState } from '../util/Types'
+import Path from '../util/Path'
 
 
 const bright_link_color = '#5ff2ff'
@@ -26,10 +27,6 @@ const Section = (props: any) => (
       </Center>
     </div>
   </div>
-)
-
-const White = (props: any) => (
-  <span style={{ color: 'white' }}>{props.children}</span>
 )
 
 const C = (props: any) => (
@@ -110,18 +107,18 @@ export default class Home extends React.Component<HomeProps, HomeState> {
           <ul style={{ marginTop: 20 }}>
             <li>
               <Typography>
-                <Link to='/upload' style={{ color: bright_link_color }}>Создание/перенос</Link> на наш сайт своей коллекции мемов, с возможностью добавить им описания,
+                <Link to={Path.UPLOAD} style={{ color: bright_link_color }}>Создание/перенос</Link> на наш сайт своей коллекции мемов, с возможностью добавить им описания,
                 что существенно облегчит поиск по ней, а также синхронизирует её для всех ваших устройств.
               </Typography>
             </li>
             <li>
               <Typography>
-                Возможность <Link to='/search' style={{ color: bright_link_color }}>поиска</Link> (в т.ч. по мемам всех пользователей, если нужный не нашелся среди ваших).
+                Возможность <Link to={Path.SEARCH} style={{ color: bright_link_color }}>поиска</Link> (в т.ч. по мемам всех пользователей, если нужный не нашелся среди ваших).
               </Typography>
             </li>
             <li>
               <Typography>
-                Можно покекать с забавных случайных мемов в разделе <Link to='/random' style={{ color: bright_link_color }}>&laquo;Рандом&raquo;</Link>.
+                Можно покекать с забавных случайных мемов в разделе <Link to={Path.TINDER} style={{ color: bright_link_color }}>&laquo;Рандом&raquo;</Link>.
               </Typography>
             </li>
           </ul>
@@ -142,7 +139,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
               </Typography>
             </li>
             <li>
-              <Typography><Link to='/upload'>Загрузите</Link> свои мемы</Typography>
+              <Typography><Link to={Path.UPLOAD}>Загрузите</Link> свои мемы</Typography>
             </li>
             <li>
               <Typography>Добавьте наш сайт в закладки (Ctrl + D), чтобы искать мемы ещё быстрее</Typography>
@@ -150,7 +147,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
           </ul>
         </Section>
         <Section style={backImg(tactics)}>
-          <Heading>Наши планы на неделю (до 19 апреля)</Heading>
+          <Heading>Наши планы на неделю (до 26 апреля)</Heading>
             <WhiteList>
               <li>
                 <Typography>Возможность размечать и добавлять себе мемы из поиска.</Typography>
@@ -182,10 +179,10 @@ export default class Home extends React.Component<HomeProps, HomeState> {
             margin: '0 -10px 20px'
           }}>
             <C>
-              <Link to='upload'>Закинуть</Link> нам пачку своих мемов
+              <Link to={Path.UPLOAD}>Закинуть</Link> нам пачку своих мемов
             </C>
             <C>
-              <Link to='markup'>Разметить</Link> уже имеющиеся у нас мемы
+              <Link to={Path.MARKUP}>Разметить</Link> уже имеющиеся у нас мемы
             </C>
             <C>
               <a href='#' onClick={e => {

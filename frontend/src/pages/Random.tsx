@@ -1,62 +1,62 @@
 import React from 'react'
 import Center from '../layout/Center';
-import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardContent, CardActions } from '@material-ui/core';
-import Axios from 'axios';
-import Form, { CenterPadding } from '../components/DescriptionForm'
+import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
+import { CenterPadding } from '../components/DescriptionForm'
 import { Meme } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
-import { withSnackbar, WithSnackbarProps } from 'notistack';
-import Funcs from '../util/Funcs';
+import { withSnackbar, WithSnackbarProps } from 'notistack'
+import { loadImage } from '../util/Funcs';
+import { randomApi } from '../api/RandomMeme';
 
 
-interface RandomState {
+type State = {
   status:
   | { readonly type: 'loading' | 'error' | 'nojob' }
   | { type: 'ready', meme: Meme }
 }
 
-class Random extends React.Component<WithSnackbarProps, RandomState> {
-  state: RandomState = {
+type Props = WithSnackbarProps
+
+class Random extends React.Component<Props, State> {
+  state: State = {
     status: { type: 'loading' }
   }
 
-  setMeme(img: HTMLImageElement, id: number, imageDescription: string, textDescription: string) {
+  componentDidMount() {
+    this.next()
+  }
+
+  setMeme(img: HTMLImageElement, id: number) {
     this.setState({
       status: {
         type: 'ready',
-        meme: { img, id, imageDescription, textDescription }
+        meme: { img, id, imageDescription: '', textDescription: '' }
       }
     })
   }
 
-  next() {
+  async next() {
     this.setState({ status: { type: 'loading' } })
-  }
-
-  getNext() {
-    const self = this
-    Axios.get('api/unmarkedmemes/').then(function(response) {
-      if (response.data.length === 0) {
-        self.setState({ status: { type: 'nojob' } })
+    try {
+      const result = await randomApi()
+      if (result === null) {
+        this.setState({ status: { type: 'error' } })
       } else {
-        const json = response.data[0]
-        Funcs.loadImage(json.id, json.url, image => {
-          self.setMeme(image, json.id, json.imageDescription, json.textDescription)
+        loadImage(result.id, result.url, image => {
+          this.setMeme(image, result.id)
         }, () => {
-          self.setState({ status: { type: 'error' } })
+          this.setState({ status: { type: 'error' } })
         })
       }
-    }).catch(function(error) {
-      Funcs.showSnackbarError(self.props, { msg: 'Неизвестная ошибка', short: true })
-    })
+    } catch(error) {
+      this.props.enqueueSnackbar('Нет интернета')
+      this.setState({ status: { type: 'error' } })
+    }
   }
 
   render() {
     const { status } = this.state
-    if (status.type === 'loading') {
-      this.getNext()
-    }
     if (status.type === 'nojob') {
       return (
         <Center>

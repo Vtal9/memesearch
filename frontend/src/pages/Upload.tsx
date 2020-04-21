@@ -1,42 +1,12 @@
 import React from 'react'
-import Axios from 'axios'
-import { useDropzone } from 'react-dropzone';
-import { Typography, ButtonBase, CircularProgress, Button, Card, Select, MenuItem, FormControlLabel, Switch, CardMedia, CardContent } from '@material-ui/core'
+import { Typography, CircularProgress, Button, Card, CardMedia, CardContent } from '@material-ui/core'
 import Center from '../layout/Center'
 import Form, { CenterPadding } from '../components/DescriptionForm'
-import Icon from '@material-ui/core/Icon'
-import Funcs from '../util/Funcs';
-import Gluejar from '../components/Gluejar'
 import { Repo, AuthState } from '../util/Types';
 import MySwitch from '../components/MySwitch';
-
-
-function FileGetter(props: { handleFiles: (files: File[]) => void }) {
-  function handleFiles(files: File[]) {
-    if (!files || files.length === 0) return
-    props.handleFiles(files)
-  }
-
-  const { isDragActive, getRootProps, getInputProps} = useDropzone({
-    onDrop: files => handleFiles(files),
-    accept: 'image/*'
-  })
-
-  return (
-    <ButtonBase {...getRootProps()} style={{ width: '100%' }}>
-      <div className={isDragActive ? 'file-picker over' : 'file-picker'}>
-        <input {...getInputProps()} />
-        <Icon fontSize='large'>cloud_upload</Icon>
-        <Typography>Выберите файл с компьютера</Typography>
-        <Typography variant='caption'>или</Typography>
-        <Typography>Перетащите файлы сюда</Typography>
-        <Typography variant='caption'>или</Typography>
-        <Typography>Вставьте картинку из буфера обмена</Typography>
-        <Gluejar onPaste={files => handleFiles(files)} onError={() => {}} />
-      </div>
-    </ButtonBase>
-  )
-}
+import { loadImage } from '../util/Funcs';
+import FilePicker from '../components/FilePicker'
+import { uploadApi } from '../api/Upload';
 
 
 class UploadItem {
@@ -63,39 +33,6 @@ type UploadState = {
 
 type UploadProps = {
   authState: AuthState
-}
-
-type UploadServerResponse = {
-  id: number
-  url: string
-}
-
-function upload(destination: Repo, file: File) {
-  const formdata = new FormData()
-  formdata.append('image', file)
-  formdata.append("textDescription", "")
-  formdata.append("imageDescription", "")
-
-  const headers = destination === Repo.Own ? {
-    'Content-Type': 'multipart/form-data',
-    'Authorization': `Token ${Funcs.getToken()}`
-  } : {
-    'Content-Type': 'multipart/form-data'
-  }
-  const url = destination === Repo.Own ? 'api/ownMemes/' : 'api/memes/'
-  return new Promise<UploadServerResponse | null>((resolve, reject) => {
-    Axios.post<UploadServerResponse>(url, formdata, {
-      headers
-    }).then(response => {
-      resolve(response.data)
-    }).catch(function(error) {
-      if (error.response && error.response.data) {
-        resolve(null)
-      } else {
-        reject()
-      }
-    })
-  })
 }
 
 export default class Upload extends React.Component<UploadProps, UploadState> {
@@ -131,17 +68,18 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     const initial_length = this.state.items.length
     const new_items =  [ ...this.state.items, ...files.map(file => new UploadItem(file)) ]
     this.setState({ items: new_items })
-    files.forEach((file, i) => {
+    files.forEach(async (file, i) => {
       const current_index = initial_length + i
       if (file.size > 10 * 1024 * 1024) {
         this.setError(current_index, 'Превышен лимит в 10 МБ')
         return
       }
-      upload(this.destination, file).then(response => {
-        if (response !== null) {
-          Funcs.loadImage(response.id, response.url, image => {
+      const result = await uploadApi(this.destination, file)
+      try {
+        if (result !== null) {
+          loadImage(result.id, result.url, image => {
             this.withItem(current_index, item => {
-              item.status = { type: 'uploaded', id: response.id, img: image }
+              item.status = { type: 'uploaded', id: result.id, img: image }
               return item
             })
           }, () => {
@@ -150,9 +88,9 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
         } else {
           this.setError(current_index, 'Ошибка сервера')
         }
-      }).catch(() => {
+      } catch {
         this.setError(current_index, 'Нет интернета')
-      })
+      }
     })
   }
 
@@ -217,7 +155,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
             })()}
           </Card>
         ))}
-        <FileGetter handleFiles={(files: Array<File>) => this.handleFiles(files)} />
+        <FilePicker handleFiles={(files: Array<File>) => this.handleFiles(files)} />
         {this.props.authState.status === 'yes' &&
           <div>
             <div className='spacing' />
