@@ -8,6 +8,9 @@ from memes.models import Memes
 from .serializers import MemesSerializer
 
 
+# ViewSets
+
+# add to own collection and get all memes from all collection
 class OwnMemesViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
 
@@ -23,17 +26,19 @@ class OwnMemesViewSet(viewsets.ModelViewSet):
             self.request.user.ownImages.add(serializer.save().id)
 
 
+# get all memes and meme by ID
 class MemesViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
 
     def get_queryset(self):
         queryset = Memes.objects.all()
-        permission_classes = [
-            permissions.AllowAny
-        ]
         return queryset
 
 
+# get memes that haven't been marked up
 class UnMarkedMemesViewSet(viewsets.ModelViewSet):
     queryset = Memes.objects.filter(textDescription="", imageDescription="").order_by('?')[0:1]
     permission_classes = [
@@ -42,6 +47,7 @@ class UnMarkedMemesViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
 
 
+# get memes that have been marked up
 class MarkedMemesViewSet(viewsets.ModelViewSet):
     queryset = Memes.objects.exclude(textDescription="", imageDescription="")
     permission_classes = [
@@ -50,6 +56,7 @@ class MarkedMemesViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
 
 
+# get new url by meme ID
 class NewURLMemesViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
     permission_classes = [
@@ -69,6 +76,7 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
             return [queryset]
 
 
+# get new url for compressed meme by DI
 class NewURLMemesCompressedViewSet(viewsets.ModelViewSet):
     serializer_class = MemesSerializer
     permission_classes = [
@@ -89,6 +97,9 @@ class NewURLMemesCompressedViewSet(viewsets.ModelViewSet):
             return [queryset]
 
 
+# APIs
+
+# API for add and remove meme to own collection
 class OwnMemesAPI(generics.GenericAPIView):
     serializer_class = MemesSerializer
     permission_classes = [
@@ -108,6 +119,7 @@ class OwnMemesAPI(generics.GenericAPIView):
         return HttpResponse()
 
 
+# API for update meme mark up
 class UpdateMemesAPI(generics.GenericAPIView):
     serializer_class = MemesSerializer
     permission_classes = [
@@ -127,6 +139,7 @@ class UpdateMemesAPI(generics.GenericAPIView):
         return HttpResponse()
 
 
+# API for add Tag to meme
 class AddTagToMemeAPI(generics.GenericAPIView):
     serializer_class = MemesSerializer
     permission_classes = [
@@ -137,4 +150,4 @@ class AddTagToMemeAPI(generics.GenericAPIView):
         id_meme = self.request.GET.get('id')
         id_tag = self.request.GET.get('tag')
         Memes.objects.get(pk=id_meme).tags.add(id_tag)
-        return Response("ok")
+        return Response()

@@ -1,13 +1,13 @@
 from rest_framework import serializers
-from .models import Images
+from memes.models import Memes
 from .models import TextDescriptions
 from .models import ImageDescriptions
 
 
 class ImagesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Images
-        fields = '__all__'
+        model = Memes
+        fields = ['id']
 
 
 class TextDescriptionsSerializer(serializers.ModelSerializer):

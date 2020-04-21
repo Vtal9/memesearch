@@ -6,18 +6,9 @@ from tags.models import Tags
 from tags.serializers import TagSerializer
 
 
-class CreateNewTagAPI(generics.GenericAPIView):
-    serializer_class = TagSerializer
+# ViewSets
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        tag = serializer.save()
-        return Response({
-            "tag": TagSerializer(tag, context=self.get_serializer_context()).data,
-        })
-
-
+# get all tags
 class TagsViewSet(viewsets.ModelViewSet):
     queryset = Tags.objects.all()
     permission_classes = [
@@ -26,6 +17,7 @@ class TagsViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
 
 
+# get tagged memes by tag ID
 class GetMemesByTagViewSet(viewsets.ModelViewSet):
     permission_classes = [
         permissions.AllowAny
@@ -36,3 +28,18 @@ class GetMemesByTagViewSet(viewsets.ModelViewSet):
         tag_id = self.request.GET.get('id')
         print(tag_id)
         return Tags.objects.get(pk=tag_id).taggedMemes.all()
+
+
+# APIs
+
+# API for creating new tag
+class CreateNewTagAPI(generics.GenericAPIView):
+    serializer_class = TagSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tag = serializer.save()
+        return Response({
+            "tag": TagSerializer(tag, context=self.get_serializer_context()).data,
+        })

@@ -1,76 +1,22 @@
+from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
-from google_images_search import GoogleImagesSearch
 from rest_framework import viewsets, permissions, generics
 
-from django.conf import settings
 from memes.models import Memes
 from tags.models import Tags
-from .indexer import query
-from .indexer.simplifier import simplify_string
+from .indexer.reserveSearch import reserve_search
 from .models import ImageDescriptions
-from .models import Images
 from .models import TextDescriptions
+from .search import search
 from .serializers import ImagesDescriptionsSerializer
 from .serializers import ImagesSerializer
 from .serializers import TextDescriptionsSerializer
 
 
-def split_query(q):
-    res = []
-    for i in q.split(", "):
-        for j in i.split(" "):
-            res.append(j)
-    return res
+# APIs
 
-
-DEV_API_KEY = 'AIzaSyD1Na311j0BcW2_xw8IJwxic3GB1f-x_vo'
-PROJECT_CX = '002908623333556470340:g0fw495dowk'
-
-DEV_API_KEY2 = 'AIzaSyCO2yyysGGjapfwBJsbkoBeQtquFKd0pGQ'
-PROJECT_CX2 = '011864322947619024690:41q4kq6govb'
-
-
-def google_search(query_text, num=5, again=False):
-    gis = \
-        GoogleImagesSearch(DEV_API_KEY, PROJECT_CX) if not again else GoogleImagesSearch(DEV_API_KEY2, PROJECT_CX2)
-    gis.search({'q': '{query} meme'.format(query=query_text), 'num': num})
-    return [img._url for img in gis.results()]
-
-
-def search(query_text, query_image):
-    # разбиваем запросы на отдельные слова.
-    if query_text is not None:
-        text_words = simplify_string(query_text)
-    else:
-        text_words = ""
-        query_text = ""
-    if query_image is not None:
-        image_words = simplify_string(query_image)
-    else:
-        image_words = ""
-        query_image = ""
-
-    # на данный момент достаем все внутри индексера
-    # ищем все картинки в описании которых совпало хотя бы одно слово. получаем список объектов модели
-    # queryset_text = TextDescriptions.objects.filter(Q(word__in=text_words))
-    # queryset_image = ImageDescriptions.objects.filter(Q(word__in=image_words))
-
-    # получаем список из URL
-    # ([urls],"error")
-    if query_text == query_image:  # не расширенный поиск, тогда объединяем
-        res1 = query.make_query(text_phrase=query_text,
-                                descr_words="")
-        res2 = query.make_query(text_phrase="",
-                                descr_words=query_text)
-        result = [list(dict.fromkeys(list(res2[0] + res1[0]))), ""]  # delete duplicates
-    else:
-        result = query.make_query(text_phrase=query_text,
-                                  descr_words=query_image)
-
-    return result
-
-
+# search by all memes
 class SearchAPI(generics.GenericAPIView):
     serializer_class = ImagesSerializer
 
@@ -81,7 +27,7 @@ class SearchAPI(generics.GenericAPIView):
 
         # поиск и ранжировка всех мемов подходящих под запрос
         result = search(query_text, query_image)
-        google_urls = []
+        extra_urls = []
 
         # фильтруем по тегам
         query_tags = self.request.GET.get('tags')
@@ -91,16 +37,8 @@ class SearchAPI(generics.GenericAPIView):
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
         else:
-            try:
-                if len(result[0]) < 10 and not settings.DEBUG:
-                    google_urls = list(google_search(query_text, again=False))
-            except Exception as ex:
-                print("GOOGLE SEARCH ERROR: " + str(ex))
-                try:
-                    google_urls = list(google_search(query_text, again=True))
-                except:
-                    pass
-
+            if len(result[0]) < 10 and not settings.DEBUG:
+                extra_urls = reserve_search(query_text)
 
         # записываем их в  response
         if result[1] == "":
@@ -109,49 +47,13 @@ class SearchAPI(generics.GenericAPIView):
                 'url': Memes.objects.get(pk=i).url  # _compressed
             } for i in res] + [{
                 'url': url
-            } for url in google_urls], safe=False)
+            } for url in extra_urls], safe=False)
         else:
             response = HttpResponse(result[1])
         return response
 
 
-class TextDescriptionsViewSet(viewsets.ModelViewSet):
-    queryset = TextDescriptions.objects.all()
-    permission_classes = [
-        permissions.AllowAny
-    ]
-    serializer_class = TextDescriptionsSerializer
-
-
-class ImageDescriptionsViewSet(viewsets.ModelViewSet):
-    queryset = ImageDescriptions.objects.all()
-    permission_classes = [
-        permissions.AllowAny
-    ]
-    serializer_class = ImagesDescriptionsSerializer
-
-
-class OwnMemesViewSet(viewsets.ModelViewSet):
-    permission_classes = [
-        permissions.IsAuthenticated
-    ]
-    serializer_class = ImagesSerializer
-
-    def get_queryset(self):
-        return self.request.user.ownImages.all()
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-
-class MemesViewSet(viewsets.ModelViewSet):
-    queryset = Images.objects.all()
-    permission_classes = [
-        permissions.AllowAny
-    ]
-    serializer_class = ImagesSerializer
-
-
+# search by own memes
 class SearchOwnMemesAPI(generics.GenericAPIView):
     serializer_class = ImagesSerializer
     permission_classes = [
@@ -187,3 +89,45 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
             response = HttpResponse(result[1])
 
         return response
+
+
+# View Sets
+# get table with text description indexes
+class TextDescriptionsViewSet(viewsets.ModelViewSet):
+    queryset = TextDescriptions.objects.all()
+    permission_classes = [
+        permissions.AllowAny
+    ]
+    serializer_class = TextDescriptionsSerializer
+
+
+# get table with image description indexes
+class ImageDescriptionsViewSet(viewsets.ModelViewSet):
+    queryset = ImageDescriptions.objects.all()
+    permission_classes = [
+        permissions.AllowAny
+    ]
+    serializer_class = ImagesDescriptionsSerializer
+
+
+# get own collection
+class OwnMemesViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+    serializer_class = ImagesSerializer
+
+    def get_queryset(self):
+        return self.request.user.ownImages.all()
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+# get all memes that can be found
+class MemesViewSet(viewsets.ModelViewSet):
+    queryset = Memes.objects.all()
+    permission_classes = [
+        permissions.AllowAny
+    ]
+    serializer_class = ImagesSerializer
