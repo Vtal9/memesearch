@@ -1,14 +1,14 @@
-from . import craft_utils
+import craft_utils
 from cv2 import INTER_LINEAR
-from . import imgproc
+import imgproc
 import numpy as np
 import pytesseract
 import torch
 from datetime import datetime
 
-from .craft import CRAFT
+from craft import CRAFT
 from collections import OrderedDict
-from .file_utils import list_images
+from file_utils import list_images
 from torch.autograd import Variable
 
 
@@ -83,18 +83,28 @@ def convertImagesToTexts(folder='media/'):
      - list of tuples of 3 strings: (image_path, text_on_image, "") 
     '''
     # Loading the net
+    start_0 = datetime.now()
     net = CRAFT()
     net.load_state_dict(copyStateDict(torch.load("craft_mlt_25k.pth", map_location='cpu')))
     net.eval()
+    print("net weights", datetime.now() - start_0)
 
     # Get list of images
     image_list = list_images(folder)
     result = []
     for img_path in image_list:
+        start = datetime.now()
         image = imgproc.loadImage(img_path)
+        print("loading image", datetime.now() - start)
+        start = datetime.now()
         bboxes, polys, score_text = netForward(net, image)
+        print("Net inference", datetime.now() - start)
+        start = datetime.now()
         polys = craft_utils.postProcess(polys, image.shape)
+        print("Post process", datetime.now() - start)
+        start = datetime.now()
         texts = recognizeText(image[:, :, ::-1], polys)
+        print("text recognition", datetime.now() - start)
         result.append((img_path, " ".join(texts), ""))
     return result
 

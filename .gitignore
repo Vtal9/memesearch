@@ -5,3 +5,4 @@ media
 *.sqlite3
 __pycache__
 .idea
+memes/ocr_pipeline/sample
