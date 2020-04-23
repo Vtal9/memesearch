@@ -85,6 +85,10 @@ class Memes(models.Model):
     is_mark_up_added = models.NullBooleanField()
     # список тегов присвоенных мему
     tags = models.ManyToManyField(Tags, related_name="taggedMemes", blank=True)
+    # количество лайков
+    likes = models.IntegerField(default=0)
+    # количество дизлайков
+    dislikes = models.IntegerField(default=0)
 
     def delete(self, **kwargs):
         pass
@@ -104,6 +108,11 @@ class Memes(models.Model):
         # Построение нового индекса по добавленному мему
         meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
+
+        # if self.likes is None or self.likes == '':
+        #     self.likes = 0
+        # if self.dislikes is None or self.dislikes == '':
+        #     self.dislikes = 0
 
         super(Memes, self).save(*args, **kwargs)
         if self.image is not None and self.image != '':

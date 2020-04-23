@@ -1,3 +1,4 @@
+from memes.api import LikingMemeAPI
 from .api import SearchAPI, MemesViewSet
 from .api import TextDescriptionsViewSet
 from .api import ImageDescriptionsViewSet
@@ -9,5 +10,5 @@ urlpatterns = [
     path('api/Text/', TextDescriptionsViewSet.as_view({'get': 'list'})),
     path('api/Image/', ImageDescriptionsViewSet.as_view({'get': 'list'})),
     path('api/search/own/', SearchOwnMemesAPI.as_view()),
-    path('api/all/', MemesViewSet.as_view({'get': 'list'}))
+    path('api/all/', MemesViewSet.as_view({'get': 'list'})),
 ]

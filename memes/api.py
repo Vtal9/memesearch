@@ -1,6 +1,6 @@
 import yadisk
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, permissions, generics
 from rest_framework.response import Response
 
@@ -151,3 +151,36 @@ class AddTagToMemeAPI(generics.GenericAPIView):
         id_tag = self.request.GET.get('tag')
         Memes.objects.get(pk=id_meme).tags.add(id_tag)
         return Response()
+
+
+# API for like / dislike
+class LikingMemeAPI(generics.GenericAPIView):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
+
+    def post(self, request, *args, **kwargs):
+        method = self.request.GET.get('method')
+        id_meme = self.request.GET.get('id')
+        meme = Memes.objects.get(pk=id_meme)
+
+        # временный кусок, пока не у всех мемов есть начальное значение
+        ################################################################
+        # if meme.likes is None or meme.likes == '':
+        #     meme.likes = 0
+        # if meme.dislikes is None or meme.dislikes == '':
+        #     meme.dislikes = 0
+        ################################################################
+
+        if method == 'like':
+            meme.likes += 1
+        else:
+            meme.dislikes += 1
+
+        meme.save(update_fields=['likes', 'dislikes'])
+
+        return JsonResponse({
+            'likes': meme.likes,
+            'dislikes': meme.dislikes
+        })
