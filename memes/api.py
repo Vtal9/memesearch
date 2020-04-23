@@ -1,10 +1,12 @@
 import yadisk
 from django.conf import settings
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, permissions, generics
 from rest_framework.response import Response
 
 from memes.models import Memes
+from tags.models import Tags
 from .serializers import MemesSerializer
 
 
@@ -165,14 +167,6 @@ class LikingMemeAPI(generics.GenericAPIView):
         id_meme = self.request.GET.get('id')
         meme = Memes.objects.get(pk=id_meme)
 
-        # временный кусок, пока не у всех мемов есть начальное значение
-        ################################################################
-        # if meme.likes is None or meme.likes == '':
-        #     meme.likes = 0
-        # if meme.dislikes is None or meme.dislikes == '':
-        #     meme.dislikes = 0
-        ################################################################
-
         if method == 'like':
             meme.likes += 1
         else:
@@ -184,3 +178,28 @@ class LikingMemeAPI(generics.GenericAPIView):
             'likes': meme.likes,
             'dislikes': meme.dislikes
         })
+
+
+# wall API
+class WallAPI(generics.GenericAPIView):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
+
+    def post(self, request, *args, **kwargs):
+        tags = self.request.GET.get('tags')
+        if tags is not None and tags != '':
+            tags = tags.split(',')
+            memes = Memes.objects.filter(Q(tags__in=tags))
+        else:
+            memes = Memes.objects.all()
+
+        sorted_by = self.request.GET.get('filter')  # time, ratio, rating
+        memes = memes.order_by("-" + sorted_by, "-id")
+        return JsonResponse([{
+            'id': i.id,
+            'url': i.url,
+            'likes': i.likes,
+            'dislikes': i.dislikes
+        } for i in memes], safe=False)

@@ -89,6 +89,12 @@ class Memes(models.Model):
     likes = models.IntegerField(default=0)
     # количество дизлайков
     dislikes = models.IntegerField(default=0)
+    # количество лайков минус количество дизлайков
+    rating = models.IntegerField(default=0)
+    # отношение лайков в дизлайкам
+    ratio = models.DecimalField(default=1, max_digits=10, decimal_places=6)
+    # дата загрузки
+    time = models.CharField(default='0', max_length=50)
 
     def delete(self, **kwargs):
         pass
@@ -103,17 +109,17 @@ class Memes(models.Model):
             # Сохранение мема на яндекс.диск
             y = settings.Y
             name = self.image.url.split(".")
-            self.fileName = ".".join(name[:-1]) + "_{}".format(time.time()) + ".jpg"
+            self.time = time.time()
+            self.fileName = ".".join(name[:-1]) + "_{}".format(self.time) + ".jpg"
 
         # Построение нового индекса по добавленному мему
         meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
         update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
-
-        # if self.likes is None or self.likes == '':
-        #     self.likes = 0
-        # if self.dislikes is None or self.dislikes == '':
-        #     self.dislikes = 0
-
+        self.rating = self.likes - self.dislikes
+        if self.dislikes != 0:
+            self.ratio = self.likes / self.dislikes
+        else:
+            self.ration = self.likes
         super(Memes, self).save(*args, **kwargs)
         if self.image is not None and self.image != '':
             if os.path.isfile(self.image.path):
@@ -124,7 +130,7 @@ class Memes(models.Model):
                 os.remove(self.image.path)
                 os.remove(self.fileName[1:])
                 self.image = None
-                super(Memes, self).save(update_fields=['image'])
+                super(Memes, self).save(update_fields=['image', 'url'])
 
         if first_save and self.id % 100 == 0:
             y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
