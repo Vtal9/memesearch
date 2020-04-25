@@ -112,15 +112,17 @@ class Memes(models.Model):
             self.time = time.time()
             self.fileName = ".".join(name[:-1]) + "_{}".format(self.time) + ".jpg"
 
-        # Построение нового индекса по добавленному мему
-        meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
-        update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
         self.rating = self.likes - self.dislikes
         if self.dislikes != 0:
             self.ratio = self.likes / self.dislikes
         else:
             self.ration = self.likes
         super(Memes, self).save(*args, **kwargs)
+
+        # Построение нового индекса по добавленному мему
+        meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
+        update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words, meme_index.descr_words)
+
         if self.image is not None and self.image != '':
             if os.path.isfile(self.image.path):
                 # сжатие картинки

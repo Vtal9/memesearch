@@ -22,14 +22,5 @@ def search(query_text, query_image):
 
     # получаем список из URL
     # ([urls],"error")
-    if query_text == query_image:  # не расширенный поиск, тогда объединяем
-        res1 = query.make_query(text_phrase=query_text,
-                                descr_words="")
-        res2 = query.make_query(text_phrase="",
-                                descr_words=query_text)
-        result = [list(dict.fromkeys(list(res2[0] + res1[0]))), ""]  # delete duplicates
-    else:
-        result = query.make_query(text_phrase=query_text,
-                                  descr_words=query_image)
-
+    result = query.make_query(text_query=query_text, image_query=query_image)
     return result
