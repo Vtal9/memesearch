@@ -17,6 +17,7 @@ type FeedState = {
   | { type: 'done', list: UnloadedMeme[] }
 }
 
+// TODO: make this beatiful: remove excess buttons, add likes and dislikes number etc
 export default class Feed extends React.Component<MyMemesProps, FeedState> {
   constructor(props: MyMemesProps) {
     super(props)
@@ -29,7 +30,8 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
   async load() {
     this.setState({ status: { type: 'loading' } })
     this.setState({
-      status: { type: 'done', list: (await memesFeedApi("rating", [], 0)).map( // dummy request
+      status: { type: 'done', list: (await memesFeedApi("ratio", [1, 2], 1)).map( // dummy request
+        // FeedMeme (with likes dislikes) -> UnloadedMeme (since Gallery is written for these)
         (meme) => ({
           type: 'native',
           id: meme.id, 
