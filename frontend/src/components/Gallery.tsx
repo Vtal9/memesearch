@@ -1,6 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
-import { UnloadedMeme, AuthState, User } from '../util/Types'
+import { UnloadedMeme, AuthState, User, FeedMeme } from '../util/Types'
 import { CircularProgress, IconButton, Icon, Dialog, DialogContent, DialogActions, Typography, DialogTitle } from '@material-ui/core'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 import DescriptionForm from './DescriptionForm'

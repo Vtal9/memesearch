@@ -9,6 +9,14 @@ export type UnloadedMeme =
 | { type: 'native', id: number, url: string }
 | { type: 'external', url: string }
 
+// TODO: make this global / union this with `Meme` ???
+export type FeedMeme = {
+  id: number,
+  url: string, 
+  likes: number,
+  dislikes: number
+}
+
 export type User = {
   id: number
   username: string

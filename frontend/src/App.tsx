@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Upload from './pages/Upload'
 import Markup from './pages/Markup'
 import Search from './pages/Search'
+import Feed from './pages/Feed'
 import logo from './img/logo.svg'
 import './style.sass'
 import { Typography } from '@material-ui/core'
@@ -48,7 +49,8 @@ const App = withRouter(props => {
     { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: true },
     { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
     { url: Path.COLLECTION, title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
-    { url: Path.TINDER, title: 'Тиндер', cmp: <Random />, tab: true }
+    { url: Path.TINDER, title: 'Тиндер', cmp: <Random />, tab: true },
+    { url: Path.FEED, title: 'Лента', cmp: <Feed authState={authState} />, tab: true }
   ]
 
   const displaySearch = !useRouteMatch({ path: Path.SEARCH })
