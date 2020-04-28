@@ -3,6 +3,7 @@ import { AuthState } from '../util/Types';
 import { Typography, Button, Icon, MenuItem, MenuList, Popover } from '@material-ui/core'
 import Token from '../util/Token';
 import AuthWindow from './AuthWindow';
+import Path from '../util/Path';
 
 
 type State = {
@@ -33,6 +34,11 @@ export default class AuthBar extends React.Component<Props, State> {
         status: 'no'
       })
     }
+  }
+
+  switchTo(path: string) {
+    this.setState({ userMenuAnchor: null })
+    location.href = '#' + path
   }
 
   openRegister() {
@@ -78,10 +84,9 @@ export default class AuthBar extends React.Component<Props, State> {
             onClose={() => this.setState({ userMenuAnchor: null })}
           >
             <MenuList>
-              <MenuItem onClick={() => {
-                this.setState({ userMenuAnchor: null })
-                location.href = '#/mymemes'
-              }}>Коллекция</MenuItem>
+              <MenuItem onClick={() => this.switchTo(Path.COLLECTION)}>Коллекция</MenuItem>
+              <MenuItem onClick={() => this.switchTo(Path.MARKUP)}>Разметить</MenuItem>
+              <MenuItem onClick={() => this.switchTo(Path.UPLOAD)}>Загрузить</MenuItem>
               <MenuItem onClick={() => {
                 Token.unset()
                 this.props.onAuthStateChange({ status: 'no' })

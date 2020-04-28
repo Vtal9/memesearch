@@ -42,13 +42,13 @@ const App = withRouter(props => {
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
 
   const pages = [
+    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true },
     { url: Path.SEARCH, title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
-    { url: Path.HOME, title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} />, tab: true },
-    { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: true },
-    { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: true },
+    { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: false },
+    { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: false },
+    { url: Path.HOME, title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} />, tab: false },
     { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
     { url: Path.COLLECTION, title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
-    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true }
   ]
 
   const displaySearch = !useRouteMatch({ path: Path.SEARCH })
