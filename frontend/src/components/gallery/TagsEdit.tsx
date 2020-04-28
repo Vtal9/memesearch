@@ -1,6 +1,7 @@
 import React from 'react'
 import { IconButton, Icon, Dialog, DialogContent, DialogActions } from '@material-ui/core'
 import TagsForm from '../TagsForm'
+import { withSnackbar } from 'notistack'
 
 
 type Props = {
@@ -45,3 +46,13 @@ export class TagsEdit extends React.Component<Props, State> {
     ])
   }
 }
+
+export const FakeTagsEdit = withSnackbar(props => (
+  <IconButton
+    size='small'
+    title='Добавить тег'
+    onClick={() => props.enqueueSnackbar('Нужна авторизация')}
+  >
+    <Icon>local_offer</Icon>
+  </IconButton>
+))

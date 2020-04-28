@@ -50,3 +50,11 @@ class _ExtraMarkup extends React.Component<Props, State> {
 }
 
 export const ExtraMarkup = withSnackbar(_ExtraMarkup)
+
+export const FakeMarkup = withSnackbar(props => (
+  <IconButton
+    size='small'
+    onClick={() => props.enqueueSnackbar('Нужна авторизация')}
+    title='Доразметить'
+  ><Icon>edit</Icon></IconButton>
+))

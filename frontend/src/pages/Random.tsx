@@ -10,18 +10,14 @@ import { loadImage } from '../util/Funcs';
 import { randomApi } from '../api/RandomMeme';
 
 
-type State = {
-  status:
-  | { readonly type: 'loading' | 'error' | 'nojob' }
-  | { type: 'ready', meme: Meme }
-}
+type State = 
+| { readonly type: 'loading' | 'error' | 'nojob' }
+| { type: 'ready', meme: Meme }
 
 type Props = WithSnackbarProps
 
 class Random extends React.Component<Props, State> {
-  state: State = {
-    status: { type: 'loading' }
-  }
+  state: State = { type: 'loading' }
 
   componentDidMount() {
     this.next()
@@ -29,35 +25,32 @@ class Random extends React.Component<Props, State> {
 
   setMeme(img: HTMLImageElement, id: number) {
     this.setState({
-      status: {
-        type: 'ready',
-        meme: { img, id, imageDescription: '', textDescription: '' }
-      }
+      type: 'ready',
+      meme: { img, id, imageDescription: '', textDescription: '' }
     })
   }
 
   async next() {
-    this.setState({ status: { type: 'loading' } })
+    this.setState({ type: 'loading' })
     try {
       const result = await randomApi()
       if (result === null) {
-        this.setState({ status: { type: 'error' } })
+        this.setState({ type: 'error' })
       } else {
         loadImage(result.id, result.url, image => {
           this.setMeme(image, result.id)
         }, () => {
-          this.setState({ status: { type: 'error' } })
+          this.setState({ type: 'error' })
         })
       }
     } catch(error) {
       this.props.enqueueSnackbar('Нет интернета')
-      this.setState({ status: { type: 'error' } })
+      this.setState({ type: 'error' })
     }
   }
 
   render() {
-    const { status } = this.state
-    if (status.type === 'nojob') {
+    if (this.state.type === 'nojob') {
       return (
         <Center>
           <BigFont>
@@ -67,7 +60,7 @@ class Random extends React.Component<Props, State> {
         </Center>
       )
     }
-    if (status.type === 'error') {
+    if (this.state.type === 'error') {
       return (
         <Center>
           <div className='vmiddle'>
@@ -81,10 +74,10 @@ class Random extends React.Component<Props, State> {
     }
     return (
       <Center>
-        {status.type === 'ready' ?
+        {this.state.type === 'ready' ?
           <div>
             <Card className='meme-form single'>
-              <CardMedia component='img' className='img' image={status.meme.img.src} />
+              <CardMedia component='img' className='img' image={this.state.meme.img.src} />
               <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Button
                   size='large'
