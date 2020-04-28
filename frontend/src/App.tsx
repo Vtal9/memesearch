@@ -48,7 +48,7 @@ const App = withRouter(props => {
     { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: true },
     { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
     { url: Path.COLLECTION, title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
-    { url: Path.TINDER, title: 'Тиндер', cmp: <Random />, tab: true }
+    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true }
   ]
 
   const displaySearch = !useRouteMatch({ path: Path.SEARCH })

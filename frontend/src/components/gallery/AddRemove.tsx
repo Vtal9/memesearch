@@ -8,7 +8,6 @@ import { IconButton, Icon } from '@material-ui/core'
 
 type Props = WithSnackbarProps & {
   id: number
-  openDialog: (id: number, img: HTMLImageElement) => void
   own: boolean
   user: User
 }

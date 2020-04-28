@@ -2,19 +2,85 @@ import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
 import { CenterPadding } from '../components/DescriptionForm'
-import { Meme } from '../util/Types'
+import { Meme, AuthState, User } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack'
-import { loadImage } from '../util/Funcs';
+import { loadImage, authHeader } from '../util/Funcs';
 import { randomApi } from '../api/RandomMeme';
+import Axios from 'axios';
 
 
-type State = 
+
+// TODO merge with gallery/AddRemove.tsx
+type AddRemoveProps = WithSnackbarProps & {
+  id: number
+  own: boolean
+  user: User
+}
+
+type AddRemoveState = {
+  own: boolean
+  disabled: boolean
+}
+
+class _AddRemove extends React.Component<AddRemoveProps, AddRemoveState> {
+  state: AddRemoveState = {
+    own: this.props.own,
+    disabled: false
+  }
+
+  addDelete(method: 'add' | 'remove') {
+    this.setState({ disabled: true })
+    Axios.post(
+      `api/configureOwnMemes?method=${method}&id=${this.props.id}`, {}, 
+      {
+        headers: authHeader()
+      }
+    ).then(response => {
+      this.setState({ disabled: false, own: !this.state.own })
+      this.props.enqueueSnackbar(
+        method === 'remove' ? 'Мем удалён из вашей коллекции' : 'Мем добавлен в вашу коллекцию'
+      )
+    }).catch(error => {
+      this.setState({ disabled: false })
+    })
+  }
+
+  render() {
+    return (
+      <Button
+        style={{ marginLeft: 'auto' }}
+        size='large'
+        disabled={this.state.disabled}
+        onClick={() => {
+          this.addDelete(this.state.own ? 'remove' : 'add')
+        }}
+        title={this.state.own ? 'Удалить из своей коллекции' : 'Добавить в свою коллекцию'}
+      ><Icon>{this.state.own ? 'delete' : 'add'}</Icon></Button>
+    )
+  }
+}
+
+const AddRemove = withSnackbar(_AddRemove)
+
+const FakeAdd = withSnackbar((props: WithSnackbarProps) => (
+  <Button
+    style={{ marginLeft: 'auto' }}
+    size='large'
+    title='Добавить в свою коллекцию'
+    onClick={() => props.enqueueSnackbar('Авторизуйтесь, и вы сможете сохранять мемы в свою коллекцию')}
+  ><Icon>add</Icon></Button>
+))
+
+
+type State =
 | { readonly type: 'loading' | 'error' | 'nojob' }
-| { type: 'ready', meme: Meme }
+| { type: 'ready', id: number, img: HTMLImageElement, owners: User[] }
 
-type Props = WithSnackbarProps
+type Props = WithSnackbarProps & {
+  authState: AuthState
+}
 
 class Random extends React.Component<Props, State> {
   state: State = { type: 'loading' }
@@ -23,10 +89,9 @@ class Random extends React.Component<Props, State> {
     this.next()
   }
 
-  setMeme(img: HTMLImageElement, id: number) {
+  setMeme(img: HTMLImageElement, id: number, owners: User[]) {
     this.setState({
-      type: 'ready',
-      meme: { img, id, imageDescription: '', textDescription: '' }
+      type: 'ready', img, id, owners
     })
   }
 
@@ -38,7 +103,7 @@ class Random extends React.Component<Props, State> {
         this.setState({ type: 'error' })
       } else {
         loadImage(result.id, result.url, image => {
-          this.setMeme(image, result.id)
+          this.setMeme(image, result.id, result.owner)
         }, () => {
           this.setState({ type: 'error' })
         })
@@ -77,16 +142,28 @@ class Random extends React.Component<Props, State> {
         {this.state.type === 'ready' ?
           <div>
             <Card className='meme-form single'>
-              <CardMedia component='img' className='img' image={this.state.meme.img.src} />
-              <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <CardMedia component='img' className='img' image={this.state.img.src} />
+              <CardActions>
                 <Button
                   size='large'
                   onClick={() => this.next()}
-                ><Icon color='primary'>thumb_up_alt</Icon></Button>
+                ><Icon>thumb_up_alt</Icon></Button>
                 <Button
                   size='large'
                   onClick={() => this.next()}
                 ><Icon>thumb_down_alt</Icon></Button>
+                {this.props.authState.status === 'yes' ? (
+                  <AddRemove
+                    id={this.state.id}
+                    own={this.state.owners.some(owner => 
+                      this.props.authState.status === 'yes' &&
+                      this.props.authState.user.id === owner.id
+                    )}
+                    user={this.props.authState.user}
+                  />
+                ) : (
+                  <FakeAdd />
+                )}
               </CardActions>
             </Card>
           </div>

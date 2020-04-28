@@ -1,11 +1,12 @@
 import Axios from 'axios'
 import { authHeader } from '../util/Funcs'
-import { UnloadedMeme } from '../util/Types'
+import { UnloadedMeme, User } from '../util/Types'
 
 
 type Item = {
   id: number
   url: string
+  owner: User[]
 }
 
 export async function unmarkedApi() {

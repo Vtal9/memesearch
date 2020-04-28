@@ -78,17 +78,11 @@ export default class GalleryItem extends React.Component<Props, State> {
               <div className='actions'>
                 <AddRemove
                   user={this.props.authState.user}
-                  openDialog={this.openDialog}
                   id={this.state.id}
-                  own={(() => {
-                    const owners = this.state.owners
-                    for (let i in owners) {
-                      if (owners[i].id === this.props.authState.user.id) {
-                        return true
-                      }
-                    }
-                    return false
-                  })()}
+                  own={this.state.owners.some(owner => 
+                    this.props.authState.status === 'yes' &&
+                    this.props.authState.user.id === owner.id
+                  )}
                 />
                 <Copy img={this.state.img} />
                 <ExtraMarkup
