@@ -1,5 +1,5 @@
 import React from 'react'
-import Gallery from '../components/Gallery'
+import Gallery from '../components/gallery/Gallery'
 import { UnloadedMeme, AuthState } from '../util/Types'
 import { CircularProgress } from '@material-ui/core'
 import Center from '../layout/Center'

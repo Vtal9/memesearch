@@ -5,7 +5,7 @@ import Center from '../layout/Center';
 import FlexCenter from '../layout/FlexCenter';
 import { CircularProgress } from '@material-ui/core';
 import BigFont from '../layout/BigFont';
-import Gallery from '../components/Gallery';
+import Gallery from '../components/gallery/Gallery';
 import { searchApi } from '../api/Search'
 
 

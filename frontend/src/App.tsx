@@ -59,7 +59,7 @@ const App = withRouter(props => {
 
       <Center className='header'>
         <div className='header-top'>
-          <Link to='search' title='На главную'>
+          <Link to={Path.HOME} title='На главную'>
             <img src={logo} className='logo' />
           </Link>
           {displaySearch &&
