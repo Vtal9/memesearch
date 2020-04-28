@@ -197,8 +197,9 @@ class WallAPI(generics.GenericAPIView):
 
         # количество мемов в одной выдаче ленты
         memes_in_iteration = 15
-
+        print(self.request.data)
         it = int(self.request.GET.get('it'))
+        print(it)
         sorted_by = self.request.GET.get('filter')  # time, ratio, rating
         memes = memes.order_by("-" + sorted_by, "-id")[it * memes_in_iteration: (it + 1) * memes_in_iteration]
         return JsonResponse([{

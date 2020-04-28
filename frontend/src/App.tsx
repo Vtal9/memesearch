@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Upload from './pages/Upload'
 import Markup from './pages/Markup'
 import Search from './pages/Search'
+import Feed from './pages/Feed'
 import logo from './img/logo.svg'
 import './style.sass'
 import { Typography } from '@material-ui/core'
@@ -43,6 +44,7 @@ const App = withRouter(props => {
 
   const pages = [
     { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true },
+    { url: Path.FEED, title: 'Лента', cmp: <Feed authState={authState} />, tab: true },
     { url: Path.SEARCH, title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
     { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: false },
     { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: false },

@@ -4,5 +4,6 @@ export default {
   UPLOAD: '/upload',
   MARKUP: '/markup',
   COLLECTION: '/mymemes',
-  TINDER: '/random'
+  TINDER: '/random',
+  FEED: '/feed'
 }
