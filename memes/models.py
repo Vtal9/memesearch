@@ -15,6 +15,8 @@ from searchEngine.indexer import misc
 from searchEngine.indexer import simplifier
 from tags.models import Tags
 
+#import memes.algo.img2hash as img2hash
+
 
 def update_index_in_db(text, description, new_index_text, new_index_description):
     """
@@ -95,6 +97,8 @@ class Memes(models.Model):
     ratio = models.DecimalField(default=1, max_digits=10, decimal_places=6)
     # дата загрузки
     time = models.CharField(default='0', max_length=50)
+    # perception hash картинки, для устранения дубликатов
+    image_hash = models.TextField(blank=True, null=True)
 
     def delete(self, **kwargs):
         pass
