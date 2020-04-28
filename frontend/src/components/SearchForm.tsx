@@ -45,7 +45,8 @@ class Search extends React.Component<Props, State> {
         return
       }
     } else {
-      if (this.state.query.trim() === '') {
+      if (this.state.query.trim() === ''
+        && this.state.tags.length === 0) {
         return
       }
     }
@@ -58,6 +59,7 @@ class Search extends React.Component<Props, State> {
     } : {
       extended: false,
       q: this.state.query,
+      tags: this.state.tags,
       own: this.state.own
     }
     this.props.onRequest(request)
@@ -78,47 +80,51 @@ class Search extends React.Component<Props, State> {
       <form onSubmit={e => this.performSearch(e)}>
         <Grid container spacing={2} style={{width: '100%'}}>
           <Grid item style={{ flex: 1 }}>
-            {this.state.extended ?
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
+            <Grid container spacing={2}>
+              {this.state.extended ? [
+                <Grid item xs={12} key={2}>
+                  <TextField value={this.state.textQuery}
+                    onChange={e => this.setState({ textQuery: e.target.value })}
+                    label='Что написано?' fullWidth />
+                </Grid>,
+                <Grid item xs={12} key={1}>
                   <TextField value={this.state.imageQuery}
                     onChange={e => this.setState({ imageQuery: e.target.value })}
                     label='Что изображено?' fullWidth />
                 </Grid>
+              ] :
                 <Grid item xs={12}>
-                  <TextField value={this.state.textQuery}
-                    onChange={e => this.setState({ textQuery: e.target.value })}
-                    label='Что написано?' fullWidth />
+                  <TextField value={this.state.query} onChange={e => this.setState({ query: e.target.value })}
+                    fullWidth autoFocus label='Какой мем ищете?' />
                 </Grid>
-                <Grid item xs={12}>
-                  <TagsPicker
-                    tags={this.state.tags}
-                    onChange={tags => this.setState({ tags }, this.performSearch)}
-                  />
-                </Grid>
+              }
+              <Grid item xs={12}>
+                <TagsPicker
+                  tags={this.state.tags}
+                  onChange={tags => this.setState({ tags }, this.performSearch)}
+                />
               </Grid>
-            :
-              <TextField value={this.state.query} onChange={e => this.setState({ query: e.target.value })}
-                fullWidth autoFocus label='Какой мем ищете?' />
-            }
-            <Switch value={this.state.extended} label='Расширенный поиск'
-              onChange={checked => {
-                if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
-                  this.setState({ textQuery: this.state.query, imageQuery: this.state.query })
-                }
-                this.setState({ extended: checked }, this.performSearch)
-              }} />
-            <Switch
-              value={this.state.own}
-              label='Поиск по личной коллекции'
-              onChange={checked => {
-                if (checked && this.props.authState.status !== 'yes') {
-                  this.props.enqueueSnackbar('Пожалуйста, авторизуйтесь')
-                } else {
-                  this.setState({ own: checked }, this.performSearch)
-                }
-              }}
-            />
+              <Grid item xs={12}>
+                <Switch value={this.state.extended} label='Расширенный поиск'
+                  onChange={checked => {
+                    if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
+                      this.setState({ textQuery: this.state.query, imageQuery: this.state.query })
+                    }
+                    this.setState({ extended: checked }, this.performSearch)
+                  }} />
+                <Switch
+                  value={this.state.own}
+                  label='Поиск по личной коллекции'
+                  onChange={checked => {
+                    if (checked && this.props.authState.status !== 'yes') {
+                      this.props.enqueueSnackbar('Пожалуйста, авторизуйтесь')
+                    } else {
+                      this.setState({ own: checked }, this.performSearch)
+                    }
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item>
             <Button variant='contained' color='primary' type='submit'

@@ -30,6 +30,6 @@ export type Tag = {
 export type SearchRequest = {
   own: boolean
 } & (
-  | { extended: false, q: string }
+  | { extended: false, q: string, tags: Tag[] }
   | { extended: true, tags: Tag[], qText: string, qImage: string }
 )
