@@ -27,6 +27,9 @@ class SearchAPI(generics.GenericAPIView):
 
         # поиск и ранжировка всех мемов подходящих под запрос
         result = search(query_text, query_image)
+        print("result=", result)
+
+
         extra_urls = []
 
         # фильтруем по тегам
@@ -67,7 +70,6 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
 
         # поиск и ранжировка всех мемов подходящих под запрос
         result = search(query_text, query_image)
-
         # фильтруем по своим мемам
         queryset = request.user.ownImages.filter(Q(id__in=result[0]))
 
@@ -78,7 +80,11 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
             tags = query_tags.split(',')
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
-
+        res_set = set(res)
+        res = []
+        for i in result[0]:
+            if int(i) in res_set:
+                res.append(i)
         # записываем их в  response
         if result[1] == "":
             response = JsonResponse([{
