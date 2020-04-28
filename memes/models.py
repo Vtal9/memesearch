@@ -112,15 +112,16 @@ class Memes(models.Model):
             # если исключение не бросится, значит мем с таким хешом существует и мы не сохраняем что сейчас имеем
             try:
                 ext_meme = Memes.objects.get(Q(image_hash=self.image_hash))
-                print("МЕМ НЕ БУДЕТ ДОБАВЛЕН")
+                #print("МЕМ НЕ БУДЕТ ДОБАВЛЕН")
                 # TODO: union memes
                 return False
             except Memes.DoesNotExist:
-                print("МЕМ БУДЕТ ДОБАВЛЕН")
+                #print("МЕМ БУДЕТ ДОБАВЛЕН")
                 return True  # meme is uniq
 
     def save(self, *args, **kwargs):
-        is_uniq_img = True  # self._check_img_uniqueness()  # если true, то мем будет добавлен
+        is_uniq_img = self._check_img_uniqueness()  # если true, то мем будет добавлен
+        is_uniq_img = True  # пока не пофиксится на фронте
 
         if is_uniq_img:  # self.image_hash мы ставим в функции проверки _check_img_uniq...
             first_save = False
@@ -150,12 +151,16 @@ class Memes(models.Model):
                 if os.path.isfile(self.image.path):
                     # сжатие картинки
                     compress_image(self.image.path, self.fileName[1:])
-                    y.upload(self.fileName[1:], self.fileName)
+                    local_path = self.fileName[1:]
+                    self.fileName = "/media/" + self.fileName.split('/')[-1]
+                    y.upload(local_path, self.fileName)
                     self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
-                    os.remove(self.image.path)
-                    os.remove(self.fileName[1:])
+                    if not("nodel" in args):
+                        os.remove(self.image.path)
+                        os.remove(local_path)  # удаляем файл, после загрузки
+
                     self.image = None
-                    super(Memes, self).save(update_fields=['image', 'url'])
+                    super(Memes, self).save(update_fields=['image', 'url', 'fileName'])
 
             if first_save and self.id % 100 == 0:
                 y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))

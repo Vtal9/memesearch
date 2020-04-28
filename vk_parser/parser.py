@@ -1,7 +1,6 @@
 import requests
 import shutil
 import random
-import platform
 import sys
 import os
 
@@ -61,12 +60,13 @@ def get_input_data_from_args():
     return pub_domains, max_photos
 
 
-def download_memes(pub_domains, max_photos=0, dest_folder=''):
+def download_memes(pub_domains, max_photos=10, dest_folder=''):  # max_photos=3 for debug
     vkPosts = init_vk_api_posts()  # it throws exit, if token is empty
+    destination = "./empty"
 
     for pub_domain in pub_domains:
         min_timestamp = 0
-        destination = os.path.join("./", os.path.join(dest_folder, pub_domain.replace(' ', '')))
+        destination = os.path.join("./media", os.path.join(dest_folder, pub_domain.replace(' ', '')))
         memes_dest = os.path.join(destination, "memes")
         timestamp_dest = os.path.join(destination, 'timestamp.txt')
         try:
@@ -94,6 +94,8 @@ def download_memes(pub_domains, max_photos=0, dest_folder=''):
         with open(timestamp_dest, 'w+') as file:
             file.write(str(latest_timestamp))
 
+    return memes_dest
+
         #    os.system("clear" if platform.system() == 'Linux' else "cls")
         #    print("Downloaded images from {0}\n {1}/{2}".format(pub_domain, i + 1, len(from_posts)))
 
@@ -107,6 +109,6 @@ def download_memes(pub_domains, max_photos=0, dest_folder=''):
 
 if __name__ == '__main__':
     pub_domains, max_photos = get_input_data_from_args()
-    download_image_from_url(pub_domains, max_photos)
+    download_memes(pub_domains, max_photos)
 
 

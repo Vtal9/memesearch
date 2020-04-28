@@ -1,5 +1,6 @@
 import os
 import django
+import traceback
 
 from config import settings
 
@@ -18,9 +19,13 @@ def update_hashes():
     path = 'media/temp'
 
     for meme in all_memes:
-        y.download(meme.fileName, path)
-        image_hash = img2hash.hash_from_image(Image.open(path))
-        Memes.objects.filter(pk=meme.pk).update(image_hash=image_hash)
+        try:
+            y.download(meme.fileName, path)
+            image_hash = img2hash.hash_from_image(Image.open(path))
+            Memes.objects.filter(pk=meme.pk).update(image_hash=image_hash)
+        except: # может вылезти ошибка, если у нас в какой-то момент загрузился битый мем(или не мем вовсе)
+            traceback.print_exc()
+            pass
 
 
 if __name__ == '__main__':
