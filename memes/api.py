@@ -6,7 +6,6 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.response import Response
 
 from memes.models import Memes
-from tags.models import Tags
 from .serializers import MemesSerializer
 
 
@@ -189,14 +188,20 @@ class WallAPI(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         tags = self.request.GET.get('tags')
+
         if tags is not None and tags != '':
             tags = tags.split(',')
             memes = Memes.objects.filter(Q(tags__in=tags))
         else:
             memes = Memes.objects.all()
 
+        # количество мемов в одной выдаче ленты
+        memes_in_iteration = 15
+
+        it = self.request.GET.get('it')
         sorted_by = self.request.GET.get('filter')  # time, ratio, rating
-        memes = memes.order_by("-" + sorted_by, "-id")
+
+        memes = memes.order_by("-" + sorted_by, "-id")[it * memes_in_iteration: (it + 1) * memes_in_iteration]
         return JsonResponse([{
             'id': i.id,
             'url': i.url,
