@@ -7,3 +7,4 @@ media
 __pycache__
 .idea
 auto_update_db/pubs/*
+memes/ocr_pipeline/sample
