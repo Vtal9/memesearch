@@ -1,10 +1,12 @@
 import craft_utils
 from cv2 import INTER_LINEAR
+import cv2
 import imgproc
 import numpy as np
 import pytesseract
 import torch
 from datetime import datetime
+from preprocessing.src.preprocess import preprocess
 
 from craft import CRAFT
 from collections import OrderedDict
@@ -62,13 +64,37 @@ def netForward(net, image, text_threshold=0.7, link_threshold=0.4, low_text=0.4)
     return boxes, polys, ret_score_text
 
 
+def apply_kernel(img):
+    kernel_size = 2
+    kernel = np.ones((kernel_size, kernel_size), np.float32) / (kernel_size ** 2)
+    ans = cv2.filter2D(img, -1, kernel)
+    return ans
+
+
+def find_color_mask(img):
+    # define range of color (for not grayscale / colorful images)
+    # lower_color = np.array([110,50,50])
+    # upper_color = np.array([130,255,255])
+    lower_color = np.array([240])
+    upper_color = np.array([255])
+    ans = cv2.inRange(img, lower_color, upper_color)
+    return ans
+
+
+def best_preproccessing(img):
+    img1 = apply_kernel(img)
+    img2 = find_color_mask(img1)
+    ans = img2
+    return ans
+
+
 def recognizeText(image, bboxes):
     config = ("-l rus --oem 1 --psm 13")
     text = []
     for box in bboxes:
         roi = image[box[0, 1]:box[2, 1], box[0, 0]:box[2, 0]]
-        # cv2.imshow("ROI", roi)
-        # cv2.waitKey(0)
+        cv2.imshow("ROI", roi)
+        cv2.waitKey(0)
         word = pytesseract.image_to_string(roi, config=config)
         text.append(word)
     return text
@@ -83,29 +109,32 @@ def convertImagesToTexts(folder='media/'):
      - list of tuples of 3 strings: (image_path, text_on_image, "") 
     '''
     # Loading the net
-    start_0 = datetime.now()
+    # start_0 = datetime.now()
     net = CRAFT()
     net.load_state_dict(copyStateDict(torch.load("craft_mlt_25k.pth", map_location='cpu')))
     net.eval()
-    print("net weights", datetime.now() - start_0)
+    # print("net weights", datetime.now() - start_0)
 
     # Get list of images
     image_list = list_images(folder)
     result = []
     for img_path in image_list:
-        start = datetime.now()
+        # start = datetime.now()
         image = imgproc.loadImage(img_path)
-        print("loading image", datetime.now() - start)
-        start = datetime.now()
+        cv2.imshow("ROI", best_preproccessing(image))
+        cv2.waitKey(0)
+        # print("loading image", datetime.now() - start)
+        # start = datetime.now()
         bboxes, polys, score_text = netForward(net, image)
-        print("Net inference", datetime.now() - start)
-        start = datetime.now()
+        # print("Net inference", datetime.now() - start)
+        # start = datetime.now()
         polys = craft_utils.postProcess(polys, image.shape)
-        print("Post process", datetime.now() - start)
-        start = datetime.now()
+        # print("Post process", datetime.now() - start)
+        # start = datetime.now()
         texts = recognizeText(image[:, :, ::-1], polys)
-        print("text recognition", datetime.now() - start)
+        # print("text recognition", datetime.now() - start)
         result.append((img_path, " ".join(texts), ""))
+        print(img_path, " ".join(texts))
     return result
 
 
