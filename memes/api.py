@@ -188,7 +188,7 @@ class WallAPI(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         tags = self.request.GET.get('tags')
-
+        print(request.data)
         if tags is not None and tags != '':
             tags = tags.split(',')
             memes = Memes.objects.filter(Q(tags__in=tags))

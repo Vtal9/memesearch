@@ -124,7 +124,7 @@ def make_query_by_text_query(text_query, queryset):
             pass
 
     if len(word_text_index) == 0:
-        return None
+        return {}
 
     ids_weight = {}
 
@@ -156,14 +156,15 @@ def make_query_by_image_query(image_query, queryset):
 
     for word in words:
         try:
-            ids = parse_db_index(ImageDescriptions.objects.get(word=word), is_descr=True)
+            ids = parse_db_index(ImageDescriptions.objects.get(word=word).index, is_descr=True)
             for id in ids:
                 if id in ids_weight:
                     ids_weight[id] += DESCRIPTION_WEIGHT
                 else:
                     ids_weight[id] = DESCRIPTION_WEIGHT
         except:
-            pass
+            print("some exception in make_query_by_image_query")
+
 
     return ids_weight
 
@@ -201,6 +202,8 @@ def make_query(text_query="", image_query="", text_queryset=(), image_queryset=(
     ids_weight_from_descr = make_query_by_image_query(image_query, image_queryset)
     ids_weight_from_text = make_query_by_text_query(text_query, text_queryset)
     result = ids_weight_from_text
+
+
     for id in ids_weight_from_descr:
         if id in result.keys():
             result[id] += ids_weight_from_descr[id]
