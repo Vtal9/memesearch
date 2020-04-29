@@ -188,7 +188,6 @@ class WallAPI(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         tags = self.request.GET.get('tags')
-        print(request.data)
         if tags is not None and tags != '':
             tags = tags.split(',')
             memes = Memes.objects.filter(Q(tags__in=tags))
@@ -196,12 +195,15 @@ class WallAPI(generics.GenericAPIView):
             memes = Memes.objects.all()
 
         # количество мемов в одной выдаче ленты
-        memes_in_iteration = 15
-        print(self.request.data)
-        it = int(self.request.GET.get('it'))
-        print(it)
+
+        it = self.request.GET.get('it')
+        it = 0 if it is None else int(it)
+
+        size = self.request.GET.get('size')
+        size = 15 if size is None else int(size)
+
         sorted_by = self.request.GET.get('filter')  # time, ratio, rating
-        memes = memes.order_by("-" + sorted_by, "-id")[it * memes_in_iteration: (it + 1) * memes_in_iteration]
+        memes = memes.order_by("-" + sorted_by, "-id")[it * size: (it + 1) * size]
         return JsonResponse([{
             'id': i.id,
             'url': i.url,

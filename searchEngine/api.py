@@ -27,8 +27,6 @@ class SearchAPI(generics.GenericAPIView):
 
         # поиск и ранжировка всех мемов подходящих под запрос
         result = search(query_text, query_image)
-        print("result=", result)
-
 
         extra_urls = []
 
@@ -44,11 +42,17 @@ class SearchAPI(generics.GenericAPIView):
                 extra_urls = reserve_search(query_text)
 
         # записываем их в  response
+        iteration = self.request.GET.get('it')
+        iteration = 0 if iteration is None else int(iteration)
+
+        size = self.request.GET.get('size')
+        size = 15 if size is None else int(size)
+
         if result[1] == "":
             response = JsonResponse([{
                 'id': i,
-                'url': Memes.objects.get(pk=i).url  # _compressed
-            } for i in res] + [{
+                'url': Memes.objects.get(pk=i).url
+            } for i in res[iteration * size:(iteration + 1) * size]] + [{
                 'url': url
             } for url in extra_urls], safe=False)
         else:
@@ -86,11 +90,16 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
             if int(i) in res_set:
                 res.append(i)
         # записываем их в  response
+        iteration = self.request.GET.get('it')
+        iteration = 0 if iteration is None else int(iteration)
+
+        size = self.request.GET.get('size')
+        size = 15 if size is None else int(size)
         if result[1] == "":
             response = JsonResponse([{
                 'id': i,
-                'url': Memes.objects.get(pk=i).url  # _compressed
-            } for i in res], safe=False)
+                'url': Memes.objects.get(pk=i).url
+            } for i in res[iteration * size:(iteration + 1) * size]], safe=False)
         else:
             response = HttpResponse(result[1])
 

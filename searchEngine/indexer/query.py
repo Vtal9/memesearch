@@ -165,7 +165,6 @@ def make_query_by_image_query(image_query, queryset):
         except:
             print("some exception in make_query_by_image_query")
 
-
     return ids_weight
 
 
@@ -202,7 +201,6 @@ def make_query(text_query="", image_query="", text_queryset=(), image_queryset=(
     ids_weight_from_descr = make_query_by_image_query(image_query, image_queryset)
     ids_weight_from_text = make_query_by_text_query(text_query, text_queryset)
     result = ids_weight_from_text
-
 
     for id in ids_weight_from_descr:
         if id in result.keys():
