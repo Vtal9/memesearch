@@ -43,3 +43,17 @@ class CreateNewTagAPI(generics.GenericAPIView):
         return Response({
             "tag": TagSerializer(tag, context=self.get_serializer_context()).data,
         })
+
+
+class DeleteTagAPI(generics.GenericAPIView):
+    serializer_class = TagSerializer
+
+    def post(self, request, *args, **kwargs):
+        tag_name = self.request.GET.get('tag')
+        try:
+            tag = Tags.objects.get(tag=tag_name)
+            tag.delete()
+            return Response("tag deleted successful")
+        except:
+            print("tag doesn't exist:", tag_name)
+            return Response("tag doesn't exist")
