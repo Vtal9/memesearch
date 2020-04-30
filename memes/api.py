@@ -1,3 +1,5 @@
+from random import random, randint
+
 import yadisk
 from django.conf import settings
 from django.db.models import Q
@@ -73,27 +75,6 @@ class NewURLMemesViewSet(viewsets.ModelViewSet):
 
             queryset.url = yadisk.functions.resources.get_download_link(y.get_session(), queryset.fileName)
             super(Memes, queryset).save(update_fields=['url'])
-
-            return [queryset]
-
-
-# get new url for compressed meme by DI
-class NewURLMemesCompressedViewSet(viewsets.ModelViewSet):
-    serializer_class = MemesSerializer
-    permission_classes = [
-        permissions.AllowAny
-    ]
-
-    def get_queryset(self):
-        y = settings.Y
-        id_meme = self.request.GET.get('id')
-
-        if id_meme is not None:
-            queryset = Memes.objects.get(pk=id_meme)
-
-            queryset.url_compressed = yadisk.functions.resources.get_download_link(y.get_session(),
-                                                                                   queryset.fileName_compressed)
-            super(Memes, queryset).save(update_fields=['url_compressed'])
 
             return [queryset]
 
@@ -194,7 +175,10 @@ class WallAPI(generics.GenericAPIView):
         else:
             memes = Memes.objects.all()
 
-        # количество мемов в одной выдаче ленты
+        banned_tags = self.request.GET.get('ban')
+        if banned_tags is not None and banned_tags != '':
+            banned_tags = banned_tags.split(',')
+            memes = memes.exclude(Q(tags__in=banned_tags))
 
         it = self.request.GET.get('it')
         it = 0 if it is None else int(it)
@@ -210,3 +194,25 @@ class WallAPI(generics.GenericAPIView):
             'likes': i.likes,
             'dislikes': i.dislikes
         } for i in memes], safe=False)
+
+
+class TinderAPI(generics.GenericAPIView):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
+
+    def get(self, request, *args, **kwargs):
+        memes = Memes.objects.all()
+
+        banned_tags = self.request.GET.get('ban')
+        if banned_tags is not None and banned_tags != '':
+            banned_tags = banned_tags.split(',')
+            memes = memes.exclude(Q(tags__in=banned_tags))
+
+        meme = memes[randint(0, memes.count())]
+        return JsonResponse({
+            "id": meme.id,
+            "url": meme.url,
+            "is_mine": 1 if self.request.user.is_authenticated and self.request.user.ownImages.filter(pk=meme.id) else 0
+        })
