@@ -2,7 +2,7 @@ import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
 import { CenterPadding } from '../components/DescriptionForm'
-import { Meme, AuthState, User } from '../util/Types'
+import { Meme, AuthState, User, Tag } from '../util/Types'
 import { Link, Route, RouteComponentProps } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack'
@@ -114,7 +114,8 @@ class Random extends React.Component<Props, State> {
   async next(id?: number) {
     this.setState({ type: 'loading' })
     try {
-      const result = id === undefined ? await randomApi() : await getMeme(id)
+      const result = id === undefined ? await randomApi([{id: 1, tag: 'desu'}]) : await getMeme(id)
+      console.log(result)
       if (result === null) {
         this.setState({ type: 'error' })
       } else {
@@ -126,6 +127,7 @@ class Random extends React.Component<Props, State> {
         })
       }
     } catch(error) {
+      console.log(error)
       this.props.enqueueSnackbar('Нет интернета')
       this.setState({ type: 'error' })
     }

@@ -5,7 +5,7 @@ import { Tag } from '../util/Types'
 
 
 type Props = {
-  tags: Tag[]
+  tags: Tag[],
   onChange?: (tags: Tag[]) => void
 }
 
@@ -22,7 +22,7 @@ function has(list: Tag[], tag: Tag) {
   ), false)
 }
 
-export default class TagsPicker extends React.Component<Props, State> {
+export default class TagsFilter extends React.Component<Props, State> {
   state: State = {
     status: { type: 'loading' },
     menuAnchor: null
@@ -60,68 +60,67 @@ export default class TagsPicker extends React.Component<Props, State> {
     case 'done':
       return (
         <div>
-          {this.props.tags.map(item => (
-            // TODO?: Add difference to +tag and -tag
-            <Chip
-              className='tag-chip'
+        {this.props.tags.map(item => (
+          <Chip
+            className='tag-chip'
+            key={item.id}
+            label={item.tag}
+            onDelete={() => {
+              this.setState(oldState => {
+                if (oldState.status.type === 'done') {
+                  const newState: State = {
+                    menuAnchor: null,
+                    status: {
+                      type: 'done',
+                      tags: [...oldState.status.tags, item]
+                    }
+                  }
+                  return newState
+                } else return oldState
+              }, () => {
+                if (this.props.onChange) {
+                  this.props.onChange(this.props.tags.filter(tag => tag.id !== item.id))
+                }
+              })
+            }}
+          />
+        ))}
+        <Button
+          variant='contained'
+          size='small'
+          startIcon={<Icon>remove</Icon>}
+          onClick={e => this.setState({ menuAnchor: e.currentTarget })}
+        >Тег</Button>
+        <Menu
+          anchorEl={this.state.menuAnchor}
+          onClose={() => this.setState({ menuAnchor: null })}
+          open={this.state.menuAnchor !== null}
+        >
+          {this.state.status.tags.map(item => (
+            <MenuItem
               key={item.id}
-              label={item.tag}
-              onDelete={() => {
+              onClick={() => {
                 this.setState(oldState => {
                   if (oldState.status.type === 'done') {
                     const newState: State = {
                       menuAnchor: null,
                       status: {
                         type: 'done',
-                        tags: [...oldState.status.tags, item],
+                        tags: oldState.status.tags.filter(tag => tag.id !== item.id)
                       }
                     }
                     return newState
                   } else return oldState
                 }, () => {
                   if (this.props.onChange) {
-                    this.props.onChange(this.props.tags.filter(tag => tag.id !== item.id))
+                    this.props.onChange([...this.props.tags, item])
                   }
                 })
               }}
-            />
+            >{item.tag}</MenuItem>
           ))}
-          <Button
-            variant='contained'
-            size='small'
-            startIcon={<Icon>add</Icon>}
-            onClick={e => this.setState({ menuAnchor: e.currentTarget })}
-          >Тег</Button>
-          <Menu
-            anchorEl={this.state.menuAnchor}
-            onClose={() => this.setState({ menuAnchor: null })}
-            open={this.state.menuAnchor !== null}
-          >
-            {this.state.status.tags.map(item => (
-              <MenuItem
-                key={item.id}
-                onClick={() => {
-                  this.setState(oldState => {
-                    if (oldState.status.type === 'done') {
-                      const newState: State = {
-                        menuAnchor: null,
-                        status: {
-                          type: 'done',
-                          tags: oldState.status.tags.filter(tag => tag.id !== item.id),
-                        }
-                      }
-                      return newState
-                    } else return oldState
-                  }, () => {
-                    if (this.props.onChange) {
-                      this.props.onChange([...this.props.tags, item])
-                    }
-                  })
-                }}
-              >{item.tag}</MenuItem>
-            ))}
-          </Menu>
-        </div>
+        </Menu>
+      </div>
       )
     }
   }

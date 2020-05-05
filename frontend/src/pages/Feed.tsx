@@ -5,7 +5,8 @@ import { CircularProgress, RadioGroup, FormControlLabel, Radio } from '@material
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { memesFeedApi } from '../api/MemesFeed'
-import TagsPicker from '../components/TagsPicker';
+import TagsPicker from '../components/TagsPicker'
+import TagsFilter from '../components/TagsFilter'
 
 
 type Filter = "rating" | "time" | "ratio"
@@ -20,7 +21,8 @@ type FeedState = {
   | { type: 'done' }
   list: UnloadedMeme[]
   filter: Filter
-  tags: Tag[]
+  plusTags: Tag[]
+  minusTags: Tag[]
 }
 
 // TODO: make this beatiful: remove excess buttons, add likes and dislikes number etc
@@ -29,7 +31,8 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
     super(props)
     this.state = {
       filter: 'rating',
-      tags: [],
+      plusTags: [],
+      minusTags: [],
       status: { type: 'loading' },
       list: []
     }
@@ -52,8 +55,8 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
   async load() {
     this.setState({ status: { type: 'loading' } })
     const addition:UnloadedMeme[] = (await memesFeedApi(
-      this.state.filter, this.state.tags.map(tag => tag.id) , this.pagesLoaded
-      )).map( // dummy request
+      this.state.filter, this.state.plusTags.map(tag => tag.id), this.state.minusTags.map(tag => tag.id), this.pagesLoaded
+      )).map(
       // FeedMeme (with likes dislikes) -> UnloadedMeme (since Gallery is written for these)
       (meme) => ({
         type: 'native',
@@ -93,11 +96,21 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
         </div>
         <div>
           <TagsPicker
-            tags={this.state.tags}
-            onChange={tags => {
+            tags={this.state.plusTags}
+            onChange={plusTags => {
               this.pagesLoaded = 0
               this.replace = true
-              this.setState({ tags }, this.load)}
+              this.setState({ plusTags }, this.load)}
+            }
+          />
+        </div>
+        <div>
+          <TagsFilter
+            tags={this.state.minusTags}
+            onChange={minusTags => {
+              this.pagesLoaded = 0
+              this.replace = true
+              this.setState({ minusTags }, this.load)}
             }
           />
         </div>
