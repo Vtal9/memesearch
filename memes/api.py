@@ -187,7 +187,7 @@ class WallAPI(generics.GenericAPIView):
         size = 15 if size is None else int(size)
 
         sorted_by = self.request.GET.get('filter')  # time, ratio, rating
-        memes = memes.order_by("-" + sorted_by, "-id")[it * size: (it + 1) * size]
+        memes = memes.order_by("-" + sorted_by)[it * size: (it + 1) * size]
         return JsonResponse([{
             'id': i.id,
             'url': i.url,
