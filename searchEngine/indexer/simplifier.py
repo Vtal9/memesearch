@@ -16,7 +16,6 @@ def simplify_string(ustr):
     temp = pattern.sub(' ', result)
 
     words = [morph.normal_forms(word)[0] for word in temp.split(' ')]
-    print("FROM SIMPLIFIER, WORDS: " + str(words))
 
     res_words = []
     for word in words:
