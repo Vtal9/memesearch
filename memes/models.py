@@ -48,7 +48,6 @@ def update_index_in_db(text, description, new_index_text, new_index_description)
                 updated_text_words.append(row.word)
                 row.index = str(misc.union_text(row.index, new_index_text[row.word]))
                 row.save()
-
         for word in text_words:  # create for new words
             if not (word in updated_text_words):
                 indexer_models.TextDescriptions.objects.create(word=word, index=new_index_text[word])
@@ -117,7 +116,7 @@ class Memes(models.Model):
                 # print("МЕМ НЕ БУДЕТ ДОБАВЛЕН")
                 # TODO: union memes
                 return False
-            except Memes.DoesNotExist:
+            except:
                 # print("МЕМ БУДЕТ ДОБАВЛЕН")
                 return True  # meme is uniq
 

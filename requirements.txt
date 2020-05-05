@@ -11,3 +11,4 @@ pytesseract
 torch
 torchvision
 Google-Images-Search
+pymorphy2

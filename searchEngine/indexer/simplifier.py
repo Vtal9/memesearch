@@ -1,8 +1,10 @@
-
+import pymorphy2
 import re
 
 SIMPLIFIED_CHARACTERS = {'о': 'а', 'ё': 'и', 'е': 'и', 'з': 'с', 'ъ': '', 'ь': '', 'й': 'и', 'г': 'к', 'д': 'т',
-                         'б': 'п', 'ж': 'ш', 'щ': 'ш', 'в': 'ф'}
+                         'б': 'п', 'ж': 'ш', 'щ': 'ш', 'в': 'ф', '0': 'о'}
+
+morph = pymorphy2.MorphAnalyzer()
 
 
 def simplify_string(ustr):
@@ -13,7 +15,8 @@ def simplify_string(ustr):
     result = str(ustr).lower()
     temp = pattern.sub(' ', result)
 
-    words = temp.split(' ')
+    words = [morph.normal_forms(word)[0] for word in temp.split(' ')]
+
     res_words = []
     for word in words:
         if len(word) > 3:
