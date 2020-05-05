@@ -9,6 +9,7 @@ import { withSnackbar, WithSnackbarProps } from 'notistack'
 import { loadImage, authHeader } from '../util/Funcs';
 import { randomApi, getMeme } from '../api/RandomMeme';
 import Axios from 'axios';
+import Voting from '../components/Voting';
 
 
 
@@ -163,14 +164,7 @@ class Random extends React.Component<Props, State> {
             <Card className='meme-form single'>
               <CardMedia component='img' className='img' image={this.state.img.src} />
               <CardActions>
-                <Button
-                  size='large'
-                  onClick={() => this.next()}
-                ><Icon>thumb_up_alt</Icon></Button>
-                <Button
-                  size='large'
-                  onClick={() => this.next()}
-                ><Icon>thumb_down_alt</Icon></Button>
+                <Voting handle={() => this.next()} id={this.state.id} />
                 {this.props.authState.status === 'yes' ? (
                   <AddRemove
                     id={this.state.id}

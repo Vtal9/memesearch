@@ -7,6 +7,8 @@ type Item = {
   id: number
   url: string
   owner: User[]
+  likes: number
+  dislikes: number
 }
 
 export async function unmarkedApi() {

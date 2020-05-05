@@ -11,7 +11,7 @@ import { TagsEdit, FakeTagsEdit } from './TagsEdit'
 
 type Props = {
   unloadedMeme: UnloadedMeme
-  openDialog: (img: HTMLImageElement) => void
+  openDialog: (img: HTMLImageElement, id: number | false) => void
   authState: AuthState
   onDelete?: () => void
 }
@@ -60,7 +60,11 @@ export default class GalleryItem extends React.Component<Props, State> {
 
   openDialog() {
     if (this.state.type !== 'loading') {
-      this.props.openDialog(this.state.img)
+      if (this.state.type === 'done') {
+        this.props.openDialog(this.state.img, this.state.id)
+      } else {
+        this.props.openDialog(this.state.img, false)
+      }
     }
   }
 

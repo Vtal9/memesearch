@@ -2,6 +2,7 @@ import React from 'react'
 import { UnloadedMeme, AuthState } from '../../util/Types'
 import { Dialog, DialogActions, Typography } from '@material-ui/core'
 import GalleryItem from './Item'
+import Voting from '../Voting'
 
 
 type Props = {
@@ -11,14 +12,17 @@ type Props = {
 
 type State = {
   dialogImg: HTMLImageElement | null
+  id: number | false
 }
 
 export default class Gallery extends React.Component<Props, State> {
   state: State = {
-    dialogImg: null
+    dialogImg: null,
+    id: false
   }
 
   render() {
+    console.log(this.state.id)
     return (
       <div className="gallery">
         <Dialog
@@ -29,6 +33,9 @@ export default class Gallery extends React.Component<Props, State> {
           {this.state.dialogImg !== null && [
             <img src={this.state.dialogImg.src} {...imageSize(this.state.dialogImg)} key={1} />,
             <DialogActions key={2}>
+              {this.state.id !== false &&
+                <Voting id={this.state.id} />
+              }
               <a href={this.state.dialogImg.src} target='_blank'>
                 <Typography>Открыть оригинал</Typography>
               </a>
@@ -38,8 +45,8 @@ export default class Gallery extends React.Component<Props, State> {
         {this.props.list.map(item => (
           <GalleryItem key={item.url} unloadedMeme={item}
             authState={this.props.authState}
-            openDialog={(img: HTMLImageElement) => {
-              this.setState({ dialogImg: img })
+            openDialog={(img, id) => {
+              this.setState({ dialogImg: img, id })
           }} />
         ))}
       </div>
