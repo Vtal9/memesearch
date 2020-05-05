@@ -2,7 +2,7 @@ import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
 import { CenterPadding } from '../components/DescriptionForm'
-import { Meme, AuthState, User } from '../util/Types'
+import { Meme, AuthState, User, Tag } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack'
@@ -98,7 +98,7 @@ class Random extends React.Component<Props, State> {
   async next() {
     this.setState({ type: 'loading' })
     try {
-      const result = await randomApi()
+      const result = await randomApi([{id: 1, tag: 'desu'}]) // dummy list of banned tags
       if (result === null) {
         this.setState({ type: 'error' })
       } else {
