@@ -34,3 +34,7 @@ export async function randomApi() {
     return result[0]
   }
 }
+
+export async function getMeme(id: number) {
+  return (await Axios.get<Item>(`api/memes/${id}/`)).data
+}

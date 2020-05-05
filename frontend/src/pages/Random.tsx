@@ -3,11 +3,11 @@ import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
 import { CenterPadding } from '../components/DescriptionForm'
 import { Meme, AuthState, User } from '../util/Types'
-import { Link } from 'react-router-dom';
+import { Link, Route, RouteComponentProps } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack'
 import { loadImage, authHeader } from '../util/Funcs';
-import { randomApi } from '../api/RandomMeme';
+import { randomApi, getMeme } from '../api/RandomMeme';
 import Axios from 'axios';
 
 
@@ -78,7 +78,7 @@ type State =
 | { readonly type: 'loading' | 'error' | 'nojob' }
 | { type: 'ready', id: number, img: HTMLImageElement, owners: User[] }
 
-type Props = WithSnackbarProps & {
+type Props = RouteComponentProps & WithSnackbarProps & {
   authState: AuthState
 }
 
@@ -86,7 +86,22 @@ class Random extends React.Component<Props, State> {
   state: State = { type: 'loading' }
 
   componentDidMount() {
-    this.next()
+    this.resolve()
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.location.search !== this.props.location.search) {
+      this.resolve()
+    }
+  }
+
+  resolve() {
+    const id = new URLSearchParams(this.props.location.search).get('id')
+    if (id === null) {
+      this.next()
+    } else {
+      this.next(parseInt(id))
+    }
   }
 
   setMeme(img: HTMLImageElement, id: number, owners: User[]) {
@@ -95,13 +110,14 @@ class Random extends React.Component<Props, State> {
     })
   }
 
-  async next() {
+  async next(id?: number) {
     this.setState({ type: 'loading' })
     try {
-      const result = await randomApi()
+      const result = id === undefined ? await randomApi() : await getMeme(id)
       if (result === null) {
         this.setState({ type: 'error' })
       } else {
+        location.href = '#/random?id=' + result.id
         loadImage(result.id, result.url, image => {
           this.setMeme(image, result.id, result.owner)
         }, () => {

@@ -103,10 +103,8 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
         </div>
         {this.state.status.type === 'done' &&
           <div>
-            {this.state.list.length === 0 ?
+            {this.state.list.length === 0 &&
               <BigFont>Мемы кончились... :c</BigFont>
-            :
-              <BigFont>Свежие мемы</BigFont>
             }
           </div>
         }
