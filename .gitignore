@@ -6,5 +6,4 @@ media
 *.sqlite3
 __pycache__
 .idea
-auto_update_db/pubs/*
-memes/ocr_pipeline/sample
+media/pubs/*
