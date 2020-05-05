@@ -60,7 +60,7 @@ def get_input_data_from_args():
     return pub_domains, max_photos
 
 
-def download_memes(pub_domains, max_photos=10, dest_folder=''):  # max_photos=3 for debug
+def download_memes(pub_domains, max_photos=0, dest_folder=''):  # max_photos=3 for debug
     vkPosts = init_vk_api_posts()  # it throws exit, if token is empty
     destination = "./empty"
 
