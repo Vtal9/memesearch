@@ -7,3 +7,4 @@ media
 __pycache__
 .idea
 media/pubs/*
+memes/ocr_pipeline/sample
