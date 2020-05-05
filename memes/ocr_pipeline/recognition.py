@@ -93,8 +93,6 @@ def recognizeText(image, bboxes):
     text = []
     for box in bboxes:
         roi = image[box[0, 1]:box[2, 1], box[0, 0]:box[2, 0]]
-        cv2.imshow("ROI", roi)
-        cv2.waitKey(0)
         word = pytesseract.image_to_string(roi, config=config)
         text.append(word)
     return text
@@ -110,9 +108,14 @@ def convertImagesToTexts(folder='media/'):
     '''
     # Loading the net
     # start_0 = datetime.now()
+    # TESTING TORCHSCRIPT PERFORMANCE
+
     net = CRAFT()
     net.load_state_dict(copyStateDict(torch.load("craft_mlt_25k.pth", map_location='cpu')))
     net.eval()
+
+    # net = torch.jit.load('craft_model.zip', map_location='cpu')
+    # net.eval()
     # print("net weights", datetime.now() - start_0)
 
     # Get list of images
@@ -121,12 +124,10 @@ def convertImagesToTexts(folder='media/'):
     for img_path in image_list:
         # start = datetime.now()
         image = imgproc.loadImage(img_path)
-        cv2.imshow("ROI", best_preproccessing(image))
-        cv2.waitKey(0)
         # print("loading image", datetime.now() - start)
-        # start = datetime.now()
+        start = datetime.now()
         bboxes, polys, score_text = netForward(net, image)
-        # print("Net inference", datetime.now() - start)
+        print("Net inference", datetime.now() - start)
         # start = datetime.now()
         polys = craft_utils.postProcess(polys, image.shape)
         # print("Post process", datetime.now() - start)
