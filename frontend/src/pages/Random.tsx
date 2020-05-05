@@ -118,6 +118,7 @@ class Random extends React.Component<Props, State> {
     if (this.state.type === 'nojob') {
       return (
         <Center>
+          <div className='spacing'></div>
           <BigFont>
             На данный момент на сайте нет неразмеченных мемов. Это очень хорошо.<br />
             Вы можете <Link to='/upload'>загрузить</Link> новые мемы
@@ -128,6 +129,7 @@ class Random extends React.Component<Props, State> {
     if (this.state.type === 'error') {
       return (
         <Center>
+          <div className='spacing'></div>
           <div className='vmiddle'>
             <Typography>Не удалось загрузить мем.</Typography>
             <Button color='primary' onClick={() => {
@@ -139,6 +141,7 @@ class Random extends React.Component<Props, State> {
     }
     return (
       <Center>
+        <div className='spacing'></div>
         {this.state.type === 'ready' ?
           <div>
             <Card className='meme-form single'>

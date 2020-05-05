@@ -122,6 +122,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     const { items } = this.state
     return (
       <Center>
+        <div className='spacing'></div>
         {items.map((item, index) => (
           <Card className='meme-form' key={index} style={{
             display: item.status.type === 'none' ? 'none' : ''

@@ -48,6 +48,7 @@ export default class Search extends React.Component<Props, State> {
   render() {
     return (
       <Center>
+        <div className='spacing'></div>
         <SearchForm
           authState={this.props.authState}
           query={this.props.query}

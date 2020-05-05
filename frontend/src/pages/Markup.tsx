@@ -59,6 +59,7 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
     if (status.type === 'cool') {
       return (
         <Center>
+          <div className='spacing'></div>
           <BigFont>
             На данный момент на сайте нет неразмеченных мемов. Это очень хорошо.<br />
             Вы можете <Link to='/upload'>загрузить</Link> новые мемы
@@ -69,6 +70,7 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
     if (status.type === 'error') {
       return (
         <Center>
+          <div className='spacing'></div>
           <div className='vmiddle'>
             <Typography>Не удалось загрузить мем.</Typography>
             <Button color='primary' onClick={() => {
@@ -80,6 +82,7 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
     }
     return (
       <Center>
+        <div className='spacing'></div>
         {status.type === 'ready' ?
           <div>
             <Card className='meme-form single'>

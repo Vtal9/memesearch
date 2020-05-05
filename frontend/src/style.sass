@@ -41,26 +41,19 @@ a
 .logo
   height: 45px
   display: block
-  margin-right: 30px
+  margin: 5px 20px 20px 0
 .header
-  .header-top
+  background: white
+  box-shadow: 0 0 5px #aaaaaa
+  .header-links
     display: flex
-    align-items: flex-end
-    margin: 20px 0
-    justify-content: space-between
-    form
-      width: 100%
-  .header-bottom
-    display: flex
-    margin-bottom: 20px
-  .header-link
-    padding: 10px 15px
-    &.active
-      background: #dddddd
-    &.clickable
-      text-decoration: none
-      &:hover
-        opacity: .7
+    align-items: center
+    flex: 1
+    justify-content: flex-end
+    .header-link
+      margin-right: 15px
+  .quick-search-wrapper
+    margin-top: -15px
 .file-picker
   display: flex
   flex-direction: column

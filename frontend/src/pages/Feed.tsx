@@ -75,6 +75,7 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
   render() {
     return (
       <Center>
+        <div className='spacing'></div>
         <div>
           <RadioGroup
             style={{ flexDirection: 'row' }}

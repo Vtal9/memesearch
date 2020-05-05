@@ -59,26 +59,30 @@ const App = withRouter(props => {
     <div>
       <Route path='/' exact><Redirect to={Path.SEARCH} /></Route>
 
-      <Center className='header'>
-        <div className='header-top'>
-          <Link to={Path.HOME} title='На главную'>
-            <img src={logo} className='logo' />
-          </Link>
-          {displaySearch &&
-            <QuickSearch onSearch={q => search(q)} />
-          }
-          <AuthBar
-            authState={authState}
-            ref={ref => setAuthBar(ref)}
-            onAuthStateChange={newAuthState => setAuthState(newAuthState)}
-          />
-        </div>
-        <div className="header-bottom">
-          {pages.filter(page => page.tab).map(page =>
-            <Tab to={page.url} label={page.title} key={page.url} />
-          )}
-        </div>
-      </Center>
+      <div className='header'>
+        <Center>
+          <div className='vmiddle'>
+            <Link to={Path.HOME} title='На главную'>
+              <img src={logo} className='logo' />
+            </Link>
+            <div className='quick-search-wrapper'>
+              {displaySearch &&
+                <QuickSearch onSearch={q => search(q)} />
+              }
+            </div>
+            <div className='header-links'>
+              {pages.filter(page => page.tab).map(page =>
+                <Tab to={page.url} label={page.title} key={page.url} />
+              )}
+              <AuthBar
+                authState={authState}
+                ref={ref => setAuthBar(ref)}
+                onAuthStateChange={newAuthState => setAuthState(newAuthState)}
+              />
+            </div>
+          </div>
+        </Center>
+      </div>
       {pages.map(page =>
         <Route path={page.url} key={page.url}>
           <TitleSetter title={page.title} />

@@ -36,6 +36,7 @@ export default class MyMemes extends React.Component<MyMemesProps, MyMemesState>
   render() {
     return (
       <Center>
+        <div className='spacing'></div>
         {this.state.status.type === 'done' ?
           <div>
             {this.state.status.list.length === 0 ?
