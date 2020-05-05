@@ -31,12 +31,8 @@ export async function myMemesApi(): Promise<UnloadedMeme[]> {
 export async function randomApi(filterTags: Tag[]) {
   const usp = new URLSearchParams()
   usp.append('ban', filterTags.map(tag => tag.id).join())
-  const result = (await Axios.get<Item[]>('api/tinder?' + usp)).data
-  if (result.length === 0) {
-    return null
-  } else {
-    return result[0]
-  }
+  const result = (await Axios.get<Item>('api/tinder?' + usp)).data
+  return result
 }
 
 export async function getMeme(id: number) {
