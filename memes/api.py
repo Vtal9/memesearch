@@ -152,7 +152,7 @@ class LikingMemeAPI(generics.GenericAPIView):
         else:
             meme.dislikes += 1
 
-        meme.save(update_fields=['likes', 'dislikes'])
+        meme.save(update_fields=['likes', 'dislikes', 'ratio', 'rating'])
 
         return JsonResponse({
             'likes': meme.likes,

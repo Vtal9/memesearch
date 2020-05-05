@@ -125,7 +125,6 @@ class Memes(models.Model):
         is_uniq_img = True  # пока не пофиксится на фронте
 
         if is_uniq_img:  # self.image_hash мы ставим в функции проверки _check_img_uniq...
-            print("save", self)
             first_save = False
             if self.image is not None and self.image != '':
                 first_save = True
