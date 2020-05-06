@@ -10,7 +10,7 @@ import logo from './img/logo.svg'
 import './style.sass'
 import { Typography } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
-import AuthBar from './components/AuthBar';
+import AuthBar from './components/auth/Bar';
 import { AuthState } from './util/Types'
 import AddTag from './pages/AddTag'
 import MyMemes from './pages/MyMemes'

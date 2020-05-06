@@ -1,7 +1,7 @@
 import React from 'react'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 import { IconButton, Icon, DialogTitle, DialogContent, Dialog, DialogActions } from '@material-ui/core'
-import DescriptionForm from '../DescriptionForm'
+import DescriptionForm from '../meme/DescriptionForm'
 
 
 type Props = {

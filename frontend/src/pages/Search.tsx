@@ -1,5 +1,5 @@
 import React from 'react'
-import { Repo, AuthState, UnloadedMeme, SearchRequest } from '../util/Types';
+import { Repo, AuthState, SearchRequest, PureMeme } from '../util/Types';
 import SearchForm from '../components/SearchForm';
 import Center from '../layout/Center';
 import FlexCenter from '../layout/FlexCenter';
@@ -16,7 +16,7 @@ type Props = {
 
 type State = {
   status: 'initial' | 'loading' | 'done' | 'error'
-  results: UnloadedMeme[]
+  results: PureMeme[]
 }
 
 export default class Search extends React.Component<Props, State> {
@@ -32,13 +32,7 @@ export default class Search extends React.Component<Props, State> {
       const items = await searchApi(request, repo)
       this.setState({
         status: 'done',
-        results: items.map(item => {
-          if (item.id !== undefined) {
-            return { type: 'native', id: parseInt(item.id), url: item.url }
-          } else {
-            return { type: 'external', url: item.url }
-          }
-        })
+        results: items
       })
     } catch {
       this.setState({ status: 'error' })

@@ -1,7 +1,7 @@
 import React from 'react'
-import { User } from '../util/Types'
+import { User } from '../../util/Types'
 import { Dialog, DialogContent, Grid, TextField, Button, Typography } from '@material-ui/core'
-import { registerApi, loginApi } from '../api/Auth'
+import { registerApi, loginApi } from '../../api/Auth'
 
 
 type LoginEvent = {

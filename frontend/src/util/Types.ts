@@ -1,20 +1,19 @@
-export type Meme = {
+export type FullMeme = InvisibleMeme & {
   img: HTMLImageElement
-  id: number
-  imageDescription: string
-  textDescription: string
 }
 
-export type UnloadedMeme =
-| { type: 'native', id: number, url: string }
-| { type: 'external', url: string }
-
-// TODO: make this global / union this with `Meme` ???
-export type FeedMeme = {
-  id: number,
-  url: string, 
-  likes: number,
+export type InvisibleMeme = PureMeme & {
+  imageDescription: string
+  textDescription: string
+  likes: number
   dislikes: number
+  tags: Tag[]
+  owner: User[]
+}
+
+export type PureMeme = {
+  id: number
+  url: string
 }
 
 export type User = {

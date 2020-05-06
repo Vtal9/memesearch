@@ -1,10 +1,10 @@
 import React from 'react'
 import Gallery from '../components/gallery/Gallery'
-import { UnloadedMeme, AuthState } from '../util/Types'
+import { AuthState, InvisibleMeme } from '../util/Types'
 import { CircularProgress } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
-import { myMemesApi } from '../api/RandomMeme'
+import { myMemesApi } from '../api/MemesLists'
 
 
 type MyMemesProps = {
@@ -14,7 +14,7 @@ type MyMemesProps = {
 type MyMemesState = {
   status:
   | { type: 'loading' }
-  | { type: 'done', list: UnloadedMeme[] }
+  | { type: 'done', list: InvisibleMeme[] }
 }
 
 export default class MyMemes extends React.Component<MyMemesProps, MyMemesState> {
@@ -37,18 +37,18 @@ export default class MyMemes extends React.Component<MyMemesProps, MyMemesState>
     return (
       <Center>
         <div className='spacing'></div>
-        {this.state.status.type === 'done' ?
+        {this.state.status.type === 'done' ? (
           <div>
-            {this.state.status.list.length === 0 ?
+            {this.state.status.list.length === 0 ? (
               <BigFont>Вы пока не сохранили ни одного мема</BigFont>
-            :
+            ) : (
               <BigFont>Мемы мои мемы</BigFont>
-            }
+            )}
             <Gallery list={this.state.status.list} authState={this.props.authState} />
           </div>
-        :
+        ) : (
           <CircularProgress />
-        }   
+        )}   
       </Center>
     )
   }

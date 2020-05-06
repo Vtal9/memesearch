@@ -1,5 +1,4 @@
 import React from 'react'
-import Center from '../layout/Center';
 import { TextField, Grid, Button } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { AuthState } from '../util/Types';
