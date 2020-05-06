@@ -6,7 +6,6 @@ import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { memesFeedApi } from '../api/MemesFeed'
 import TagsPicker from '../components/TagsPicker'
-import TagsFilter from '../components/TagsFilter'
 
 
 type Filter = "rating" | "time" | "ratio"
