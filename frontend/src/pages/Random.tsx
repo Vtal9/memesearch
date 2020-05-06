@@ -140,13 +140,13 @@ class Random extends React.Component<Props, State> {
     }
     return (
       <Center>
-        <div className='spacing'></div>
+        {/* <div className='spacing'></div>
         <TagsPicker
           tags={this.state.bannedTags}
           onChange={tags => this.setState({ bannedTags: tags })}
         >
           <Icon fontSize='small'>remove</Icon>Тег
-        </TagsPicker>
+        </TagsPicker> */}
         <div className='spacing'></div>
         {this.state.state.status === 'ready' ? (
           <div>
