@@ -2,11 +2,11 @@ import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
 import { CenterPadding } from '../components/meme/DescriptionForm'
-import { InvisibleMeme, AuthState, User, Tag, FullMeme } from '../util/Types'
-import { Link, Route, RouteComponentProps } from 'react-router-dom';
+import { AuthState, FullMeme } from '../util/Types'
+import { Link, RouteComponentProps } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack'
-import { loadImage, authHeader, getById, pureToFull } from '../util/Funcs';
+import { authHeader, getById, pureToFull } from '../util/Funcs';
 import { randomApi } from '../api/MemesLists';
 import Axios from 'axios';
 import Voting from '../components/Voting';
@@ -17,7 +17,6 @@ import Voting from '../components/Voting';
 type AddRemoveProps = WithSnackbarProps & {
   id: number
   own: boolean
-  user: User
 }
 
 type AddRemoveState = {
@@ -167,7 +166,6 @@ class Random extends React.Component<Props, State> {
                       this.props.authState.status === 'yes' &&
                       this.props.authState.user.id === owner.id
                     )}
-                    user={this.props.authState.user}
                   />
                 ) : (
                   <FakeAdd />

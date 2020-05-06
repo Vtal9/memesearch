@@ -1,6 +1,5 @@
 import React from 'react'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
-import { User } from '../../util/Types'
 import Axios from 'axios'
 import { authHeader } from '../../util/Funcs'
 import { IconButton, Icon } from '@material-ui/core'
@@ -9,7 +8,6 @@ import { IconButton, Icon } from '@material-ui/core'
 type Props = WithSnackbarProps & {
   id: number
   own: boolean
-  user: User
 }
 
 type State = {

@@ -57,7 +57,6 @@ export default class GalleryItem extends React.Component<Props, State> {
           {this.props.authState.status === 'yes' ? (
             <div className='actions'>
               <AddRemove
-                user={this.props.authState.user}
                 id={this.state.meme.id}
                 own={this.state.meme.owner.some(owner => 
                   this.props.authState.status === 'yes' &&
