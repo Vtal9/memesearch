@@ -41,14 +41,22 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
   replace: boolean = false
   pagesLoaded = 0
 
+  scrollListener = () => {
+    const eps = 2
+    if (window.innerHeight + window.scrollY + eps >= document.body.offsetHeight) {
+      console.log('bottom')
+      this.replace = false
+      this.load()
+    }
+  }
+
   componentDidMount() {
     this.load()
-    window.onscroll = () => {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        this.replace = false
-        this.load()
-      }
-    };
+    window.onscroll = this.scrollListener
+  }
+
+  componentWillUnmount() {
+    window.onscroll = null
   }
 
   async load() {
