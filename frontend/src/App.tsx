@@ -62,24 +62,28 @@ const App = withRouter(props => {
 
       <div className='header'>
         <Center>
-          <div className='vmiddle'>
-            <Link to={Path.HOME} title='На главную'>
-              <img src={logo} className='logo' />
-            </Link>
-            <div className='quick-search-wrapper'>
-              {displaySearch &&
-                <QuickSearch onSearch={q => search(q)} />
-              }
+          <div className='blocks'>
+            <div className='vmiddle'>
+              <Link to={Path.HOME} title='На главную'>
+                <img src={logo} className='logo' />
+              </Link>
+              <div className='quick-search-wrapper'>
+                {displaySearch &&
+                  <QuickSearch onSearch={q => search(q)} />
+                }
+              </div>
             </div>
-            <div className='header-links'>
-              {pages.filter(page => page.tab).map(page =>
-                <Tab to={page.url} label={page.title} key={page.url} />
-              )}
-              <AuthBar
-                authState={authState}
-                ref={ref => setAuthBar(ref)}
-                onAuthStateChange={newAuthState => setAuthState(newAuthState)}
-              />
+            <div className='vmiddle'>
+              <div className='header-links'>
+                {pages.filter(page => page.tab).map(page =>
+                  <Tab to={page.url} label={page.title} key={page.url} />
+                )}
+                <AuthBar
+                  authState={authState}
+                  ref={ref => setAuthBar(ref)}
+                  onAuthStateChange={newAuthState => setAuthState(newAuthState)}
+                />
+              </div>
             </div>
           </div>
         </Center>
