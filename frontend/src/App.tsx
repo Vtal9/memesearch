@@ -1,5 +1,6 @@
 import React from 'react'
-import { HashRouter as Router, Route, Link, withRouter, Redirect, useRouteMatch } from 'react-router-dom'
+import { HashRouter as Router, Route, Link, withRouter, Redirect, useRouteMatch, Switch } from 'react-router-dom'
+import H from 'history'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'

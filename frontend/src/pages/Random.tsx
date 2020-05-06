@@ -2,14 +2,15 @@ import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
 import { CenterPadding } from '../components/meme/DescriptionForm'
-import { AuthState, FullMeme } from '../util/Types'
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { AuthState, FullMeme, Tag } from '../util/Types'
+import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack'
-import { authHeader, getById, pureToFull } from '../util/Funcs';
+import { authHeader, pureToFull } from '../util/Funcs';
 import { randomApi } from '../api/MemesLists';
 import Axios from 'axios';
 import Voting from '../components/Voting';
+import TagsPicker from '../components/TagsPicker';
 
 
 
@@ -74,40 +75,46 @@ const FakeAdd = withSnackbar((props: WithSnackbarProps) => (
 ))
 
 
-type State =
-| { readonly status: 'loading' | 'error' | 'nojob' }
-| { status: 'ready', meme: FullMeme }
+type State = {
+  state:
+  | { readonly status: 'loading' | 'error' | 'nojob' }
+  | { status: 'ready', meme: FullMeme }
+  bannedTags: Tag[]
+}
 
 type Props = WithSnackbarProps & {
   authState: AuthState
 }
 
 class Random extends React.Component<Props, State> {
-  state: State = { status: 'loading' }
+  state: State = { state: { status: 'loading' }, bannedTags: [] }
+
+  componentDidMount() {
+    this.next()
+  }
 
   async next() {
-    this.setState({ status: 'loading' })
+    this.setState({ state: { status: 'loading' } })
     try {
-      const result = await randomApi([{id: 1, tag: 'desu'}])
+      const result = await randomApi(this.state.bannedTags)
       console.log(result)
       if (result === null) {
-        this.setState({ status: 'error' })
+        this.setState({ state: { status: 'error' } })
       } else {
-        location.href = '#/random?id=' + result.id
         try {
-          this.setState({ status: 'ready', meme: await pureToFull(result) })
+          this.setState({ state: { status: 'ready', meme: await pureToFull(result) } })
         } catch {
-          this.setState({ status: 'error' })
+          this.setState({ state: { status: 'error' } })
         }
       }
     } catch(error) {
       this.props.enqueueSnackbar('Нет интернета')
-      this.setState({ status: 'error' })
+      this.setState({ state: { status: 'error' } })
     }
   }
 
   render() {
-    if (this.state.status === 'nojob') {
+    if (this.state.state.status === 'nojob') {
       return (
         <Center>
           <div className='spacing'></div>
@@ -118,7 +125,7 @@ class Random extends React.Component<Props, State> {
         </Center>
       )
     }
-    if (this.state.status === 'error') {
+    if (this.state.state.status === 'error') {
       return (
         <Center>
           <div className='spacing'></div>
@@ -134,16 +141,23 @@ class Random extends React.Component<Props, State> {
     return (
       <Center>
         <div className='spacing'></div>
-        {this.state.status === 'ready' ? (
+        <TagsPicker
+          tags={this.state.bannedTags}
+          onChange={tags => this.setState({ bannedTags: tags })}
+        >
+          <Icon fontSize='small'>remove</Icon>Тег
+        </TagsPicker>
+        <div className='spacing'></div>
+        {this.state.state.status === 'ready' ? (
           <div>
             <Card className='meme-form single'>
-              <CardMedia component='img' className='img' image={this.state.meme.img.src} />
+              <CardMedia component='img' className='img' image={this.state.state.meme.img.src} />
               <CardActions>
-                <Voting handle={() => this.next()} id={this.state.meme.id} />
+                <Voting handle={() => this.next()} id={this.state.state.meme.id} />
                 {this.props.authState.status === 'yes' ? (
                   <AddRemove
-                    id={this.state.meme.id}
-                    own={this.state.meme.owner.some(owner => 
+                    id={this.state.state.meme.id}
+                    own={this.state.state.meme.owner.some(owner => 
                       this.props.authState.status === 'yes' &&
                       this.props.authState.user.id === owner.id
                     )}
