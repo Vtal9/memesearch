@@ -78,36 +78,17 @@ type State =
 | { readonly status: 'loading' | 'error' | 'nojob' }
 | { status: 'ready', meme: FullMeme }
 
-type Props = RouteComponentProps & WithSnackbarProps & {
+type Props = WithSnackbarProps & {
   authState: AuthState
 }
 
 class Random extends React.Component<Props, State> {
   state: State = { status: 'loading' }
 
-  componentDidMount() {
-    this.resolve()
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.location.search !== this.props.location.search) {
-      this.resolve()
-    }
-  }
-
-  resolve() {
-    const id = new URLSearchParams(this.props.location.search).get('id')
-    if (id === null) {
-      this.next()
-    } else {
-      this.next(parseInt(id))
-    }
-  }
-
-  async next(id?: number) {
+  async next() {
     this.setState({ status: 'loading' })
     try {
-      const result = id === undefined ? await randomApi([{id: 1, tag: 'desu'}]) : await getById(id)
+      const result = await randomApi([{id: 1, tag: 'desu'}])
       console.log(result)
       if (result === null) {
         this.setState({ status: 'error' })

@@ -43,7 +43,7 @@ const App = withRouter(props => {
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
 
   const pages = [
-    { url: Path.TINDER, title: 'Тиндер', cmp: <div /> /* defined later */, tab: true },
+    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true },
     { url: Path.FEED, title: 'Лента', cmp: <Feed authState={authState} />, tab: true },
     { url: Path.SEARCH, title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
     { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: false },
@@ -84,22 +84,10 @@ const App = withRouter(props => {
         </Center>
       </div>
       {pages.map(page => (
-        page.url === Path.TINDER ? ( // costyl, to be fixed
-          <Route
-            path={page.url}
-            key={page.url}
-            render={props => [
-              <TitleSetter title={page.title} key={1} />,
-              <Random authState={authState} {...props} key={2} />
-            ]}
-          >
-          </Route>
-        ) : (
-          <Route path={page.url} key={page.url}>
-            <TitleSetter title={page.title} />
-            {page.cmp}
-          </Route>
-        )
+        <Route path={page.url} key={page.url}>
+          <TitleSetter title={page.title} />
+          {page.cmp}
+        </Route>
       ))}
     </div>
   )

@@ -89,9 +89,8 @@ export default class TagsPicker extends React.Component<Props, State> {
           <Button
             variant='contained'
             size='small'
-            startIcon={<Icon>add</Icon>}
             onClick={e => this.setState({ menuAnchor: e.currentTarget })}
-          >Тег</Button>
+          >{this.props.children}</Button>
           <Menu
             anchorEl={this.state.menuAnchor}
             onClose={() => this.setState({ menuAnchor: null })}
