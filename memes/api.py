@@ -152,7 +152,7 @@ class LikingMemeAPI(generics.GenericAPIView):
         else:
             meme.dislikes += 1
 
-        meme.save(update_fields=['likes', 'dislikes'])
+        meme.save(update_fields=['likes', 'dislikes', 'ratio', 'rating'])
 
         return JsonResponse({
             'likes': meme.likes,
@@ -187,7 +187,7 @@ class WallAPI(generics.GenericAPIView):
         size = 15 if size is None else int(size)
 
         sorted_by = self.request.GET.get('filter')  # time, ratio, rating
-        memes = memes.order_by("-" + sorted_by, "-id")[it * size: (it + 1) * size]
+        memes = memes.order_by("-" + sorted_by)[it * size: (it + 1) * size]
         return JsonResponse([{
             'id': i.id,
             'url': i.url,
