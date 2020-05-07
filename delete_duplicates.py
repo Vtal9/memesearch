@@ -6,6 +6,7 @@ from config import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
+from django.contrib.auth.models import User
 from memes.models import Memes
 from converter import convert
 
@@ -27,6 +28,7 @@ def union_memes_and_delete_excess(identical_memes):
     image_descr = ""
     likes = 0
     dislikes = 0
+    owners_id = set()
 
     # получили всю нужную информацию по мемам
     for meme in identical_memes:
@@ -34,16 +36,28 @@ def union_memes_and_delete_excess(identical_memes):
         dislikes += meme.dislikes
         for tag in meme.tags.all():
             tag_ids.add(tag.id)
-        image_descr += meme.imageDescription  # конкатенируем, т.к. для описания не учитываются фразы, биграммы...
+        if not(meme.imageDescription is None):
+            image_descr += meme.imageDescription  # конкатенируем, т.к. для описания не учитываются фразы, биграммы...
         if text_descr == "":  # т.е. берем текст только с одного произвольного мема. мб нужно подругому сделать
             text_descr = meme.textDescription
+        for _owner in meme.owner.all():  # добавляем всех пользователей в сет, чтобы потом им присвоить единственный мем
+            owners_id.add(_owner.id)
 
     first_meme = identical_memes[0]
 
-    # для первого тега, нужно удалить из сета(tag_ids) все теги, которые он уже имеет
+    # для первого мема, нужно удалить из сета(tag_ids) все теги, которые он уже имеет
     for tag in first_meme.tags.all():
         if tag.id in tag_ids:
             tag_ids.remove(tag.id)
+
+    # удаляем id овнеров, которые уже имеют этот first_meme
+    for _owner in first_meme.owner.all():
+        if _owner.id in owners_id:
+            owners_id.remove(_owner.id)
+
+    # всем остальным овнерам добавляем этот first_meme
+    for owner_id in owners_id:
+        user = User.objects.get(id=owners_id).ownImages.add(first_meme.id)
 
     # устанавливаем полученные значения
     first_meme.likes = likes
