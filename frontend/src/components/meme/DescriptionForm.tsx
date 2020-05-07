@@ -2,7 +2,7 @@ import React, { FormEvent } from 'react'
 import { TextField, Grid, Button, Icon, Typography } from '@material-ui/core';
 import Axios, { AxiosResponse } from 'axios'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { authHeader } from '../util/Funcs';
+import { authHeader } from '../../util/Funcs';
 
 
 function updateDescription(id: number, textDescription: string, imageDescription: string, concat?: boolean) {

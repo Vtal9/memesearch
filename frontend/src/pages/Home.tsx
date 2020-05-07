@@ -10,9 +10,6 @@ import steve from '../img/steve.jpg'
 import { AuthState } from '../util/Types'
 import Path from '../util/Path'
 
-
-const bright_link_color = '#5ff2ff'
-
 const Heading = (props: React.PropsWithChildren<{}>) => (
   <Typography variant='h4' align='center' style={{ fontWeight: 100 }}>
     {props.children}
@@ -80,50 +77,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
             <iframe src={yandex_money} width="422" height="222" allowTransparency={true} scrolling="no" frameBorder={0} />
           </DialogContent>
         </Dialog>
-        <Section style={backImg(musk)}>
-          <BigFont>
-            Часто бывает так, что вы тратите<br />
-            на поиски нужного мема больше 30 секунд?< br />
-            Или, что ещё хуже, так его и не находите?
-          </BigFont>
-        </Section>
-        <Section>
-          <div className='text-with-img'>
-            <img src={smeshariki} />
-            <div>
-              <Typography variant='h4' className='news'>
-                У нас для вас отличные новости!
-              </Typography>
-              <Typography>
-                Мы создаём веб-приложение, позволяющее быстро и эффективно искать мемы
-              </Typography>
-            </div>
-          </div>
-        </Section>
-        <Section style={backImg(steve)}>
-          <Heading>
-            Наши фичи:
-          </Heading>
-          <ul style={{ marginTop: 20 }}>
-            <li>
-              <Typography>
-                <Link to={Path.UPLOAD} style={{ color: bright_link_color }}>Создание/перенос</Link> на наш сайт своей коллекции мемов, с возможностью добавить им описания,
-                что существенно облегчит поиск по ней, а также синхронизирует её для всех ваших устройств.
-              </Typography>
-            </li>
-            <li>
-              <Typography>
-                Возможность <Link to={Path.SEARCH} style={{ color: bright_link_color }}>поиска</Link> (в т.ч. по мемам всех пользователей, если нужный не нашелся среди ваших).
-              </Typography>
-            </li>
-            <li>
-              <Typography>
-                Можно покекать с забавных случайных мемов в разделе <Link to={Path.TINDER} style={{ color: bright_link_color }}>&laquo;Рандом&raquo;</Link>.
-              </Typography>
-            </li>
-          </ul>
-        </Section>
-        <Section>
+        <Section style={backImg(steve)} className='dark'>
           <Heading>Инструкция по созданию своей базы мемов с быстрым доступом к ней:</Heading>
           <ul style={{ marginTop: 20 }}>
             <li>
@@ -142,33 +96,18 @@ export default class Home extends React.Component<HomeProps, HomeState> {
               <Typography><Link to={Path.UPLOAD}>Загрузите</Link> свои мемы</Typography>
             </li>
             <li>
-              <Typography>Добавьте наш сайт в закладки (Ctrl + D), чтобы искать мемы ещё быстрее</Typography>
+              <Typography>
+                Орите с мемов в <Link to={Path.TINDER}>&laquo;Тиндере&raquo;</Link>
+                &nbsp;и <Link to={Path.FEED}>Ленте</Link>, попутно добавляя их в свою коллекцию
+              </Typography>
+            </li>
+            <li>
+              <Typography>
+                <Link to={Path.SEARCH}>Ищите</Link> мемы по своей коллекции или, если не нашли у себя,
+                по объединенной коллекции всех пользователей
+              </Typography>
             </li>
           </ul>
-        </Section>
-        <Section style={backImg(tactics)}>
-          <Heading>Наши планы на неделю (до 26 апреля)</Heading>
-            <WhiteList>
-              <li>
-                <Typography>Возможность размечать и добавлять себе мемы из поиска.</Typography>
-              </li>
-              <li>
-                <Typography>Авторазметка мемов при загрузке (уже реализовали, оптимизируем).</Typography>
-              </li>
-              <li>
-                <Typography>Добавление списка тегов и возможности поиска по ним.</Typography>
-              </li>
-              <li>
-                <Typography>Слияние всех одинаковых по картинке+тексту мемов в один (решение нашли, встраиваем).</Typography>
-              </li>
-              <li>
-                <Typography>
-                  Анализ всех предложений и замечаний, присланных&nbsp;
-                  <a href={google_form} target='_blank' style={{ color: bright_link_color }}>сюда</a> (лучшие обязательно реализуем).
-                  О багах, если таковые встретите, можно сообщить туда же.
-                </Typography>
-              </li>
-            </WhiteList>
         </Section>
         <Section>
           <Heading>Чем вы можете нам помочь?</Heading>
@@ -179,19 +118,13 @@ export default class Home extends React.Component<HomeProps, HomeState> {
             margin: '0 -10px 20px'
           }}>
             <C>
-              <Link to={Path.UPLOAD}>Закинуть</Link> нам пачку своих мемов
-            </C>
-            <C>
-              <Link to={Path.MARKUP}>Разметить</Link> уже имеющиеся у нас мемы
-            </C>
-            <C>
               <a href='#' onClick={e => {
                 e.preventDefault()
                 this.setState({ donateOpen: true })
               }}>Задонатить</a> нам на индуса (скорость разработки &times;2)
             </C>
             <C>
-              <a href={google_form} target='_blank'>Сообщить</a> нам любые свои идеи на этот счёт
+              <a href={google_form} target='_blank'>Написать</a> нам любые замечания и предложения
             </C>
           </div>
           <div style={{

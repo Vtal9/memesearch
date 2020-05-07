@@ -1,6 +1,5 @@
 import React from 'react'
-import Center from '../layout/Center';
-import { TextField, Grid, Button } from '@material-ui/core';
+import { TextField, Grid, Button, Icon } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { AuthState } from '../util/Types';
 import Switch from '../components/MySwitch';
@@ -102,7 +101,7 @@ class Search extends React.Component<Props, State> {
                 <TagsPicker
                   tags={this.state.tags}
                   onChange={tags => this.setState({ tags }, this.performSearch)}
-                />
+                ><Icon fontSize='small'>add</Icon>Тег</TagsPicker>
               </Grid>
               <Grid item xs={12}>
                 <Switch value={this.state.extended} label='Расширенный поиск'

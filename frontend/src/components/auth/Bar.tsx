@@ -1,9 +1,9 @@
 import React from 'react'
-import { AuthState } from '../util/Types';
+import { AuthState } from '../../util/Types';
 import { Typography, Button, Icon, MenuItem, MenuList, Popover, Divider } from '@material-ui/core'
-import Token from '../util/Token';
-import AuthWindow from './AuthWindow';
-import Path from '../util/Path';
+import Token from '../../util/Token';
+import AuthWindow from './Modal';
+import Path from '../../util/Path';
 
 
 type State = {
@@ -82,7 +82,7 @@ export default class AuthBar extends React.Component<Props, State> {
             startIcon={<Icon>account_circle</Icon>}
             endIcon={<Icon>expand_more</Icon>}
             onClick={e => this.setState({ userMenuAnchor: e.currentTarget })}
-          >{this.props.authState.user.username}</Button>
+          />
           <Popover
             open={this.state.userMenuAnchor !== null}
             anchorEl={this.state.userMenuAnchor}

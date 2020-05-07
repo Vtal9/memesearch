@@ -1,5 +1,6 @@
 import React from 'react'
-import { HashRouter as Router, Route, Link, withRouter, Redirect, useRouteMatch } from 'react-router-dom'
+import { HashRouter as Router, Route, Link, withRouter, Redirect, useRouteMatch, Switch } from 'react-router-dom'
+import H from 'history'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
@@ -10,7 +11,7 @@ import logo from './img/logo.svg'
 import './style.sass'
 import { Typography } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
-import AuthBar from './components/AuthBar';
+import AuthBar from './components/auth/Bar';
 import { AuthState } from './util/Types'
 import AddTag from './pages/AddTag'
 import MyMemes from './pages/MyMemes'
@@ -43,7 +44,7 @@ const App = withRouter(props => {
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
 
   const pages = [
-    { url: Path.TINDER, title: 'Тиндер', cmp: <div /> /* defined later */, tab: true },
+    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true },
     { url: Path.FEED, title: 'Лента', cmp: <Feed authState={authState} />, tab: true },
     { url: Path.SEARCH, title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
     { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: false },
@@ -61,45 +62,37 @@ const App = withRouter(props => {
 
       <div className='header'>
         <Center>
-          <div className='vmiddle'>
-            <Link to={Path.HOME} title='На главную'>
-              <img src={logo} className='logo' />
-            </Link>
-            <div className='quick-search-wrapper'>
-              {displaySearch &&
-                <QuickSearch onSearch={q => search(q)} />
-              }
+          <div className='blocks'>
+            <div className='vmiddle'>
+              <Link to={Path.HOME} title='На главную'>
+                <img src={logo} className='logo' />
+              </Link>
+              <div className='quick-search-wrapper'>
+                {displaySearch &&
+                  <QuickSearch onSearch={q => search(q)} />
+                }
+              </div>
             </div>
-            <div className='header-links'>
-              {pages.filter(page => page.tab).map(page =>
-                <Tab to={page.url} label={page.title} key={page.url} />
-              )}
-              <AuthBar
-                authState={authState}
-                ref={ref => setAuthBar(ref)}
-                onAuthStateChange={newAuthState => setAuthState(newAuthState)}
-              />
+            <div className='vmiddle'>
+              <div className='header-links'>
+                {pages.filter(page => page.tab).map(page =>
+                  <Tab to={page.url} label={page.title} key={page.url} />
+                )}
+                <AuthBar
+                  authState={authState}
+                  ref={ref => setAuthBar(ref)}
+                  onAuthStateChange={newAuthState => setAuthState(newAuthState)}
+                />
+              </div>
             </div>
           </div>
         </Center>
       </div>
       {pages.map(page => (
-        page.url === Path.TINDER ? ( // costyl, to be fixed
-          <Route
-            path={page.url}
-            key={page.url}
-            render={props => [
-              <TitleSetter title={page.title} key={1} />,
-              <Random authState={authState} {...props} key={2} />
-            ]}
-          >
-          </Route>
-        ) : (
-          <Route path={page.url} key={page.url}>
-            <TitleSetter title={page.title} />
-            {page.cmp}
-          </Route>
-        )
+        <Route path={page.url} key={page.url}>
+          <TitleSetter title={page.title} />
+          {page.cmp}
+        </Route>
       ))}
     </div>
   )

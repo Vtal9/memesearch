@@ -1,15 +1,16 @@
 import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardActions } from '@material-ui/core';
-import { CenterPadding } from '../components/DescriptionForm'
-import { Meme, AuthState, User, Tag } from '../util/Types'
-import { Link, Route, RouteComponentProps } from 'react-router-dom';
+import { CenterPadding } from '../components/meme/DescriptionForm'
+import { AuthState, FullMeme, Tag } from '../util/Types'
+import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack'
-import { loadImage, authHeader } from '../util/Funcs';
-import { randomApi, getMeme } from '../api/RandomMeme';
+import { authHeader, pureToFull } from '../util/Funcs';
+import { randomApi } from '../api/MemesLists';
 import Axios from 'axios';
 import Voting from '../components/Voting';
+import TagsPicker from '../components/TagsPicker';
 
 
 
@@ -17,7 +18,6 @@ import Voting from '../components/Voting';
 type AddRemoveProps = WithSnackbarProps & {
   id: number
   own: boolean
-  user: User
 }
 
 type AddRemoveState = {
@@ -75,66 +75,46 @@ const FakeAdd = withSnackbar((props: WithSnackbarProps) => (
 ))
 
 
-type State =
-| { readonly type: 'loading' | 'error' | 'nojob' }
-| { type: 'ready', id: number, img: HTMLImageElement, owners: User[] }
+type State = {
+  state:
+  | { readonly status: 'loading' | 'error' | 'nojob' }
+  | { status: 'ready', meme: FullMeme }
+  bannedTags: Tag[]
+}
 
-type Props = RouteComponentProps & WithSnackbarProps & {
+type Props = WithSnackbarProps & {
   authState: AuthState
 }
 
 class Random extends React.Component<Props, State> {
-  state: State = { type: 'loading' }
+  state: State = { state: { status: 'loading' }, bannedTags: [] }
 
   componentDidMount() {
-    this.resolve()
+    this.next()
   }
 
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.location.search !== this.props.location.search) {
-      this.resolve()
-    }
-  }
-
-  resolve() {
-    const id = new URLSearchParams(this.props.location.search).get('id')
-    if (id === null) {
-      this.next()
-    } else {
-      this.next(parseInt(id))
-    }
-  }
-
-  setMeme(img: HTMLImageElement, id: number, owners: User[]) {
-    this.setState({
-      type: 'ready', img, id, owners
-    })
-  }
-
-  async next(id?: number) {
-    this.setState({ type: 'loading' })
+  async next() {
+    this.setState({ state: { status: 'loading' } })
     try {
-      const result = id === undefined ? await randomApi([{id: 1, tag: 'desu'}]) : await getMeme(id)
+      const result = await randomApi(this.state.bannedTags)
       console.log(result)
       if (result === null) {
-        this.setState({ type: 'error' })
+        this.setState({ state: { status: 'error' } })
       } else {
-        location.href = '#/random?id=' + result.id
-        loadImage(result.id, result.url, image => {
-          this.setMeme(image, result.id, result.owner)
-        }, () => {
-          this.setState({ type: 'error' })
-        })
+        try {
+          this.setState({ state: { status: 'ready', meme: await pureToFull(result) } })
+        } catch {
+          this.setState({ state: { status: 'error' } })
+        }
       }
     } catch(error) {
-      console.log(error)
       this.props.enqueueSnackbar('Нет интернета')
-      this.setState({ type: 'error' })
+      this.setState({ state: { status: 'error' } })
     }
   }
 
   render() {
-    if (this.state.type === 'nojob') {
+    if (this.state.state.status === 'nojob') {
       return (
         <Center>
           <div className='spacing'></div>
@@ -145,7 +125,7 @@ class Random extends React.Component<Props, State> {
         </Center>
       )
     }
-    if (this.state.type === 'error') {
+    if (this.state.state.status === 'error') {
       return (
         <Center>
           <div className='spacing'></div>
@@ -160,21 +140,27 @@ class Random extends React.Component<Props, State> {
     }
     return (
       <Center>
+        {/* <div className='spacing'></div>
+        <TagsPicker
+          tags={this.state.bannedTags}
+          onChange={tags => this.setState({ bannedTags: tags })}
+        >
+          <Icon fontSize='small'>remove</Icon>Тег
+        </TagsPicker> */}
         <div className='spacing'></div>
-        {this.state.type === 'ready' ?
+        {this.state.state.status === 'ready' ? (
           <div>
             <Card className='meme-form single'>
-              <CardMedia component='img' className='img' image={this.state.img.src} />
+              <CardMedia component='img' className='img' image={this.state.state.meme.img.src} />
               <CardActions>
-                <Voting handle={() => this.next()} id={this.state.id} />
+                <Voting handle={() => this.next()} id={this.state.state.meme.id} />
                 {this.props.authState.status === 'yes' ? (
                   <AddRemove
-                    id={this.state.id}
-                    own={this.state.owners.some(owner => 
+                    id={this.state.state.meme.id}
+                    own={this.state.state.meme.owner.some(owner => 
                       this.props.authState.status === 'yes' &&
                       this.props.authState.user.id === owner.id
                     )}
-                    user={this.props.authState.user}
                   />
                 ) : (
                   <FakeAdd />
@@ -182,9 +168,9 @@ class Random extends React.Component<Props, State> {
               </CardActions>
             </Card>
           </div>
-        :
+        ) : (
           <CenterPadding><CircularProgress /></CenterPadding>
-        }
+        )}
       </Center>
     )
   }

@@ -15,6 +15,9 @@ a
   text-decoration: none
   &:hover
     text-decoration: underline
+.dark
+  a
+    color: #5ff2ff
 .vmiddle
   display: flex
   align-items: center
@@ -45,13 +48,18 @@ a
 .header
   background: white
   box-shadow: 0 0 5px #aaaaaa
+  .blocks
+    display: flex
+    justify-content: space-between
+    @media (max-width: 700px)
+      flex-direction: column
   .header-links
     display: flex
     align-items: center
     flex: 1
-    justify-content: flex-end
+    padding: 15px 0
     .header-link
-      margin-right: 15px
+      margin-right: 30px
   .quick-search-wrapper
     margin-top: -15px
 .file-picker

@@ -1,12 +1,11 @@
 import React from 'react'
 import Gallery from '../components/gallery/Gallery'
-import { UnloadedMeme, AuthState, Tag } from '../util/Types'
-import { CircularProgress, RadioGroup, FormControlLabel, Radio } from '@material-ui/core'
+import { AuthState, Tag, PureMeme } from '../util/Types'
+import { RadioGroup, FormControlLabel, Radio, Icon } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { memesFeedApi } from '../api/MemesFeed'
 import TagsPicker from '../components/TagsPicker'
-import TagsFilter from '../components/TagsFilter'
 
 
 type Filter = "rating" | "time" | "ratio"
@@ -19,7 +18,7 @@ type FeedState = {
   status:
   | { type: 'loading' }
   | { type: 'done' }
-  list: UnloadedMeme[]
+  list: PureMeme[]
   filter: Filter
   plusTags: Tag[]
   minusTags: Tag[]
@@ -41,30 +40,33 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
   replace: boolean = false
   pagesLoaded = 0
 
+  scrollListener = () => {
+    const eps = 2
+    if (window.innerHeight + window.scrollY + eps >= document.body.offsetHeight) {
+      console.log('bottom')
+      this.replace = false
+      this.load()
+    }
+  }
+
   componentDidMount() {
     this.load()
-    window.onscroll = () => {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        this.replace = false
-        this.pagesLoaded++
-        this.load()
-      }
-    };
+    window.onscroll = this.scrollListener
+  }
+
+  componentWillUnmount() {
+    window.onscroll = null
   }
 
   async load() {
     this.setState({ status: { type: 'loading' } })
-    const addition:UnloadedMeme[] = (await memesFeedApi(
-      this.state.filter, this.state.plusTags.map(tag => tag.id), this.state.minusTags.map(tag => tag.id), this.pagesLoaded
-      )).map(
-      // FeedMeme (with likes dislikes) -> UnloadedMeme (since Gallery is written for these)
-      (meme) => ({
-        type: 'native',
-        id: meme.id, 
-        url: meme.url
-      })
-    )
-    let list:UnloadedMeme[] = []
+    const addition: PureMeme[] = (await memesFeedApi(
+      this.state.filter,
+      this.state.plusTags.map(tag => tag.id),
+      this.state.minusTags.map(tag => tag.id),
+      this.pagesLoaded
+    ))
+    let list: PureMeme[] = []
     if (this.replace) {
       list = addition
     } else {
@@ -73,6 +75,7 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
     this.setState({
       status: { type: 'done' }, list
     })
+    this.pagesLoaded++
   }
 
   render() {
@@ -89,30 +92,38 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
               this.setState({ filter: e.target.value as Filter }, this.load)
             }}
           >
-            <FormControlLabel value="rating" control={<Radio />} label="По рейтингу" />
-            <FormControlLabel value="time" control={<Radio />} label="По времени" />
-            <FormControlLabel value="ratio" control={<Radio />} label="По соотношению лайков и дизлайков" />
+            <FormControlLabel value="rating" control={
+              <Radio color='primary' />
+            } label="По рейтингу" />
+            <FormControlLabel value="time" control={
+              <Radio color='primary' />
+            } label="По времени" />
+            <FormControlLabel value="ratio" control={
+              <Radio color='primary' />
+            } label="По отношению лайки / дизлайки" />
           </RadioGroup>
         </div>
-        <div>
-          <TagsPicker
-            tags={this.state.plusTags}
-            onChange={plusTags => {
-              this.pagesLoaded = 0
-              this.replace = true
-              this.setState({ plusTags }, this.load)}
-            }
-          />
-        </div>
-        <div>
-          <TagsFilter
-            tags={this.state.minusTags}
-            onChange={minusTags => {
-              this.pagesLoaded = 0
-              this.replace = true
-              this.setState({ minusTags }, this.load)}
-            }
-          />
+        <div style={{ display: 'flex' }}>
+          <div>
+            <TagsPicker
+              tags={this.state.plusTags}
+              onChange={plusTags => {
+                this.pagesLoaded = 0
+                this.replace = true
+                this.setState({ plusTags }, this.load)}
+              }
+            ><Icon fontSize='small'>add</Icon>Тег</TagsPicker>
+          </div>
+          <div style={{ marginLeft: 20 }}>
+            <TagsPicker
+              tags={this.state.minusTags}
+              onChange={minusTags => {
+                this.pagesLoaded = 0
+                this.replace = true
+                this.setState({ minusTags }, this.load)}
+              }
+            ><Icon fontSize='small'>remove</Icon>Тег</TagsPicker>
+          </div>
         </div>
         {this.state.status.type === 'done' &&
           <div>

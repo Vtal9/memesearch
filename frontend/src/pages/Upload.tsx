@@ -1,7 +1,7 @@
 import React from 'react'
 import { Typography, CircularProgress, Button, Card, CardMedia, CardContent } from '@material-ui/core'
 import Center from '../layout/Center'
-import Form, { CenterPadding } from '../components/DescriptionForm'
+import Form, { CenterPadding } from '../components/meme/DescriptionForm'
 import { Repo, AuthState } from '../util/Types';
 import MySwitch from '../components/MySwitch';
 import { loadImage } from '../util/Funcs';
@@ -94,14 +94,19 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
       const result = await uploadApi(this.destination, file)
       try {
         if (result !== null) {
-          loadImage(result.id, result.url, image => {
+          try {
+            const image = await loadImage(result)
             this.withItem(current_index, item => {
-              item.status = { type: 'uploaded', id: result.id, img: image }
+              item.status = {
+                type: 'uploaded',
+                id: result.id,
+                img: image
+              }
               return item
             })
-          }, () => {
+          } catch {
             this.setError(current_index, 'Ошибка при отображении картинки')
-          })
+          }
         } else {
           this.setError(current_index, 'Ошибка сервера')
         }
