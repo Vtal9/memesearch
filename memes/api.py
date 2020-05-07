@@ -210,7 +210,7 @@ class TinderAPI(generics.GenericAPIView):
             banned_tags = banned_tags.split(',')
             memes = memes.exclude(Q(tags__in=banned_tags))
 
-        meme = memes[randint(0, memes.count())]
+        meme = memes.get(pk=randint(0, memes.count() - 1))
         return JsonResponse({
             "id": meme.id,
             "url": meme.url,
