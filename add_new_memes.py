@@ -42,7 +42,7 @@ def upload_images_to_db(imgs_dest, pub_tag):
                 imageDescription=""
             )
             if pub_tag != '':
-                new_meme.tags.add(Tags.objects.get(tag=pub_tag))
+                new_meme.tags.add(Tags.objects.get(tag=pub_tag).id)
             new_meme.image.name = join(imgs_dest.replace("/media", ''), file)
             new_meme.save("nodel")
 
