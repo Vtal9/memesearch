@@ -41,10 +41,10 @@ def upload_images_to_db(imgs_dest, pub_tag):
                 textDescription="",
                 imageDescription=""
             )
-            if pub_tag != '':
-                new_meme.tags.add(Tags.objects.get(tag=pub_tag).id)
             new_meme.image.name = join(imgs_dest.replace("/media", ''), file)
             new_meme.save("nodel")
+            if pub_tag != '':
+                Tags.objects.get(tag=pub_tag).taggedMemes.add(new_meme.id)  # назначаем ТЕГУ мем
 
     # удаляем все файлы в папке, в том числе созданные после компрессора
     for file in listdir(imgs_dest):
