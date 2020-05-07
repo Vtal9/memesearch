@@ -22,7 +22,7 @@ class VkApiPosts:
         try:
             return response.json()['response']
         except:
-            print("Error: something went wrong. May be pub is closed")
+            print("Error: something went wrong while getting json data. May be pub is closed")
             return None
 
     def get_all_json_data(self, pub_domain, max_posts=0):
@@ -37,10 +37,10 @@ class VkApiPosts:
 
         all_posts = []
 
-        while (len(all_posts) < num_posts):
+        while len(all_posts) < num_posts:
             all_posts += self.get_json_data(pub_domain, min(100, num_posts - len(all_posts)), len(all_posts))['items']
             os.system("clear" if platform.system() == 'Linux' else "cls")
-          #  print("Getting data from {0}:\n {1}/{2}".format(pub_domain, len(all_posts), num_posts))
+            print("Getting data from {0}:\n {1}/{2}".format(pub_domain, len(all_posts), num_posts))
 
         return all_posts
 
@@ -117,7 +117,7 @@ class VkApiPosts:
         imgs = []
         for comment in comments:
             try:
-                imgs.append(comment['attachments'][0]['photo']['sizes'][-1]['url']) # only first and only photo
+                imgs.append(comment['attachments'][0]['photo']['sizes'][-1]['url'])  # only first and only photo
             except:
                 pass
         return imgs

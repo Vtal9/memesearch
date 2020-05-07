@@ -3,6 +3,7 @@ import shutil
 import random
 import sys
 import os
+import platform
 
 from . import vk_api_posts
 
@@ -60,7 +61,7 @@ def get_input_data_from_args():
     return pub_domains, max_photos
 
 
-def download_memes(pub_domains, max_photos=0, dest_folder=''):  # max_photos=3 for debug
+def download_memes(pub_domains, max_photos=20, dest_folder=''):  # max_photos=3 for debug
     vkPosts = init_vk_api_posts()  # it throws exit, if token is empty
     destination = "./empty"
 
@@ -90,21 +91,13 @@ def download_memes(pub_domains, max_photos=0, dest_folder=''):  # max_photos=3 f
 
         for i, url in enumerate(from_posts):
             download_image_from_url(url, memes_dest, "{img_name}.jpg".format(img_name=str(i)))
+            os.system("clear" if platform.system() == 'Linux' else "cls")
+            print("Downloading images from {0}:\n {1}/{2}".format(pub_domain, i + 1, len(from_posts)))
 
         with open(timestamp_dest, 'w+') as file:
             file.write(str(latest_timestamp))
 
     return memes_dest
-
-        #    os.system("clear" if platform.system() == 'Linux' else "cls")
-        #    print("Downloaded images from {0}\n {1}/{2}".format(pub_domain, i + 1, len(from_posts)))
-
-        # for i, url in enumerate(from_comments):
-        #    download_image_from_url(url, destination, "c_{img_name}.jpg".format(img_name=str(i)))
-        #    os.system("clear" if platform.system() == 'Linux' else "cls")
-        #    print("Downloaded images from {0}\n {1}/{2}".format(pub_domain, i + 1, len(from_comments)))
-
-        # print("Done")
 
 
 if __name__ == '__main__':
