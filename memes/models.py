@@ -15,9 +15,6 @@ from searchEngine.indexer import misc
 from searchEngine.indexer import simplifier
 from tags.models import Tags
 
-import memes.algo.img2hash as img2hash
-from PIL import Image
-
 
 def update_index_in_db(text, description, new_index_text, new_index_description):
     """
@@ -104,66 +101,46 @@ class Memes(models.Model):
     def delete(self, **kwargs):
         pass
 
-    def _check_img_uniqueness(self):
-        if self.image is not None and self.image != '':
-            self.image_hash = img2hash.hash_from_image(Image.open(self.image))
-
-            # проверяем есть ли у нас мем с таким хешом, и если нет, то бросается исключение, которое игнорим.
-            # если исключение не бросится, значит мем с таким хешом существует и мы не сохраняем что сейчас имеем
-            try:
-                ext_meme = Memes.objects.get(Q(image_hash=self.image_hash))
-                # print("МЕМ НЕ БУДЕТ ДОБАВЛЕН")
-                # TODO: union memes
-                return False
-            except:
-                # print("МЕМ БУДЕТ ДОБАВЛЕН")
-                return True  # meme is uniq
-
     def save(self, *args, **kwargs):
-        is_uniq_img = self._check_img_uniqueness()  # если true, то мем будет добавлен
-        is_uniq_img = True  # пока не пофиксится на фронте
 
-        if is_uniq_img:  # self.image_hash мы ставим в функции проверки _check_img_uniq...
-            first_save = False
-            if self.image is not None and self.image != '':
-                first_save = True
-                # Разметка мема (текст)
-                # self.textDescription = re.sub("[^а-яa-z0-9 ]+", "", " ".join(getTextFromImage(self.image)).lower())
+        first_save = False
+        if self.image is not None and self.image != '':
+            first_save = True
+            # Разметка мема (текст)
+            # self.textDescription = re.sub("[^а-яa-z0-9 ]+", "", " ".join(getTextFromImage(self.image)).lower())
 
-                # Сохранение мема на яндекс.диск
-                y = settings.Y
-                name = self.image.url.split(".")
-                self.time = time.time()
-                self.fileName = ".".join(name[:-1]) + "_{}".format(self.time) + ".jpg"
+            # Сохранение мема на яндекс.диск
+            y = settings.Y
+            name = self.image.url.split(".")
+            self.time = time.time()
+            self.fileName = ".".join(name[:-1]) + "_{}".format(self.time) + ".jpg"
 
-            self.rating = self.likes - self.dislikes
-            if self.dislikes != 0:
-                self.ratio = self.likes / self.dislikes
-            else:
-                self.ration = self.likes
-            super(Memes, self).save(*args, **kwargs)
+        self.rating = self.likes - self.dislikes
+        if self.dislikes != 0:
+            self.ratio = self.likes / self.dislikes
+        else:
+            self.ration = self.likes
+        super(Memes, self).save(*args, **kwargs)
 
-            # Построение нового индекса по добавленному мему
-            meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
-            update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words,
-                               meme_index.descr_words)
+        # Построение нового индекса по добавленному мему
+        meme_index = indexer.full_index([info.MemeInfo(self.id, self.textDescription, self.imageDescription)])
+        update_index_in_db(self.textDescription, self.imageDescription, meme_index.text_words,
+                           meme_index.descr_words)
 
-            if self.image is not None and self.image != '':
-                if os.path.isfile(self.image.path):
-                    # сжатие картинки
-                    compress_image(self.image.path, self.fileName[1:])
-                    local_path = self.fileName[1:]
-                    self.fileName = "/media/" + self.fileName.split('/')[-1]
-                    y.upload(local_path, self.fileName)
-                    self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
-                    if not ("nodel" in args):
-                        os.remove(self.image.path)
-                        os.remove(local_path)  # удаляем файл, после загрузки
+        if self.image is not None and self.image != '':
+            if os.path.isfile(self.image.path):
+                # сжатие картинки
+                compress_image(self.image.path, self.fileName[1:])
+                local_path = self.fileName[1:]
+                self.fileName = "/media/" + self.fileName.split('/')[-1]
+                y.upload(local_path, self.fileName)
+                self.url = yadisk.functions.resources.get_download_link(y.get_session(), self.fileName)
+                if not ("nodel" in args):
+                    os.remove(self.image.path)
+                    os.remove(local_path)  # удаляем файл, после загрузки
 
-                    self.image = None
-                    super(Memes, self).save(update_fields=['image', 'url', 'fileName'])
+                self.image = None
+                super(Memes, self).save(update_fields=['image', 'url', 'fileName'])
 
-            if first_save and self.id % 100 == 0:
-                y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))
-        else:  # такая картинка у нас уже есть
-            pass
+        if first_save and self.id % 100 == 0:
+            y.upload("db.sqlite3", "backup/db_{}.sqlite3".format(self.id))

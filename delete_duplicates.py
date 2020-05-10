@@ -36,7 +36,7 @@ def union_memes_and_delete_excess(identical_memes):
         dislikes += meme.dislikes
         for tag in meme.tags.all():
             tag_ids.add(tag.id)
-        if not(meme.imageDescription is None):
+        if not (meme.imageDescription is None):
             image_descr += meme.imageDescription  # конкатенируем, т.к. для описания не учитываются фразы, биграммы...
         if text_descr == "":  # т.е. берем текст только с одного произвольного мема. мб нужно подругому сделать
             text_descr = meme.textDescription
@@ -57,7 +57,7 @@ def union_memes_and_delete_excess(identical_memes):
 
     # всем остальным овнерам добавляем этот first_meme
     for owner_id in owners_id:
-        user = User.objects.get(id=owners_id).ownImages.add(first_meme.id)
+        User.objects.get(id=owner_id).ownImages.add(first_meme.id)
 
     # устанавливаем полученные значения
     first_meme.likes = likes
