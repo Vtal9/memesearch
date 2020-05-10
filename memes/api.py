@@ -221,7 +221,7 @@ class TinderAPI(generics.GenericAPIView):
 
 
 # get all memes and meme by ID
-class MemesDownloadAPI(generics.GenericAPIView):
+class MemesUploadAPI(generics.GenericAPIView):
     serializer_class = MemesSerializer
     permission_classes = [
         permissions.AllowAny
