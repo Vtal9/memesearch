@@ -3,6 +3,7 @@ import shutil
 import random
 import sys
 import os
+import time
 import platform
 
 from . import vk_api_posts
@@ -81,18 +82,31 @@ def download_memes(pub_domains, max_photos=0, dest_folder=''):  # max_photos=3 f
                 min_timestamp = int(file.readline())
 
         # urls from posts and comments
-        from_posts, from_comments, latest_timestamp =\
-            vkPosts.get_all_photos_urls(
+        from_posts_with_timestamp, from_comments, latest_timestamp =\
+            vkPosts.get_all_photos_urls_with_timestamps(
                 pub_domain,
                 max_photos,
                 from_comments=False,
                 min_timestamp=min_timestamp
             )
 
-        for i, url in enumerate(from_posts):
-            download_image_from_url(url, memes_dest, "{img_name}.jpg".format(img_name=str(i)))
-            os.system("clear" if platform.system() == 'Linux' else "cls")
-            print("Downloading images from {0}:\n {1}/{2}".format(pub_domain, i + 1, len(from_posts)))
+
+        for i, elem in enumerate(from_posts_with_timestamp):
+            post_urls, posts_timestamp = elem
+            for j, url in enumerate(post_urls):
+                try:
+                    download_image_from_url(url, memes_dest, "{img_name}.jpg".format(img_name=str(i) + "_" + str(j)))
+                    os.system("clear" if platform.system() == 'Linux' else "cls")
+                    print("Downloading images from {0}:\n {1}/{2}".format(pub_domain, i + 1, len(from_posts_with_timestamp)))
+                except:
+                    with open(timestamp_dest, 'w+') as file:
+                        file.write(str(posts_timestamp))
+                    time.sleep(10)  # sleep 10sec
+
+#        for i, url in enumerate(from_posts):
+#            download_image_from_url(url, memes_dest, "{img_name}.jpg".format(img_name=str(i)))
+#            os.system("clear" if platform.system() == 'Linux' else "cls")
+#            print("Downloading images from {0}:\n {1}/{2}".format(pub_domain, i + 1, len(from_posts)))
 
         with open(timestamp_dest, 'w+') as file:
             file.write(str(latest_timestamp))
