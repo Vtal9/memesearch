@@ -40,27 +40,33 @@ class Search extends React.Component<Props, State> {
 
   render() {
     return (
-      <Center>
-        <div className='spacing'></div>
-        <SearchForm
-          authState={this.props.authState}
-          query={/*this.props.query*/''} // TODO FIX
-          onRequest={request => this.handleRequest(request)}
-          disabled={this.state.status === 'loading'}
-        />
-        <div className='gallery'>
-          {this.state.status === 'loading' &&
-            <FlexCenter><CircularProgress /></FlexCenter>
-          }
-          {this.state.results.length === 0 && this.state.status === 'done' &&
-            <BigFont>Таких мемов не нашлось</BigFont>
-          }
-          {this.state.status === 'error' &&
-            <BigFont>Ошибка сервера, попробуйте ещё раз</BigFont>
-          }
-          <Gallery list={this.state.results} authState={this.props.authState} />
+      <div>
+        <div className='top'>
+          <div className='spacing' />
+          <Center>
+            <SearchForm
+              authState={this.props.authState}
+              query={/*this.props.query*/''} // TODO FIX
+              onRequest={request => this.handleRequest(request)}
+              disabled={this.state.status === 'loading'}
+            />
+          </Center>
         </div>
-      </Center>
+        <Center>
+          <div className='gallery'>
+            {this.state.status === 'loading' &&
+              <FlexCenter><CircularProgress /></FlexCenter>
+            }
+            {this.state.results.length === 0 && this.state.status === 'done' &&
+              <BigFont>Таких мемов не нашлось</BigFont>
+            }
+            {this.state.status === 'error' &&
+              <BigFont>Ошибка сервера, попробуйте ещё раз</BigFont>
+            }
+            <Gallery list={this.state.results} authState={this.props.authState} />
+          </div>
+        </Center>
+      </div>
     )
   }
 }

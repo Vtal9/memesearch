@@ -91,21 +91,26 @@ class Upload extends React.Component<UploadProps, UploadState> {
         this.setError(current_index, 'Ошибка при отображении картинки')
       }
       // uploading
-      const result = await uploadApi(this.destination, file)
+      //const result = await uploadApi(this.destination, file)
+      const result = await uploadApi(file)
       try {
         if (result !== null) {
-          try {
-            const image = await loadImage(result)
-            this.withItem(current_index, item => {
-              item.status = {
-                type: 'uploaded',
-                id: result.id,
-                img: image
-              }
-              return item
-            })
-          } catch {
-            this.setError(current_index, 'Ошибка при отображении картинки')
+          if (!result.meme_already_exist) {
+            try {
+              const image = await loadImage(result)
+              this.withItem(current_index, item => {
+                item.status = {
+                  type: 'uploaded',
+                  id: result.id,
+                  img: image
+                }
+                return item
+              })
+            } catch {
+              this.setError(current_index, 'Ошибка при отображении картинки')
+            }
+          } else {
+            this.setError(current_index, 'Такой мем уже есть на нашем сайте')
           }
         } else {
           this.setError(current_index, 'Ошибка сервера')

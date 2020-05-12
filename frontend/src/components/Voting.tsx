@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Icon } from '@material-ui/core'
+import { Button, Icon, Typography, IconButton } from '@material-ui/core'
 import Axios from 'axios'
 
 
@@ -29,24 +29,21 @@ export default class Voting extends React.Component<Props, State> {
   render() {
     const handle = this.props.handle
     return [
-      <Button
+      <IconButton
         key={1}
-        size='large'
         onClick={() => {
           this.vote('like')
           handle && handle()
         }}
-        startIcon={<Icon>thumb_up_alt</Icon>}
-      >{this.state.likes === 0 ? '' : this.state.likes}</Button>,
-      <Button
+      ><Icon>thumb_up_alt</Icon></IconButton>,
+      <Typography key={3}>{this.state.likes - this.state.dislikes}</Typography>,
+      <IconButton
         key={2}
-        size='large'
         onClick={() => {
           this.vote('dislike')
           handle && handle()
         }}
-        startIcon={<Icon>thumb_down_alt</Icon>}
-      >{this.state.dislikes === 0 ? '' : this.state.dislikes}</Button>,
+      ><Icon>thumb_down_alt</Icon></IconButton>,
     ]
   }
 }
