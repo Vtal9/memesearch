@@ -91,8 +91,7 @@ class Upload extends React.Component<UploadProps, UploadState> {
         this.setError(current_index, 'Ошибка при отображении картинки')
       }
       // uploading
-      //const result = await uploadApi(this.destination, file)
-      const result = await uploadApi(file)
+      const result = await uploadApi(this.destination, file)
       try {
         if (result !== null) {
           if (!result.meme_already_exist) {
