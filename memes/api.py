@@ -220,7 +220,7 @@ class TinderAPI(generics.GenericAPIView):
         })
 
 
-# get all memes and meme by ID
+# upload memes API
 class MemesUploadAPI(generics.GenericAPIView):
     serializer_class = MemesSerializer
     permission_classes = [
@@ -262,3 +262,51 @@ class MemesUploadAPI(generics.GenericAPIView):
                 'url': existed_meme.url,
                 'meme_already_exist': True
             })
+
+
+
+# upload own memes API
+class OwnMemesUploadAPI(generics.GenericAPIView):
+    serializer_class = MemesSerializer
+    permission_classes = [
+        permissions.AllowAny
+    ]
+
+    def _check_img_uniqueness(self):
+        if self.request.data['image'] is not None and self.request.data['image'] != '':
+            image_hash = img2hash.hash_from_image(Image.open(self.request.data['image']))
+
+            # проверяем есть ли у нас мем с таким хешом, и если нет, то бросается исключение, которое игнорим.
+            # если исключение не бросится, значит мем с таким хешом существует и мы не сохраняем что сейчас имеем
+            try:
+                print("try")
+                existed_meme = Memes.objects.get(Q(image_hash=image_hash))
+                print("existed_meme=", existed_meme)
+                print("МЕМ НЕ БУДЕТ ДОБАВЛЕН")
+                # TODO: union memes
+                return False, existed_meme, image_hash
+            except:
+                print("МЕМ БУДЕТ ДОБАВЛЕН")
+                return True, None, image_hash  # meme is uniq
+
+    def post(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            is_uniq_img, existed_meme, meme_hash = self._check_img_uniqueness()  # если true, то мем будет добавлен
+            if is_uniq_img:  # self.image_hash мы ставим в функции проверки _check_img_uniq...
+                meme = Memes(textDescription=self.request.data['textDescription'],
+                             imageDescription=self.request.data['imageDescription'],
+                             image=self.request.data['image'],
+                             image_hash=meme_hash)
+                meme.save()
+                self.request.user.ownImages.add(meme)
+                return Response({'id': meme.id,
+                                 'url': meme.url,
+                                 'meme_already_exist': False
+                                 })
+            else:
+                self.request.user.ownImages.add(existed_meme)
+                return Response({
+                    'id': existed_meme.id,
+                    'url': existed_meme.url,
+                    'meme_already_exist': True
+                })

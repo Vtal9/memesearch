@@ -46,7 +46,12 @@ def update_index_in_db(text, description, new_index_text, new_index_description)
                 row.save()
         for word in text_words:  # create for new words
             if not (word in updated_text_words):
-                indexer_models.TextDescriptions.objects.create(word=word, index=new_index_text[word])
+                try:
+                    indexer_models.TextDescriptions.objects.create(word=word, index=new_index_text[word])
+                except:
+                    text_description = indexer_models.TextDescriptions.objects.get(word=word)
+                    text_description.index = new_index_text[word]
+                    text_description.save()
 
     if simplified_description != '':
         descr_index = indexer_models.ImageDescriptions.objects.filter(Q(word__in=description_words))
@@ -62,7 +67,7 @@ def update_index_in_db(text, description, new_index_text, new_index_description)
                 try:
                     indexer_models.ImageDescriptions.objects.create(word=word, index=new_index_description[word])
                 except:
-                    print("ERROR IN THE WORD: |" + word + "| updated_descr_words: " + str(updated_descr_words))
+                   # print("ERROR IN THE WORD: |" + word + "| updated_descr_words: " + str(updated_descr_words))
                     image_description = indexer_models.ImageDescriptions.objects.get(word=word)
                     image_description.index = new_index_description[word]
                     image_description.save()

@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework import routers
 
-from .api import MarkedMemesViewSet, TinderAPI, MemesUploadAPI
+from .api import MarkedMemesViewSet, TinderAPI, MemesUploadAPI, OwnMemesUploadAPI
 from .api import NewURLMemesViewSet
 from .api import OwnMemesViewSet, MemesViewSet, OwnMemesAPI, UpdateMemesAPI, AddTagToMemeAPI, \
     LikingMemeAPI, WallAPI
@@ -21,3 +21,4 @@ urlpatterns.append(path('api/like', LikingMemeAPI.as_view()))
 urlpatterns.append(path('api/wall', WallAPI.as_view()))
 urlpatterns.append(path('api/tinder', TinderAPI.as_view()))
 urlpatterns.append(path('api/upload', MemesUploadAPI.as_view()))
+urlpatterns.append(path('api/uploadown', OwnMemesUploadAPI.as_view()))
