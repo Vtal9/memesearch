@@ -2,6 +2,7 @@ import os
 import django
 import torch
 import sys
+import gc
 
 from config import settings
 
@@ -27,7 +28,6 @@ def markUp(n=500):
 
     y = settings.Y
     for _ in range(n):
-        print('net size', sys.getsizeof(net))
         try:
             meme = Memes.objects.filter(textDescription="").order_by('?')[0]
         except Exception as e:
@@ -35,9 +35,7 @@ def markUp(n=500):
         print("memeID: " + str(meme.id))
         path = 'media/toMarkup'   # по идее по этому адрсу и будет лежать картинка, можешь поменять адрес как тебе надо
         y.download(meme.fileName, path)
-        print('y size', sys.getsizeof(y))
         textDescription = " ".join(netInference(net, path))
-        print('text descr size', sys.getsizeof(textDescription))
         if os.path.isfile(path):
             os.remove(path)
         # Построение нового индекса по добавленному мему
@@ -45,7 +43,7 @@ def markUp(n=500):
 
         meme.is_mark_up_added = False
         meme.save()  # при сохранении индекс сам обновляется для этого мема
-        print('meme size', sys.getsizeof(meme))
+        gc.collect()
 
 
 if __name__ == '__main__':
