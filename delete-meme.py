@@ -10,7 +10,7 @@ django.setup()
 from memes.models import Memes
 
 
-MEMES_TO_DELETE = [48]
+MEMES_TO_DELETE = []
 
 
 def delete_tags():

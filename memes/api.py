@@ -189,7 +189,7 @@ class WallAPI(generics.GenericAPIView):
         size = 15 if size is None else int(size)
 
         sorted_by = self.request.GET.get('filter')  # time, ratio, rating
-        memes = memes.order_by("-" + sorted_by)[it * size: (it + 1) * size]
+        memes = memes.order_by("-" + sorted_by)[it * size + 1: (it + 1) * size]
         return JsonResponse([{
             'id': i.id,
             'url': i.url,
@@ -212,7 +212,7 @@ class TinderAPI(generics.GenericAPIView):
             banned_tags = banned_tags.split(',')
             memes = memes.exclude(Q(tags__in=banned_tags))
 
-        meme = memes.get(pk=randint(0, memes.count() - 1))
+        meme = memes.order_by('?')[0]
         return JsonResponse({
             "id": meme.id,
             "url": meme.url,
