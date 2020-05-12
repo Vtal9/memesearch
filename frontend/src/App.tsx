@@ -1,6 +1,5 @@
 import React from 'react'
 import { HashRouter as Router, Route, Link, withRouter, Redirect, useRouteMatch, Switch } from 'react-router-dom'
-import H from 'history'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
@@ -26,33 +25,36 @@ const TitleSetter = (props: { title: string }) => {
 }
 
 const Tab = (props: { label: string, to: string }) => {
-  const match = useRouteMatch({ path: props.to })
+  const i = props.to.indexOf(':')
+  const to = i == -1 ? props.to : props.to.substr(0, i) + '.'
+  const match = useRouteMatch({ path: to })
+
   return match ? (
     <div className='header-link active'>
       <Typography>{props.label}</Typography>
     </div>
   ) : (
-    <Link className='header-link clickable' to={props.to}>
+    <Link className='header-link clickable' to={to}>
       <Typography>{props.label}</Typography>
     </Link>
   )
 }
 
+const pages = [
+  { url: Path.TINDER, title: 'Тиндер', cmp: Random, tab: true },
+  { url: Path.FEED, title: 'Лента', cmp: Feed, tab: true },
+  { url: Path.SEARCH, title: 'Поиск', cmp: Search, tab: true },
+  { url: Path.UPLOAD, title: 'Загрузить', cmp: Upload, tab: false },
+  { url: Path.MARKUP, title: 'Разметить', cmp: Markup, tab: false },
+  { url: Path.HOME, title: 'О проекте', cmp: Home, tab: false },
+  { url: '/newtag', title: 'Новый тег', cmp: AddTag, tab: false }, // TODO remove
+  { url: Path.COLLECTION, title: 'Коллекция', cmp: MyMemes, tab: false },
+]
+
 const App = withRouter(props => {
   const [ searchQuery, search ] = React.useState('')
   const [ authBar, setAuthBar ] = React.useState<AuthBar | null>(null)
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
-
-  const pages = [
-    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true },
-    { url: Path.FEED, title: 'Лента', cmp: <Feed authState={authState} />, tab: true },
-    { url: Path.SEARCH, title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
-    { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: false },
-    { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: false },
-    { url: Path.HOME, title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} />, tab: false },
-    { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
-    { url: Path.COLLECTION, title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
-  ]
 
   const displaySearch = !useRouteMatch({ path: Path.SEARCH })
 
@@ -91,7 +93,7 @@ const App = withRouter(props => {
       {pages.map(page => (
         <Route path={page.url} key={page.url}>
           <TitleSetter title={page.title} />
-          {page.cmp}
+          <page.cmp authState={authState} />
         </Route>
       ))}
     </div>

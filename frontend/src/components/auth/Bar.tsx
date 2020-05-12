@@ -82,7 +82,7 @@ export default class AuthBar extends React.Component<Props, State> {
             startIcon={<Icon>account_circle</Icon>}
             endIcon={<Icon>expand_more</Icon>}
             onClick={e => this.setState({ userMenuAnchor: e.currentTarget })}
-          />
+          >{''}</Button>
           <Popover
             open={this.state.userMenuAnchor !== null}
             anchorEl={this.state.userMenuAnchor}

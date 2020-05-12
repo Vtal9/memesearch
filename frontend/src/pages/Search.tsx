@@ -7,19 +7,18 @@ import { CircularProgress } from '@material-ui/core';
 import BigFont from '../layout/BigFont';
 import Gallery from '../components/gallery/Gallery';
 import { searchApi } from '../api/Search'
+import { PageProps } from './PageProps';
+import { withRouter } from 'react-router-dom';
 
 
-type Props = {
-  authState: AuthState
-  query: string
-}
+type Props = PageProps
 
 type State = {
   status: 'initial' | 'loading' | 'done' | 'error'
   results: PureMeme[]
 }
 
-export default class Search extends React.Component<Props, State> {
+class Search extends React.Component<Props, State> {
   state: State = {
     status: 'initial',
     results: []
@@ -45,7 +44,7 @@ export default class Search extends React.Component<Props, State> {
         <div className='spacing'></div>
         <SearchForm
           authState={this.props.authState}
-          query={this.props.query}
+          query={/*this.props.query*/''} // TODO FIX
           onRequest={request => this.handleRequest(request)}
           disabled={this.state.status === 'loading'}
         />
@@ -65,3 +64,5 @@ export default class Search extends React.Component<Props, State> {
     )
   }
 }
+
+export default withRouter(Search)

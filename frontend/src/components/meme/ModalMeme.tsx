@@ -35,7 +35,7 @@ export default class ModalMeme extends React.Component<Props> {
 function imageSize(img: HTMLImageElement) {
   const [ imgW, imgH ] = [ img.width, img.height ]
   const [ clientW, clientH ] = [ window.innerWidth, window.innerHeight ]
-  const [ availableW, availableH ] = [ clientW - 64, clientH - 110 ]
+  const [ availableW, availableH ] = [ clientW - 64, clientH - 125 ]
   const scale = Math.min(1, availableW / imgW, availableH / imgH)
   return { width: imgW * scale, height: imgH * scale }
 }

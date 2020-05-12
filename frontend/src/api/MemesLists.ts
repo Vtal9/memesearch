@@ -1,6 +1,6 @@
 import Axios from 'axios'
 import { authHeader } from '../util/Funcs'
-import { InvisibleMeme, Tag, PureMeme } from '../util/Types'
+import { InvisibleMeme, Tag, PureMeme, FullMeme } from '../util/Types'
 
 
 export async function unmarkedApi() {
@@ -25,4 +25,8 @@ export async function randomApi(filterTags: Tag[]) {
   usp.append('ban', filterTags.map(tag => tag.id).join())
   const result = (await Axios.get<PureMeme>('api/tinder?' + usp)).data
   return result
+}
+
+export async function getMeme(id: number) {
+  return (await Axios.get<InvisibleMeme>(`api/memes/${id}/`)).data
 }

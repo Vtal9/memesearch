@@ -3,7 +3,6 @@ import { AuthState, PureMeme, FullMeme } from '../../util/Types'
 import GalleryItem from './Item'
 import ModalMeme from '../meme/ModalMeme'
 
-
 type Props = {
   list: PureMeme[]
   authState: AuthState

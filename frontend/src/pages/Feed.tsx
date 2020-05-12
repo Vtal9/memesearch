@@ -6,13 +6,13 @@ import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { memesFeedApi } from '../api/MemesFeed'
 import TagsPicker from '../components/TagsPicker'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { PageProps } from './PageProps'
 
 
 type Filter = "rating" | "time" | "ratio"
 
-type MyMemesProps = {
-  authState: AuthState
-}
+type MyMemesProps = PageProps
 
 type FeedState = {
   status:
@@ -25,7 +25,7 @@ type FeedState = {
 }
 
 // TODO: make this beatiful: remove excess buttons, add likes and dislikes number etc
-export default class Feed extends React.Component<MyMemesProps, FeedState> {
+class Feed extends React.Component<MyMemesProps, FeedState> {
   constructor(props: MyMemesProps) {
     super(props)
     this.state = {
@@ -137,3 +137,5 @@ export default class Feed extends React.Component<MyMemesProps, FeedState> {
     )
   }
 }
+
+export default withRouter(Feed)
