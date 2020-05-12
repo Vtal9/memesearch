@@ -42,7 +42,6 @@ def markUp(n=500):
 
         meme.is_mark_up_added = False
         meme.save()  # при сохранении индекс сам обновляется для этого мема
-        print("textDescription: " + textDescription)
         break
 
 
