@@ -59,7 +59,13 @@ def update_index_in_db(text, description, new_index_text, new_index_description)
 
         for word in description_words:  # create for new words
             if not (word in updated_descr_words):
-                indexer_models.ImageDescriptions.objects.create(word=word, index=new_index_description[word])
+                try:
+                    indexer_models.ImageDescriptions.objects.create(word=word, index=new_index_description[word])
+                except:
+                    print("ERROR IN THE WORD: |" + word + "| updated_descr_words: " + str(updated_descr_words))
+                    image_description = indexer_models.ImageDescriptions.objects.get(word=word)
+                    image_description.index = new_index_description[word]
+                    image_description.save()
 
 
 class Memes(models.Model):

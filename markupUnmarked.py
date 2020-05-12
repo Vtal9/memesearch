@@ -27,7 +27,7 @@ def markUp(n=500):
 
     for _ in range(n):
         try:
-            meme = Memes.objects.filter(textDescription="")[0]
+            meme = Memes.objects.filter(textDescription="").order_by('?')[0]
         except Exception as e:
             break
         print("memeID: " + str(meme.id))
