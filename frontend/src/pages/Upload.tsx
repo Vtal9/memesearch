@@ -2,11 +2,13 @@ import React from 'react'
 import { Typography, CircularProgress, Button, Card, CardMedia, CardContent } from '@material-ui/core'
 import Center from '../layout/Center'
 import Form, { CenterPadding } from '../components/meme/DescriptionForm'
-import { Repo, AuthState } from '../util/Types';
+import { Repo } from '../util/Types';
 import MySwitch from '../components/MySwitch';
 import { loadImage } from '../util/Funcs';
 import FilePicker from '../components/FilePicker'
 import { uploadApi } from '../api/Upload';
+import { withRouter } from 'react-router-dom';
+import { PageProps } from '../pages/PageProps'
 
 
 class UploadItem {
@@ -32,11 +34,9 @@ type UploadState = {
   desiredDestination: Repo
 }
 
-type UploadProps = {
-  authState: AuthState
-}
+type UploadProps = PageProps
 
-export default class Upload extends React.Component<UploadProps, UploadState> {
+class Upload extends React.Component<UploadProps, UploadState> {
   state: UploadState = {
     items: [] as UploadItem[],
     desiredDestination: this.props.authState.status === 'yes' ? Repo.Own : Repo.Public
@@ -94,18 +94,22 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
       const result = await uploadApi(this.destination, file)
       try {
         if (result !== null) {
-          try {
-            const image = await loadImage(result)
-            this.withItem(current_index, item => {
-              item.status = {
-                type: 'uploaded',
-                id: result.id,
-                img: image
-              }
-              return item
-            })
-          } catch {
-            this.setError(current_index, 'Ошибка при отображении картинки')
+          if (!result.meme_already_exist) {
+            try {
+              const image = await loadImage(result)
+              this.withItem(current_index, item => {
+                item.status = {
+                  type: 'uploaded',
+                  id: result.id,
+                  img: image
+                }
+                return item
+              })
+            } catch {
+              this.setError(current_index, 'Ошибка при отображении картинки')
+            }
+          } else {
+            this.setError(current_index, 'Такой мем уже есть на нашем сайте')
           }
         } else {
           this.setError(current_index, 'Ошибка сервера')
@@ -204,3 +208,5 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     )
   }
 }
+
+export default withRouter(Upload)

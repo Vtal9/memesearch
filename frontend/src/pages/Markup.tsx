@@ -3,19 +3,22 @@ import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardContent } from '@material-ui/core';
 import Form, { CenterPadding } from '../components/meme/DescriptionForm'
 import { FullMeme } from '../util/Types'
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { makeVisible } from '../util/Funcs';
 import { unmarkedApi } from '../api/MemesLists';
+import { PageProps } from './PageProps';
 
 
-type MarkState =
+type Props = PageProps & WithSnackbarProps
+
+type State =
 | { readonly type: 'loading' | 'error' | 'cool' }
 | { type: 'ready', meme: FullMeme }
 
-class Markup extends React.Component<WithSnackbarProps, MarkState> {
-  state: MarkState = { type: 'loading' }
+class Markup extends React.Component<Props, State> {
+  state: State = { type: 'loading' }
 
   makeLoading() {
     this.setState({ type: 'loading' })
@@ -96,4 +99,4 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
   }
 }
 
-export default withSnackbar(Markup)
+export default withRouter(withSnackbar(Markup))
