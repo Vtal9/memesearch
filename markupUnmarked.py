@@ -25,13 +25,13 @@ def markUp(n=500):
     net.load_state_dict(copyStateDict(torch.load("memes/ocr_pipeline/craft_mlt_25k.pth", map_location='cpu')))
     net.eval()
 
+    y = settings.Y
     for _ in range(n):
         try:
             meme = Memes.objects.filter(textDescription="").order_by('?')[0]
         except Exception as e:
             break
         print("memeID: " + str(meme.id))
-        y = settings.Y
         path = 'media/toMarkup'   # по идее по этому адрсу и будет лежать картинка, можешь поменять адрес как тебе надо
         y.download(meme.fileName, path)
         textDescription = " ".join(netInference(net, path))

@@ -110,12 +110,12 @@ def convertImagesToTexts(folder='media/'):
     # start_0 = datetime.now()
     # TESTING TORCHSCRIPT PERFORMANCE
 
-    net = CRAFT()
-    net.load_state_dict(copyStateDict(torch.load("craft_mlt_25k.pth", map_location='cpu')))
-    net.eval()
-
-    # net = torch.jit.load('craft_model.zip', map_location='cpu')
+    # net = CRAFT()
+    # net.load_state_dict(copyStateDict(torch.load("craft_mlt_25k.pth", map_location='cpu')))
     # net.eval()
+
+    net = torch.jit.load('craft_model.zip', map_location='cpu')
+    net.eval()
     # print("net weights", datetime.now() - start_0)
 
     # Get list of images
