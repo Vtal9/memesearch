@@ -116,10 +116,10 @@ class Memes(models.Model):
             self.fileName = ".".join(name[:-1]) + "_{}".format(self.time) + ".jpg"
 
         self.rating = self.likes - self.dislikes
-        if self.dislikes != 0:
+        if self.dislikes > 0:
             self.ratio = self.likes / self.dislikes
         else:
-            self.ration = self.likes
+            self.ratio = self.likes
         super(Memes, self).save(*args, **kwargs)
 
         # Построение нового индекса по добавленному мему
