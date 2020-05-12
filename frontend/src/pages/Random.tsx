@@ -203,6 +203,13 @@ class Random extends React.Component<Props, State> {
         <div className='spacing'></div>
         {this.state.status === 'ready' ? (
           <div>
+            <Button
+              color='primary'
+              variant='outlined'
+              onClick={() => this.props.history.goBack()}
+              startIcon={<Icon>arrow_back</Icon>}
+            >Назад</Button>
+            <div className='spacing'></div>
             <Card className='meme-form single'>
               <CardMedia component='img' className='img' image={this.state.meme.img.src} />
               <CardActions>
