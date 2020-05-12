@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import generics, permissions, viewsets
 from rest_framework.response import Response
 
@@ -5,12 +6,22 @@ from memes.serializers import MemesSerializer
 from tags.models import Tags
 from tags.serializers import TagSerializer
 
+TINDER_TAGS = ['Котики', 'Собачки', 'Политота', 'Постирония', 'Коронавирус', 'Аниме']
+
 
 # ViewSets
 
 # get all tags
 class TagsViewSet(viewsets.ModelViewSet):
     queryset = Tags.objects.all()
+    permission_classes = [
+        permissions.AllowAny
+    ]
+    serializer_class = TagSerializer
+
+
+class TinderTagsViewSet(viewsets.ModelViewSet):
+    queryset = Tags.objects.filter(Q(tag__in=TINDER_TAGS))
     permission_classes = [
         permissions.AllowAny
     ]
@@ -57,3 +68,10 @@ class DeleteTagAPI(generics.GenericAPIView):
         except:
             print("tag doesn't exist:", tag_name)
             return Response("tag doesn't exist")
+
+#
+# class GetTinderTagsAPI(generics.GenericAPIView):
+#     serializer_class =  TagSerializer
+#
+#     def get(self, request, *args, **kwargs):
+#
