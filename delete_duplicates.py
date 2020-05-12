@@ -16,7 +16,7 @@ from converter import convert
 
 def delete_meme(meme):
     y = settings.Y
-    y.remove(meme.fileName, permanently=True)  # удаляем мем с яндекс диска
+ #   y.remove(meme.fileName, permanently=True)  # не удаляем мем с яндекс диска, чтобы бэкапы норм работали
     Memes.objects.filter(id=meme.id).delete()  # удаляем из бд
 
 
