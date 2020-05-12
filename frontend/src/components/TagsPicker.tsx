@@ -1,6 +1,7 @@
 import React from 'react'
-import { getTags, Tag } from './TagsForm'
+import { getTags } from './TagsForm'
 import { Chip, Typography, Button, MenuItem, Menu, Icon } from '@material-ui/core'
+import { Tag } from '../util/Types'
 
 
 type Props = {
@@ -60,6 +61,7 @@ export default class TagsPicker extends React.Component<Props, State> {
       return (
         <div>
           {this.props.tags.map(item => (
+            // TODO?: Add difference to +tag and -tag
             <Chip
               className='tag-chip'
               key={item.id}
@@ -71,7 +73,7 @@ export default class TagsPicker extends React.Component<Props, State> {
                       menuAnchor: null,
                       status: {
                         type: 'done',
-                        tags: [...oldState.status.tags, item]
+                        tags: [...oldState.status.tags, item],
                       }
                     }
                     return newState
@@ -87,9 +89,8 @@ export default class TagsPicker extends React.Component<Props, State> {
           <Button
             variant='contained'
             size='small'
-            startIcon={<Icon>add</Icon>}
             onClick={e => this.setState({ menuAnchor: e.currentTarget })}
-          >Тег</Button>
+          >{this.props.children}</Button>
           <Menu
             anchorEl={this.state.menuAnchor}
             onClose={() => this.setState({ menuAnchor: null })}
@@ -105,7 +106,7 @@ export default class TagsPicker extends React.Component<Props, State> {
                         menuAnchor: null,
                         status: {
                           type: 'done',
-                          tags: oldState.status.tags.filter(tag => tag.id !== item.id)
+                          tags: oldState.status.tags.filter(tag => tag.id !== item.id),
                         }
                       }
                       return newState

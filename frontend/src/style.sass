@@ -15,6 +15,9 @@ a
   text-decoration: none
   &:hover
     text-decoration: underline
+.dark
+  a
+    color: #5ff2ff
 .vmiddle
   display: flex
   align-items: center
@@ -41,26 +44,24 @@ a
 .logo
   height: 45px
   display: block
-  margin-right: 30px
+  margin: 5px 20px 20px 0
 .header
-  .header-top
+  background: white
+  box-shadow: 0 0 5px #aaaaaa
+  .blocks
     display: flex
-    align-items: flex-end
-    margin: 20px 0
     justify-content: space-between
-    form
-      width: 100%
-  .header-bottom
+    @media (max-width: 700px)
+      flex-direction: column
+  .header-links
     display: flex
-    margin-bottom: 20px
-  .header-link
-    padding: 10px 15px
-    &.active
-      background: #dddddd
-    &.clickable
-      text-decoration: none
-      &:hover
-        opacity: .7
+    align-items: center
+    flex: 1
+    padding: 15px 0
+    .header-link
+      margin-right: 30px
+  .quick-search-wrapper
+    margin-top: -15px
 .file-picker
   display: flex
   flex-direction: column
@@ -103,6 +104,12 @@ a
         flex-direction: column
     .error
       margin-top: 10px
+  .meme-with-actions
+    position: relative
+    .actions
+      position: absolute
+      right: 0
+      bottom: 0
 .refresh
   position: relative
   top: -20px

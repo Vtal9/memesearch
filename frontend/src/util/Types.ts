@@ -1,17 +1,19 @@
-export type Meme = {
+export type FullMeme = InvisibleMeme & {
   img: HTMLImageElement
-  id: number
-  imageDescription: string
-  textDescription: string
 }
 
-export type UnloadedMeme =
-| { type: 'native', id: number, url: string }
-| { type: 'external', url: string }
+export type InvisibleMeme = PureMeme & {
+  imageDescription: string
+  textDescription: string
+  likes: number
+  dislikes: number
+  tags: Tag[]
+  owner: User[]
+}
 
-export type SnackbarError = {
-  msg: string
-  short: boolean
+export type PureMeme = {
+  id: number
+  url: string
 }
 
 export type User = {
@@ -21,8 +23,20 @@ export type User = {
 
 export type AuthState =
 | { readonly status: 'unknown' | 'no' }
-| { status: 'yes', user: User }
+| { status: 'yes', user: User, token: string }
 
 export enum Repo {
   Own, Public
 }
+
+export type Tag = {
+  id: number
+  tag: string
+}
+
+export type SearchRequest = {
+  own: boolean
+} & (
+  | { extended: false, q: string, tags: Tag[] }
+  | { extended: true, tags: Tag[], qText: string, qImage: string }
+)

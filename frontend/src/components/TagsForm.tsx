@@ -1,12 +1,8 @@
 import React from 'react'
-import { Grid, Typography, Button, Chip, Select, MenuItem, InputLabel, FormControl } from '@material-ui/core'
+import { Typography, Button, Select, MenuItem, InputLabel, FormControl } from '@material-ui/core'
 import Axios from 'axios'
+import { Tag } from '../util/Types'
 
-
-export type Tag = {
-  id: number
-  tag: string
-}
 
 export function getTags() {
   return new Promise<Tag[]>((resolve, reject) => {

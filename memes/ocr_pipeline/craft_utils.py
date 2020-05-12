@@ -78,6 +78,7 @@ def getDetBoxes_core(textmap, linkmap, text_threshold, link_threshold, low_text)
 
     return det, labels, mapper
 
+
 def getPoly_core(boxes, labels, mapper, linkmap):
     # configs
     num_cp = 5
@@ -242,21 +243,25 @@ def adjustResultCoordinates(polys, ratio_w, ratio_h, ratio_net = 2):
                 polys[k] *= (ratio_w * ratio_net, ratio_h * ratio_net)
     return polys
 
+
 def postProcess(polys, size):
     res = []
     h, w, _ = size
     for i, box in enumerate(polys):
         poly = np.array(box).astype(np.int32).reshape((-1, 2))
-        left = np.min(poly[:,0])
-        right = np.max(poly[:,0])
-        top = np.min(poly[:,1])
-        bottom = np.max(poly[:,1])
+        left = np.min(poly[:, 0])
+        right = np.max(poly[:, 0])
+        top = np.min(poly[:, 1])
+        bottom = np.max(poly[:, 1])
         dx = int((right - left) * 0.05)
         dy = int((bottom - top) * 0.05)
         new_poly = np.array([
             [left, top], [right, top], [right, bottom], [left, bottom]
         ])
-        ll, rr, tt, bb = max(left-dx, 0), min(right+dx, w), max(0, top-dy), min(bottom+dy, h)
+        ll = max(left - dx, dx // 2)
+        rr = min(right + dx, w - dx // 2)
+        tt = max(dy, top - dy // 2)
+        bb = min(bottom + dy, h - dy // 2)
         if np.all(new_poly == poly):
             poly = np.array([[ll, tt], [rr, tt], [rr, bb], [ll, bb]])
         else:

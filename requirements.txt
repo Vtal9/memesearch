@@ -1,3 +1,4 @@
+imagehash
 django
 djangorestframework
 pillow
@@ -10,3 +11,4 @@ pytesseract
 torch
 torchvision
 Google-Images-Search
+pymorphy2

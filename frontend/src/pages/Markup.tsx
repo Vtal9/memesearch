@@ -1,65 +1,51 @@
 import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia, CardContent } from '@material-ui/core';
-import Axios from 'axios';
-import Form, { CenterPadding } from '../components/DescriptionForm'
-import { Meme } from '../util/Types'
+import Form, { CenterPadding } from '../components/meme/DescriptionForm'
+import { FullMeme } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import Funcs from '../util/Funcs';
+import { makeVisible } from '../util/Funcs';
+import { unmarkedApi } from '../api/MemesLists';
 
 
-interface MarkState {
-  status:
-  | { readonly type: 'loading' | 'error' | 'nojob' }
-  | { type: 'ready', meme: Meme }
-}
+type MarkState =
+| { readonly type: 'loading' | 'error' | 'cool' }
+| { type: 'ready', meme: FullMeme }
 
 class Markup extends React.Component<WithSnackbarProps, MarkState> {
-  state: MarkState = {
-    status: { type: 'loading' }
-  }
-
-  setMeme(img: HTMLImageElement, id: number, imageDescription: string, textDescription: string) {
-    this.setState({
-      status: {
-        type: 'ready',
-        meme: { img, id, imageDescription, textDescription }
-      }
-    })
-  }
+  state: MarkState = { type: 'loading' }
 
   makeLoading() {
-    this.setState({ status: { type: 'loading' } })
+    this.setState({ type: 'loading' })
   }
 
-  getNext() {
-    const self = this
-    Axios.get('api/unmarkedmemes/').then(function(response) {
-      if (response.data.length === 0) {
-        self.setState({ status: { type: 'nojob' } })
+  async getNext() {
+    try {
+      const result = await unmarkedApi()
+      if (result === null) {
+        this.setState({ type: 'cool' })
       } else {
-        const json = response.data[0]
-        Funcs.loadImage(json.id, json.url, image => {
-          self.setMeme(image, json.id, json.imageDescription, json.textDescription)
-        }, () => {
-          self.setState({ status: { type: 'error' } })
-        })
+        try {
+          this.setState({ type: 'ready', meme: await makeVisible(result) })
+        } catch {
+          this.setState({ type: 'error' })
+        }
       }
-    }).catch(function(error) {
-      Funcs.showSnackbarError(self.props, { msg: 'Неизвестная ошибка', short: true })
-    })
+    } catch(error) {
+      this.props.enqueueSnackbar('Нет интернета')
+    }
   }
 
   render() {
-    const { status } = this.state
-    if (status.type === 'loading') {
+    if (this.state.type === 'loading') {
       this.getNext()
     }
-    if (status.type === 'nojob') {
+    if (this.state.type === 'cool') {
       return (
         <Center>
+          <div className='spacing'></div>
           <BigFont>
             На данный момент на сайте нет неразмеченных мемов. Это очень хорошо.<br />
             Вы можете <Link to='/upload'>загрузить</Link> новые мемы
@@ -67,13 +53,14 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
         </Center>
       )
     }
-    if (status.type === 'error') {
+    if (this.state.type === 'error') {
       return (
         <Center>
+          <div className='spacing'></div>
           <div className='vmiddle'>
             <Typography>Не удалось загрузить мем.</Typography>
             <Button color='primary' onClick={() => {
-              this.setState({ status: { type: 'loading' } })
+              this.setState({ type: 'loading' })
             }}>Повторить попытку</Button>
           </div>
         </Center>
@@ -81,14 +68,13 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
     }
     return (
       <Center>
-        {status.type === 'ready' ?
+        <div className='spacing'></div>
+        {this.state.type === 'ready' ?
           <div>
             <Card className='meme-form single'>
-              <CardMedia component='img' className='img' image={status.meme.img.src} />
+              <CardMedia component='img' className='img' image={this.state.meme.img.src} />
               <CardContent className='content'>
-                <Form memeId={status.meme.id} autofocus
-                  initialImageDescription={status.meme.imageDescription}
-                  initialTextDescription={status.meme.textDescription}
+                <Form memeId={this.state.meme.id} autofocus
                   onDone={() => {
                     this.makeLoading()
                   }}
@@ -97,7 +83,7 @@ class Markup extends React.Component<WithSnackbarProps, MarkState> {
             </Card>
             <Button
               className='refresh'
-              onClick={() => this.setState({ status: { type: 'loading' } })}
+              onClick={() => this.setState({ type: 'loading' })}
               endIcon={<Icon>navigate_next</Icon>}
               color='primary'
             >Следующий мем</Button>

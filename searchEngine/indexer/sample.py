@@ -9,4 +9,4 @@ if __name__ == '__main__':
 
     index = indexer.full_index(SAMPLE)
     print(index.text_words)
-    print(query.make_query(text_phrase="собака пока голодна", descr_words=""))
+    print(query.make_query(text_query="собака пока голодна", image_query=""))

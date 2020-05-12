@@ -1,52 +1,40 @@
-import React, { FormEvent } from 'react'
-import { HashRouter as Router, Route, Link, withRouter, Redirect } from 'react-router-dom'
+import React from 'react'
+import { HashRouter as Router, Route, Link, withRouter, Redirect, useRouteMatch, Switch } from 'react-router-dom'
+import H from 'history'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
 import Markup from './pages/Markup'
 import Search from './pages/Search'
+import Feed from './pages/Feed'
 import logo from './img/logo.svg'
 import './style.sass'
-import { TextField, Typography, InputAdornment, Icon, IconButton } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import { SnackbarProvider } from 'notistack'
-import AuthBar from './components/AuthBar';
+import AuthBar from './components/auth/Bar';
 import { AuthState } from './util/Types'
 import AddTag from './pages/AddTag'
 import MyMemes from './pages/MyMemes'
 import Random from './pages/Random'
+import QuickSearch from './components/QuickSearch'
+import Path from './util/Path'
 
-
-const Main = () => <Redirect to='/search' />
 
 const TitleSetter = (props: { title: string }) => {
   document.title = props.title + '. MemeSearch'
   return null
 }
 
-const FastSearchForm = (props: { onSearch: (q: string) => void }) => {
-  const [ query, setQuery ] = React.useState('')
-  const [ error, setError ] = React.useState(false)
-
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    if (query.trim() === '') {
-      setError(true)
-    } else {
-      props.onSearch(query)
-      location.href = '#/search'
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <TextField label='Поиск' value={query}
-        onChange={e => setQuery(e.target.value)} error={error}
-        InputProps={{ endAdornment:
-          <InputAdornment position='end'>
-            <IconButton onClick={handleSubmit}><Icon>search</Icon></IconButton>
-          </InputAdornment> }}
-      />
-    </form>
+const Tab = (props: { label: string, to: string }) => {
+  const match = useRouteMatch({ path: props.to })
+  return match ? (
+    <div className='header-link active'>
+      <Typography>{props.label}</Typography>
+    </div>
+  ) : (
+    <Link className='header-link clickable' to={props.to}>
+      <Typography>{props.label}</Typography>
+    </Link>
   )
 }
 
@@ -56,50 +44,56 @@ const App = withRouter(props => {
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
 
   const pages = [
-    { url: '/', title: 'Главная', cmp: <Main />, tab: false },
-    { url: '/search', title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
-    { url: '/about', title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} />, tab: true },
-    { url: '/upload', title: 'Загрузить', cmp: <Upload authState={authState} />, tab: true },
-    { url: '/markup', title: 'Разметить', cmp: <Markup />, tab: true },
+    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true },
+    { url: Path.FEED, title: 'Лента', cmp: <Feed authState={authState} />, tab: true },
+    { url: Path.SEARCH, title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
+    { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: false },
+    { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: false },
+    { url: Path.HOME, title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} />, tab: false },
     { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
-    { url: '/mymemes', title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
-    { url: '/random', title: 'Рандом', cmp: <Random />, tab: true }
+    { url: Path.COLLECTION, title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
   ]
+
+  const displaySearch = !useRouteMatch({ path: Path.SEARCH })
 
   return (
     <div>
-      <Center className='header'>
-        <div className='header-top'>
-          <Link to='/search' title='На главную'><img src={logo} className='logo' /></Link>
-          {props.location.pathname !== '/search' &&
-            <FastSearchForm 
-              onSearch={q => search(q)} />
-          }
-          <div style={{ justifySelf: 'flex-end' }}>
-            <AuthBar authState={authState} ref={ref => setAuthBar(ref)} onAuthStateChange={u => {
-              if (u === null) {
-                setAuthState({ status: 'no' })
-              } else {
-                setAuthState({ status: 'yes', user: u })
-              }
-            }} />
+      <Route path='/' exact><Redirect to={Path.SEARCH} /></Route>
+
+      <div className='header'>
+        <Center>
+          <div className='blocks'>
+            <div className='vmiddle'>
+              <Link to={Path.HOME} title='На главную'>
+                <img src={logo} className='logo' />
+              </Link>
+              <div className='quick-search-wrapper'>
+                {displaySearch &&
+                  <QuickSearch onSearch={q => search(q)} />
+                }
+              </div>
+            </div>
+            <div className='vmiddle'>
+              <div className='header-links'>
+                {pages.filter(page => page.tab).map(page =>
+                  <Tab to={page.url} label={page.title} key={page.url} />
+                )}
+                <AuthBar
+                  authState={authState}
+                  ref={ref => setAuthBar(ref)}
+                  onAuthStateChange={newAuthState => setAuthState(newAuthState)}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="header-bottom">
-          {pages.filter(page => page.tab).map(page =>
-            props.location.pathname === page.url ?
-              <div className='header-link active' key={page.url}><Typography>{page.title}</Typography></div>
-            :
-              <Link className='header-link clickable' key={page.url} to={page.url}><Typography>{page.title}</Typography></Link>
-          )}
-        </div>
-      </Center>
-      {pages.map(page =>
-        <Route path={page.url} key={page.url} exact>
+        </Center>
+      </div>
+      {pages.map(page => (
+        <Route path={page.url} key={page.url}>
           <TitleSetter title={page.title} />
           {page.cmp}
         </Route>
-      )}
+      ))}
     </div>
   )
 })

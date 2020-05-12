@@ -7,32 +7,32 @@ from memes.models import Memes
 
 BIGRAM_WEIGHT = 1
 PHRASE_WEIGHT = 30
-DESCRIPTION_WEIGHT = 5
+DESCRIPTION_WEIGHT = 3
 
-DB_INDEX_TEXT_SAMPLE = {'сапака': "{'url1': [0, 2], 'url2': [0, 2]}", 'ни': "{'url1': [1], 'url2': [1, 5]}",
-                        'пака': "{'url1': [3], 'url2': [3]}", 'ана': "{'url1': [4], 'url2': [4]}",
-                        'калатна': "{'url1': [5], 'url2': [6]}"}
-DB_INDEX_DESCR_SAMPLE = {"сапака": "{'url1', 'url2'}", "фалк": "{'url2'}", "тфикс": "{'url1'}"}
+DB_INDEX_TEXT_SAMPLE = {'сапака': "{'id1': [0, 2], 'id2': [0, 2]}", 'ни': "{'id1': [1], 'id2': [1, 5]}",
+                        'пака': "{'id1': [3], 'id2': [3]}", 'ана': "{'id1': [4], 'id2': [4]}",
+                        'калатна': "{'id1': [5], 'id2': [6]}"}
+DB_INDEX_DESCR_SAMPLE = {"сапака": "{'id1', 'id2'}", "фалк": "{'id2'}", "тфикс": "{'id1'}"}
 
 
 # input = "{'https:dasdasdasdk.comsads/dsd': [0, 1, 2]}"
 def parse_db_index(db_index_str, is_descr=False):
     if is_descr:
-        sstr = db_index_str.replace('\'', '')[1:-1].replace(',', '')
-        result = set(sstr.split(' '))
+        simplified_db_index_str = db_index_str.replace('\'', '')[1:-1].replace(',', '')
+        result = set(simplified_db_index_str.split(' '))
         if 'None' in result:
             result.remove('None')
         return result
     else:
-        url_poss = {}
+        id_poss = {}
         s = db_index_str.replace('\'', '')[1:-1].replace('],', ']')
 
         for token in s.split(']')[:-1]:  # -1 because after ']', next is empty
             temp = token.split(': ')
-            url = temp[0].replace(' ', '')
-            if url != 'None':
-                url_poss[temp[0].replace(' ', '')] = [int(num) for num in temp[1][1:].split(',')]
-        return url_poss
+            id = temp[0].replace(' ', '')
+            if id != 'None':
+                id_poss[temp[0].replace(' ', '')] = [int(num) for num in temp[1][1:].split(',')]
+        return id_poss
 
 
 def db_query(word, is_descr=False):
@@ -51,62 +51,65 @@ def __intersection(*args):
     return list(intersect)
 
 
-def _one_word_query(word, word_index, urls_weight={}):
+def _one_word_query(word, word_index, ids_weight={}):
     if len(word) == 1 and word != 'я':
-        return urls_weight
+        return ids_weight
 
-    for url in word_index[word].keys():
-        if url in urls_weight:
-            urls_weight[url] += len(word_index[word][url])
+    for id in word_index[word].keys():
+        if id in ids_weight:
+            ids_weight[id] += len(word_index[word][id])
         else:
-            urls_weight[url] = len(word_index[word][url])
-    return urls_weight
+            ids_weight[id] = len(word_index[word][id])
+    return ids_weight
 
 
-def _bigram_query(word1, word2, word_index, urls_weight={}):
-    try: # it throws exception if word_i not contains in word_index
-        common_urls = __intersection(word_index[word1].keys(), word_index[word2].keys())
+def _bigram_query(word1, word2, word_index, ids_weight={}):
+    try:  # it throws exception if word_i not contains in word_index
+        common_ids = __intersection(word_index[word1].keys(), word_index[word2].keys())
 
-        for url in common_urls:
-            poss1 = word_index[word1][url]
-            poss2 = [pos - 1 for pos in word_index[word2][url]]
+        for id in common_ids:
+            poss1 = word_index[word1][id]
+            poss2 = [pos - 1 for pos in word_index[word2][id]]
 
             if len(__intersection(poss1, poss2)) != 0:
-                if url in urls_weight.keys():
-                    urls_weight[url] += BIGRAM_WEIGHT
+                if id in ids_weight.keys():
+                    ids_weight[id] += BIGRAM_WEIGHT
                 else:
-                    urls_weight[url] = BIGRAM_WEIGHT  # + 2
+                    ids_weight[id] = BIGRAM_WEIGHT  # + 2
     except:
         pass
 
-    return urls_weight
+    return ids_weight
 
 
-def _phrase_query(phrase, word_index, urls_weight={}):
+def _phrase_query(phrase, word_index, ids_weight={}):
     try:  # it throws exception if word_i not contains in word_index
         words = phrase.split(' ')
-        common_urls = __intersection(*word_index.values())
+        common_ids = __intersection(*word_index.values())
 
-        for url in common_urls:
+        for id in common_ids:
             words_pos = []
             for i, word in enumerate(words):
-                words_pos.append(pos - i for pos in word_index[word][url])
+                words_pos.append(pos - i for pos in word_index[word][id])
 
             if len(__intersection(*words_pos)) != 0:
-                if url in urls_weight.keys():
-                    urls_weight[url] += PHRASE_WEIGHT * len(words)
+                if id in ids_weight.keys():
+                    ids_weight[id] += PHRASE_WEIGHT * len(words)
                 else:
-                    urls_weight[url] = PHRASE_WEIGHT * len(words) + len(words)
+                    ids_weight[id] = PHRASE_WEIGHT * len(words) + len(words)
     except:
         pass
 
-    return urls_weight
+    return ids_weight
 
 
-def make_query_text_part(text):
-    stext = simplifier.simplify_string(text)
+def make_query_by_text_query(text_query, queryset):
+    if text_query is None or text_query == '':
+        return {}
 
-    words = stext.split(' ')
+    simplified_text_query = simplifier.simplify_string(text_query)
+
+    words = simplified_text_query.split(' ')
     words_set = set(words)
 
     if '' in words_set:
@@ -121,71 +124,91 @@ def make_query_text_part(text):
             pass
 
     if len(word_text_index) == 0:
-        return None
+        return {}
 
-    urls_weight = {}
+    ids_weight = {}
 
     for word in word_text_index.keys():
-        urls_weight.update(_one_word_query(word, word_text_index, urls_weight))
+        ids_weight.update(_one_word_query(word, word_text_index, ids_weight))
 
-    rows = Memes.objects.filter(Q(id__in=list(urls_weight.keys())))
+    rows = Memes.objects.filter(Q(id__in=list(ids_weight.keys())))
     for row in rows:
-        urls_weight[str(row.id)] /= float(len(simplifier.simplify_string(row.textDescription).split(' ')))
+        ids_weight[str(row.id)] /= float(len(simplifier.simplify_string(row.textDescription).split(' ')))
 
     if len(words) > 2:
         i = 0
         while i + 1 < len(words):
-            urls_weight.update(_bigram_query(words[i], words[i + 1], word_text_index, urls_weight))
+            ids_weight.update(_bigram_query(words[i], words[i + 1], word_text_index, ids_weight))
             i += 1
-        urls_weight.update(_phrase_query(stext, word_text_index, urls_weight))
+        ids_weight.update(_phrase_query(simplified_text_query, word_text_index, ids_weight))
 
-    return urls_weight
+    return ids_weight
 
 
-def make_query_descr_part(descr):
-    sdescr = simplifier.simplify_string(descr)
-    words = sdescr.split(' ')
+def make_query_by_image_query(image_query, queryset):
+    if image_query is None or image_query == '':
+        return {}
 
-    common_urls = set()
+    simplified_image_query = simplifier.simplify_string(image_query)
+    words = simplified_image_query.split(' ')
 
-    for index, word in enumerate(words):
+    ids_weight = {}
+
+    for word in words:
         try:
-            if index == 0:
-                common_urls = db_result(words[0], is_descr=True)[word]
-            else:
-                common_urls.intersection(db_result(word, is_descr=True)[word])
-        except Exception as ex:
-            pass
+            ids = parse_db_index(ImageDescriptions.objects.get(word=word).index, is_descr=True)
+            for id in ids:
+                if id in ids_weight:
+                    ids_weight[id] += DESCRIPTION_WEIGHT
+                else:
+                    ids_weight[id] = DESCRIPTION_WEIGHT
+        except:
+            print("some exception in make_query_by_image_query")
 
-    return common_urls
+    return ids_weight
 
 
-def make_query(text_phrase="", descr_words=""):
-    if text_phrase == "" and descr_words == "":
+def make_query_old(text_query="", image_query="", text_queryset=(), image_queryset=()):
+    if text_query == "" and image_query == "":
         return [], "query is empty"
 
-    if text_phrase == "":  # descr_word != ""
-        common_urls_from_descr = make_query_descr_part(descr_words)
-        return list(set(common_urls_from_descr)), ""
+    if text_query == "":  # image_query != ""
+        common_ids_from_descr = make_query_by_image_query(image_query, image_queryset)
+        return list(set(common_ids_from_descr)), ""
 
-    urls_weight_from_text = make_query_text_part(text_phrase)
+    ids_weight_from_text = make_query_by_text_query(text_query, text_queryset)
 
-    if urls_weight_from_text == None:
-        if descr_words == "":
+    if ids_weight_from_text is None:
+        if image_query == "":
             return [], "no text words found in the database"
 
-        common_urls_from_descr = make_query_descr_part(descr_words)
-        return list(set(common_urls_from_descr)), ""
+        common_ids_from_descr = make_query_by_image_query(image_query, image_queryset)
+        return list(set(common_ids_from_descr)), ""
     else:
-        if descr_words != "":
-            common_urls_from_descr = set(make_query_descr_part(descr_words))
-            for url in common_urls_from_descr:
-                if url in urls_weight_from_text.keys():
-                    urls_weight_from_text[url] += DESCRIPTION_WEIGHT
+        if image_query != "":
+            common_ids_from_descr = set(make_query_by_image_query(image_query, image_queryset))
+            for id in common_ids_from_descr:
+                if id in ids_weight_from_text.keys():
+                    ids_weight_from_text[id] += DESCRIPTION_WEIGHT
                 else:
-                    urls_weight_from_text[url] = DESCRIPTION_WEIGHT
-
-        ranked_result = sorted(urls_weight_from_text, key=urls_weight_from_text.get, reverse=True)
+                    ids_weight_from_text[id] = DESCRIPTION_WEIGHT
+        ranked_result = sorted(ids_weight_from_text, key=ids_weight_from_text.get, reverse=True)
         ranked_result = list(dict.fromkeys(ranked_result))  # delete duplicates
-
         return ranked_result, ""
+
+
+def make_query(text_query="", image_query="", text_queryset=(), image_queryset=()):
+    ids_weight_from_descr = make_query_by_image_query(image_query, image_queryset)
+    ids_weight_from_text = make_query_by_text_query(text_query, text_queryset)
+    result = ids_weight_from_text
+
+    for id in ids_weight_from_descr:
+        if id in result.keys():
+            result[id] += ids_weight_from_descr[id]
+        else:
+            result[id] = ids_weight_from_descr[id]
+    ranked_result = []
+    if result is not None:
+        ranked_result = sorted(result, key=result.get, reverse=True)
+        ranked_result = list(dict.fromkeys(ranked_result))  # delete duplicates
+    return ranked_result, ""

@@ -2,7 +2,6 @@ import React from 'react'
 import { TextField, Button, Typography, Icon } from '@material-ui/core';
 import Axios from 'axios';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import Funcs from '../util/Funcs';
 
 
 const email_regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -19,10 +18,10 @@ export default withSnackbar(function Subscription(props: WithSnackbarProps) {
     } else {
       Axios.post('emails/emails/', {
         Email: email
-      }).then(function(response) {
+      }).then(response => {
         setDone(true)
-      }).catch(function(error) {
-        Funcs.showSnackbarError(props, { short: true, msg: 'Неизвестная ошибка' })
+      }).catch(error => {
+        props.enqueueSnackbar('Неизвестная ошибка')
       })
     }
   }
