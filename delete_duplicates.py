@@ -87,7 +87,9 @@ def delete_duplicates():
     img_hashes_set = find_unique_img_hashes()
 
     for img_hash in img_hashes_set:
+        print("img_hash: " + img_hash)
         identical_memes = Memes.objects.filter(image_hash=img_hash).all()  # получаем все мемы с этим хешом
+        print("identical_memes: " + str(len(identical_memes)))
         union_memes_and_delete_excess(identical_memes)
 
 
