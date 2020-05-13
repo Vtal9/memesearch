@@ -50,6 +50,7 @@ class _Copy extends React.Component<Props, State> {
   render() {
     return (
       <IconButton
+        className='gtm-copy'
         disabled={this.state.disabled}
         size={this.props.size}
         onClick={() => this.copy()}

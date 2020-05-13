@@ -39,6 +39,7 @@ class _AddRemove extends React.Component<Props, State> {
   render() {
     return (
       <IconButton
+        className='gtm-collection'
         size={this.props.size}
         disabled={this.state.disabled}
         onClick={() => {
@@ -54,6 +55,7 @@ export const AddRemove = withSnackbar(_AddRemove)
 
 export const FakeAdd = withSnackbar((props: WithSnackbarProps & { size: 'small' | 'medium' }) => (
   <IconButton
+    className='gtm-collection'
     size={props.size}
     title='Добавить в свою коллекцию'
     onClick={() => props.enqueueSnackbar('Авторизуйтесь, и вы сможете сохранять мемы в свою коллекцию')}
