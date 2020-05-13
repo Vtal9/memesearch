@@ -10,12 +10,16 @@ import { searchApi } from '../api/Search'
 import { PageProps } from './PageProps';
 
 
+type Props = {
+  query: string
+} & PageProps
+
 type State = {
   status: 'initial' | 'loading' | 'done' | 'error'
   results: PureMeme[]
 }
 
-export default class Search extends React.Component<PageProps, State> {
+export default class Search extends React.Component<Props, State> {
   state: State = {
     status: 'initial',
     results: []
@@ -36,13 +40,15 @@ export default class Search extends React.Component<PageProps, State> {
   }
 
   render() {
+    const q_ = new URLSearchParams(this.props.location.search).get('q')
+    const q = q_ !== null ? q_ : ''
     return (
       <div>
         <Center>
           <div className='spacing' />
           <SearchForm
             authState={this.props.authState}
-            query={/*this.props.query*/''} // TODO FIX
+            query={q}
             onRequest={request => this.handleRequest(request)}
             disabled={this.state.status === 'loading'}
           />

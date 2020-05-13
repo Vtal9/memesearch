@@ -24,7 +24,6 @@ export default class QuickSearch extends React.Component<Props, State> {
       this.setState({ error: true })
     } else {
       this.props.onSearch(this.state.query)
-      location.href = '#/search'
     }
   }
 

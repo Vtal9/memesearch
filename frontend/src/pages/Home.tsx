@@ -69,16 +69,7 @@ export default class Home extends React.Component<PageProps, State> {
           <Heading>Инструкция по созданию своей базы мемов с быстрым доступом к ней:</Heading>
           <ul style={{ marginTop: 20 }}>
             <li>
-              <Typography>
-                {this.props.authState.status === "no" ?
-                  <a href="#" onClick={e => {
-                    e.preventDefault()
-                    //this.props.onRegisterClick() TODO
-                  }}>Зарегистрируйтесь</a>
-                :
-                  'Зарегистрируйтесь'
-                } на нашем сайте.
-              </Typography>
+              <Typography>Зарегистрируйтесь на нашем сайте</Typography>
             </li>
             <li>
               <Typography><Link to={Path.UPLOAD}>Загрузите</Link> свои мемы</Typography>

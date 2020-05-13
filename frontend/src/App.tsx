@@ -63,6 +63,13 @@ const rawPages: Page[] = [
   { match: Path.COLLECTION, title: 'Коллекция', cmp: MyMemes, location: 'authbar' },
 ]
 
+// i wish this is temporary
+const searchWrapper = (query: string) => {
+  return (props: PageProps) => (
+    <Search {...props} query={query} />
+  )
+}
+
 export const pages = rawPages.map(item => {
   return {
     ...item,
@@ -72,8 +79,6 @@ export const pages = rawPages.map(item => {
 })
 
 const App = withRouter(props => {
-  const [ searchQuery, search ] = React.useState('')
-  const [ authBar, setAuthBar ] = React.useState<AuthBar | null>(null)
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
 
   const displaySearch = !useRouteMatch({ path: Path.SEARCH })
@@ -91,7 +96,7 @@ const App = withRouter(props => {
               </Link>
               <div className='quick-search-wrapper'>
                 {displaySearch &&
-                  <QuickSearch onSearch={q => search(q)} />
+                  <QuickSearch onSearch={q => props.history.push(`search?q=${q}`)} />
                 }
               </div>
             </div>
@@ -102,7 +107,6 @@ const App = withRouter(props => {
                 )}
                 <AuthBar
                   authState={authState}
-                  ref={ref => setAuthBar(ref)}
                   onAuthStateChange={newAuthState => setAuthState(newAuthState)}
                 />
               </div>
