@@ -156,10 +156,9 @@ class LikingMemeAPI(generics.GenericAPIView):
 
         meme.save(update_fields=['likes', 'dislikes', 'ratio', 'rating'])
 
-        return JsonResponse({
-            'likes': meme.likes,
-            'dislikes': meme.dislikes
-        })
+        return JsonResponse(
+            MemesSerializer(meme, context=self.get_serializer_context()).data
+        )
 
 
 # wall API
@@ -190,12 +189,9 @@ class WallAPI(generics.GenericAPIView):
 
         sorted_by = self.request.GET.get('filter')  # time, ratio, rating
         memes = memes.order_by("-" + sorted_by)[it * size + 1: (it + 1) * size]
-        return JsonResponse([{
-            'id': i.id,
-            'url': i.url,
-            'likes': i.likes,
-            'dislikes': i.dislikes
-        } for i in memes], safe=False)
+        return JsonResponse([
+            MemesSerializer(meme, context=self.get_serializer_context()).data
+            for meme in memes], safe=False)
 
 
 class TinderAPI(generics.GenericAPIView):
@@ -213,11 +209,10 @@ class TinderAPI(generics.GenericAPIView):
             memes = memes.exclude(Q(tags__in=banned_tags))
 
         meme = memes.order_by('?')[0]
-        return JsonResponse({
-            "id": meme.id,
-            "url": meme.url,
-            "is_mine": 1 if self.request.user.is_authenticated and self.request.user.ownImages.filter(pk=meme.id) else 0
-        })
+        response = {i[0]: i[1] for i in MemesSerializer(meme, context=self.get_serializer_context()).data.items()}
+        response.update([("is_mine", 1 if self.request.user.is_authenticated and self.request.user.ownImages.filter(
+            pk=meme.id) else 0)])
+        return JsonResponse(response)
 
 
 # upload memes API
@@ -246,23 +241,19 @@ class MemesUploadAPI(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         is_uniq_img, existed_meme, meme_hash = self._check_img_uniqueness()  # если true, то мем будет добавлен
+        response_dict = dict()
         if is_uniq_img:  # self.image_hash мы ставим в функции проверки _check_img_uniq...
             meme = Memes(textDescription=self.request.data['textDescription'],
                          imageDescription=self.request.data['imageDescription'],
                          image=self.request.data['image'],
                          image_hash=meme_hash)
             meme.save()
-            return Response({'id': meme.id,
-                             'url': meme.url,
-                             'meme_already_exist': False
-                             })
+            response_dict.update(MemesSerializer(meme, context=self.get_serializer_context()).data.items())
+            response_dict.update([('meme_already_exist', False)])
         else:
-            return Response({
-                'id': existed_meme.id,
-                'url': existed_meme.url,
-                'meme_already_exist': True
-            })
-
+            response_dict.update(MemesSerializer(existed_meme, context=self.get_serializer_context()).data.items())
+            response_dict.update([('meme_already_exist', True)])
+        return JsonResponse(response_dict)
 
 
 # upload own memes API
@@ -279,18 +270,17 @@ class OwnMemesUploadAPI(generics.GenericAPIView):
             # проверяем есть ли у нас мем с таким хешом, и если нет, то бросается исключение, которое игнорим.
             # если исключение не бросится, значит мем с таким хешом существует и мы не сохраняем что сейчас имеем
             try:
-                print("try")
                 existed_meme = Memes.objects.get(Q(image_hash=image_hash))
-                print("existed_meme=", existed_meme)
-                print("МЕМ НЕ БУДЕТ ДОБАВЛЕН")
+                # print("МЕМ НЕ БУДЕТ ДОБАВЛЕН")
                 # TODO: union memes
                 return False, existed_meme, image_hash
             except:
-                print("МЕМ БУДЕТ ДОБАВЛЕН")
+                # print("МЕМ БУДЕТ ДОБАВЛЕН")
                 return True, None, image_hash  # meme is uniq
 
     def post(self, request, *args, **kwargs):
         if self.request.user.is_authenticated:
+            response_dict = dict()
             is_uniq_img, existed_meme, meme_hash = self._check_img_uniqueness()  # если true, то мем будет добавлен
             if is_uniq_img:  # self.image_hash мы ставим в функции проверки _check_img_uniq...
                 meme = Memes(textDescription=self.request.data['textDescription'],
@@ -299,14 +289,10 @@ class OwnMemesUploadAPI(generics.GenericAPIView):
                              image_hash=meme_hash)
                 meme.save()
                 self.request.user.ownImages.add(meme)
-                return Response({'id': meme.id,
-                                 'url': meme.url,
-                                 'meme_already_exist': False
-                                 })
+                response_dict.update(MemesSerializer(meme, context=self.get_serializer_context()).data.items())
+                response_dict.update([('meme_already_exist', False)])
             else:
                 self.request.user.ownImages.add(existed_meme)
-                return Response({
-                    'id': existed_meme.id,
-                    'url': existed_meme.url,
-                    'meme_already_exist': True
-                })
+                response_dict.update(MemesSerializer(existed_meme, context=self.get_serializer_context()).data.items())
+                response_dict.update([('meme_already_exist', True)])
+            return JsonResponse(response_dict)
