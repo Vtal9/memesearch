@@ -1,11 +1,9 @@
-*/__pycache__
-memes/migrations/__pychache__/*
 env
 .vscode
 media
+!media/pubs/README.md
+!media/vk_pubs_list.txt
 *.sqlite3
 __pycache__
 .idea
-media/pubs/*
-memes/ocr_pipeline/sample
 local
