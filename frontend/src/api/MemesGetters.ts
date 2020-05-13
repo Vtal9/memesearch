@@ -1,6 +1,6 @@
 import Axios from 'axios'
 import { authHeader } from '../util/Funcs'
-import { InvisibleMeme, Tag, PureMeme } from '../util/Types'
+import { InvisibleMeme, Tag } from '../util/Types'
 
 
 export async function unmarkedApi() {
@@ -23,7 +23,7 @@ export async function myMemesApi(): Promise<InvisibleMeme[]> {
 export async function randomApi(filterTags: Tag[]) {
   const usp = new URLSearchParams()
   usp.append('ban', filterTags.map(tag => tag.id).join())
-  const result = (await Axios.get<PureMeme>('api/tinder?' + usp)).data
+  const result = (await Axios.get<InvisibleMeme>('api/tinder?' + usp)).data
   return result
 }
 
@@ -37,5 +37,5 @@ export async function feedApi(filter: "rating" | "time" | "ratio", plusTags: num
   urlFeed.append('tags', plusTags.join())
   urlFeed.append('ban', minusTags.join())
   urlFeed.append('it', it.toString())
-  return (await Axios.post<PureMeme[]>('api/wall' + '?' + urlFeed)).data
+  return (await Axios.post<InvisibleMeme[]>('api/wall' + '?' + urlFeed)).data
 }

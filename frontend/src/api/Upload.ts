@@ -1,11 +1,9 @@
 import Axios from 'axios'
-import { Repo } from '../util/Types'
+import { Repo, InvisibleMeme } from '../util/Types'
 import { authHeader } from '../util/Funcs'
 
 
-type UploadServerResponse = {
-  id: number
-  url: string
+type UploadServerResponse = InvisibleMeme & {
   meme_already_exist: boolean
 }
 

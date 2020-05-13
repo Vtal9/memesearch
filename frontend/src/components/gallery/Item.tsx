@@ -1,20 +1,20 @@
 import React from 'react'
-import { AuthState, FullMeme, PureMeme } from '../../util/Types'
-import { pureToFull } from '../../util/Funcs'
+import { AuthState, FullMeme, InvisibleMeme, ForeignMeme, VisibleForeign } from '../../util/Types'
 import { CircularProgress } from '@material-ui/core'
 import MemeActions from '../actions/MemeActions'
+import { makeVisible, isForeign, makeForeignVisible } from '../../util/Funcs'
 
 
 type Props = {
-  unloadedMeme: PureMeme
-  openDialog: (meme: FullMeme) => void
+  unloadedMeme: InvisibleMeme | ForeignMeme
+  openDialog: (meme: FullMeme | VisibleForeign) => void
   authState: AuthState
   onDelete?: () => void
 }
 
 type State =
 | { type: 'loading' }
-| { type: 'done', meme: FullMeme }
+| { type: 'done', meme: FullMeme | VisibleForeign }
 
 export default class GalleryItem extends React.Component<Props, State> {
   state: State = {
@@ -33,7 +33,11 @@ export default class GalleryItem extends React.Component<Props, State> {
   }
 
   async load() {
-    this.setState({ type: 'done', meme: await pureToFull(this.props.unloadedMeme) })
+    if (isForeign(this.props.unloadedMeme)) {
+      this.setState({ type: 'done', meme: await makeForeignVisible(this.props.unloadedMeme) })
+    } else {
+      this.setState({ type: 'done', meme: await makeVisible(this.props.unloadedMeme) })
+    }
   }
 
   openDialog() {

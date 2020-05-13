@@ -1,5 +1,5 @@
 import React from 'react'
-import { Repo, SearchRequest, PureMeme } from '../util/Types';
+import { Repo, SearchRequest, InvisibleMeme, ForeignMeme } from '../util/Types';
 import SearchForm from '../components/forms/Search';
 import Center from '../layout/Center';
 import FlexCenter from '../layout/FlexCenter';
@@ -16,7 +16,7 @@ type Props = {
 
 type State = {
   status: 'initial' | 'loading' | 'done' | 'error'
-  results: PureMeme[]
+  results: (InvisibleMeme | ForeignMeme)[]
 }
 
 export default class Search extends React.Component<Props, State> {

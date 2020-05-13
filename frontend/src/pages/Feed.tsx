@@ -1,13 +1,12 @@
 import React from 'react'
 import Gallery from '../components/gallery/Gallery'
-import { Tag, PureMeme } from '../util/Types'
-import { Select, MenuItem, FormControl, FormLabel, ExpansionPanel, ExpansionPanelSummary, Typography, ExpansionPanelDetails, Paper } from '@material-ui/core'
+import { Tag, InvisibleMeme } from '../util/Types'
+import { Select, MenuItem, FormControl, FormLabel, Paper } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { feedApi } from '../api/MemesGetters'
 import TagsPicker from '../components/inputs/TagsPicker'
 import { PageProps } from './PageProps'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 
 type Filter = "rating" | "time" | "ratio"
@@ -16,7 +15,7 @@ type FeedState = {
   status:
   | { type: 'loading' }
   | { type: 'done' }
-  list: PureMeme[]
+  list: InvisibleMeme[]
   filter: Filter
   plusTags: Tag[]
   minusTags: Tag[]
@@ -58,13 +57,13 @@ export default class Feed extends React.Component<PageProps, FeedState> {
 
   async load() {
     this.setState({ status: { type: 'loading' } })
-    const addition: PureMeme[] = (await feedApi(
+    const addition: InvisibleMeme[] = (await feedApi(
       this.state.filter,
       this.state.plusTags.map(tag => tag.id),
       this.state.minusTags.map(tag => tag.id),
       this.pagesLoaded
     ))
-    let list: PureMeme[] = []
+    let list: InvisibleMeme[] = []
     if (this.replace) {
       list = addition
     } else {

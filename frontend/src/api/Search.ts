@@ -1,9 +1,9 @@
-import { SearchRequest, Repo, PureMeme } from "../util/Types"
+import { SearchRequest, Repo, InvisibleMeme, ForeignMeme } from "../util/Types"
 import Axios from "axios"
 import { authHeader } from "../util/Funcs"
 
 
-type Response = PureMeme[]
+type Response = (InvisibleMeme | ForeignMeme)[]
 
 export async function searchApi(request: SearchRequest, repo: Repo) {
   const qText = request.extended ? request.qText : request.q

@@ -2,10 +2,10 @@ import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, CardMedia } from '@material-ui/core';
 import { CenterPadding } from '../components/forms/Description'
-import { FullMeme, Tag, PureMeme } from '../util/Types'
+import { FullMeme, Tag, InvisibleMeme } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
-import { pureToFull, makeVisible } from '../util/Funcs';
+import { makeVisible } from '../util/Funcs';
 import { getMeme } from '../api/MemesGetters';
 import { PageProps } from './PageProps';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
@@ -20,7 +20,7 @@ type State = (
 }
 
 type Props = {
-  getRandom: () => Promise<PureMeme>
+  getRandom: () => Promise<InvisibleMeme>
   footer: React.FC<{ meme: FullMeme, self: GeneralizedMemePage }>
   nextButton?: boolean
 } & PageProps
@@ -93,7 +93,7 @@ export default class GeneralizedMemePage extends React.Component<Props, State> {
         this.setState({ status: 'error' })
       } else {
         try {
-          this.setState({ status: 'ready', meme: await pureToFull(result), bannedTags: this.state.bannedTags })
+          this.setState({ status: 'ready', meme: await makeVisible(result), bannedTags: this.state.bannedTags })
           return result.id
         } catch {
           this.setState({ status: 'error' })

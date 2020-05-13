@@ -4,12 +4,12 @@ import GeneralizedMemeView from './GeneralizedMemeView'
 import { unmarkedApi } from '../api/MemesGetters'
 import { CardContent } from '@material-ui/core'
 import Form from '../components/forms/Description'
-import { PureMeme } from '../util/Types'
+import { InvisibleMeme } from '../util/Types'
 
 
 export default (props: PageProps) => (
   <GeneralizedMemeView {...props}
-    getRandom={() => unmarkedApi() as Promise<PureMeme>}
+    getRandom={() => unmarkedApi() as Promise<InvisibleMeme>}
     footer={p => (
       <CardContent className='content'>
         <Form memeId={p.meme.id} autofocus

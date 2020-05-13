@@ -1,23 +1,27 @@
 import Axios from 'axios';
 import Token from './Token'
-import { PureMeme, InvisibleMeme, FullMeme } from './Types';
+import { InvisibleMeme, FullMeme, ForeignMeme, VisibleForeign } from './Types';
 
-// TODO speed up
 const YADISK_READ_TOKEN = 'AgAAAAA-tVsqAAZWU44pcDIOME6OsdH_mgZ99HM'
 
-export async function loadImage(pureMeme: PureMeme) {
+export async function loadImage(meme: InvisibleMeme) {
+  const response = await Axios.get(
+    `https://cloud-api.yandex.net:443/v1/disk/resources?path=${encodeURIComponent(meme.fileName)}`,
+    {
+      headers: {
+        Authorization: `OAuth ${YADISK_READ_TOKEN}`
+      }
+    }
+  )
+  return await loadImageByURL(response.data.file)
+}
+
+export async function loadImageByURL(url: string) {
   return await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image()
     img.onload = () => resolve(img)
-    img.onerror = () => {
-      Axios.get<InvisibleMeme[]>(`api/new_meme_url/?id=${pureMeme.id}`).then(function(response) {
-        const secondTry = new Image()
-        secondTry.onload = () => resolve(secondTry)
-        secondTry.onerror = reject
-        secondTry.src = response.data[0].url
-      }).catch(reject)
-    }
-    img.src = pureMeme.url
+    img.onerror = reject
+    img.src = url
   })
 }
 
@@ -28,13 +32,24 @@ export async function makeVisible(invisibleMeme: InvisibleMeme): Promise<FullMem
   }
 }
 
-export async function pureToFull(pureMeme: PureMeme) {
-  const invisible = (await Axios.get<InvisibleMeme>(`api/memes/${pureMeme.id}/`)).data
-  return await makeVisible(invisible)
+export async function makeForeignVisible(meme: ForeignMeme): Promise<VisibleForeign> {
+  return {
+    ...meme,
+    img: await loadImageByURL(meme.url)
+  }
+}
+
+export function isForeign(meme: ForeignMeme | InvisibleMeme): meme is ForeignMeme {
+  return (meme as InvisibleMeme).fileName === undefined
+}
+
+export function isNative(meme: ForeignMeme | InvisibleMeme): meme is InvisibleMeme {
+  return !isForeign(meme)
 }
 
 export async function getById(id: number) {
-  return pureToFull({ id, url: '%INCORRECT%' })
+  const invisible = (await Axios.get<InvisibleMeme>(`api/memes/${id}/`)).data
+  return await makeVisible(invisible)
 }
 
 export function authHeader() {

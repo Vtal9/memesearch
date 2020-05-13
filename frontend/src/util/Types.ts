@@ -2,7 +2,9 @@ export type FullMeme = InvisibleMeme & {
   img: HTMLImageElement
 }
 
-export type InvisibleMeme = PureMeme & {
+export type InvisibleMeme = {
+  id: number
+  url: string
   imageDescription: string
   textDescription: string
   fileName: string
@@ -12,9 +14,12 @@ export type InvisibleMeme = PureMeme & {
   owner: User[]
 }
 
-export type PureMeme = {
-  id: number
+export type ForeignMeme = {
   url: string
+}
+
+export type VisibleForeign = ForeignMeme & {
+  img: HTMLImageElement
 }
 
 export type User = {

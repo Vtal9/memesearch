@@ -1,15 +1,16 @@
 import React from 'react'
-import { AuthState, PureMeme, FullMeme } from '../../util/Types'
+import { AuthState, FullMeme, InvisibleMeme, ForeignMeme, VisibleForeign } from '../../util/Types'
 import GalleryItem from './Item'
 import ModalMeme from '../../modals/Meme'
+import { isForeign, isNative } from '../../util/Funcs'
 
 type Props = {
-  list: PureMeme[]
+  list: (InvisibleMeme | ForeignMeme)[]
   authState: AuthState
 }
 
 type State = {
-  dialogMeme?: FullMeme
+  dialogMeme?: FullMeme | VisibleForeign
 }
 
 export default class Gallery extends React.Component<Props, State> {
@@ -24,7 +25,7 @@ export default class Gallery extends React.Component<Props, State> {
           onClose={() => this.setState({ dialogMeme: undefined })}
         />
         {this.props.list.map(item => (
-          <GalleryItem key={item.id + item.url} unloadedMeme={item}
+          <GalleryItem key={key(item)} unloadedMeme={item}
             authState={this.props.authState}
             openDialog={meme => {
               this.setState({ dialogMeme: meme })
@@ -33,4 +34,8 @@ export default class Gallery extends React.Component<Props, State> {
       </div>
     )
   }
+}
+
+function key(item: InvisibleMeme | ForeignMeme) {
+  return isNative(item) ? item.id + item.url : item.url
 }

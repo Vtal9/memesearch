@@ -1,12 +1,13 @@
 import React from 'react'
 import { Dialog, DialogActions } from '@material-ui/core'
-import { FullMeme, AuthState } from '../util/Types'
+import { FullMeme, AuthState, VisibleForeign } from '../util/Types'
 import Voting from '../components/actions/Voting'
 import MemeActions from '../components/actions/MemeActions'
+import { isNative } from '../util/Funcs'
 
 
 type Props = {
-  meme?: FullMeme
+  meme?: FullMeme | VisibleForeign
   onClose?: () => void
   authState: AuthState
 }
@@ -22,7 +23,7 @@ export default class ModalMeme extends React.Component<Props> {
         {this.props.meme !== undefined && [
           <img src={this.props.meme.img.src} {...imageSize(this.props.meme.img)} key={1} />,
           <DialogActions className='meme-footer' key={2}>
-            <Voting id={this.props.meme.id} />
+            {isNative(this.props.meme) && <Voting id={this.props.meme.id} />}
             <MemeActions authState={this.props.authState} meme={this.props.meme} big />
           </DialogActions>
         ]}
