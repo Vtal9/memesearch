@@ -56,13 +56,12 @@ export default class Feed extends React.Component<PageProps, FeedState> {
   }
 
   async load() {
-    this.pagesLoaded++
     this.setState({ status: { type: 'loading' } })
     const addition: InvisibleMeme[] = (await feedApi(
       this.state.filter,
       this.state.plusTags.map(tag => tag.id),
       this.state.minusTags.map(tag => tag.id),
-      this.pagesLoaded
+      this.pagesLoaded++
     ))
     let list: InvisibleMeme[] = []
     if (this.replace) {
