@@ -96,7 +96,7 @@ const App = withRouter(props => {
               </Link>
               <div className='quick-search-wrapper'>
                 {displaySearch &&
-                  <QuickSearch onSearch={q => props.history.push(`search?q=${q}`)} />
+                  <QuickSearch onSearch={q => props.history.push(`/search?q=${q}`)} />
                 }
               </div>
             </div>
