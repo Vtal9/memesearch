@@ -37,6 +37,7 @@ export default class Voting extends React.Component<Props, State> {
     return (
       <div className='voting'>
         <IconButton
+          disabled={this.state.disabled}
           onClick={() => {
             this.vote('like')
             handle && handle()
@@ -50,6 +51,7 @@ export default class Voting extends React.Component<Props, State> {
           )}
         </Typography>
         <IconButton
+          disabled={this.state.disabled}
           onClick={() => {
             this.vote('dislike')
             handle && handle()
