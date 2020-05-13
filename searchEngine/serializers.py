@@ -4,6 +4,7 @@ from .models import TextDescriptions
 from .models import ImageDescriptions
 
 
+
 class ImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Memes
@@ -20,3 +21,5 @@ class ImagesDescriptionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageDescriptions
         fields = '__all__'
+
+

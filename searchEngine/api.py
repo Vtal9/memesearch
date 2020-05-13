@@ -1,9 +1,9 @@
-from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, permissions, generics
 
 from memes.models import Memes
+from memes.serializers import MemesSerializer
 from tags.models import Tags
 from .indexer.reserveSearch import reserve_search
 from .models import ImageDescriptions
@@ -48,16 +48,14 @@ class SearchAPI(generics.GenericAPIView):
         size = self.request.GET.get('size')
         size = 15 if size is None else int(size)
 
+        response = []
         if result[1] == "":
-            response = JsonResponse([{
-                'id': i,
-                'url': Memes.objects.get(pk=i).url
-            } for i in res[iteration * size:(iteration + 1) * size]] + [{
-                'url': url
-            } for url in extra_urls], safe=False)
+            for i in res[iteration * size:(iteration + 1) * size]:
+                response.append(MemesSerializer(Memes.objects.get(pk=i), context=self.get_serializer_context()).data)
+            response += [{'url': url} for url in extra_urls]
         else:
             response = HttpResponse(result[1])
-        return response
+        return JsonResponse(response, safe=False)
 
 
 # search by own memes
@@ -76,7 +74,8 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
         result = search(query_text, query_image)
         # фильтруем по своим мемам
         queryset = request.user.ownImages.filter(Q(id__in=result[0]))
-
+        if query_text == "" and query_image == "":
+            queryset = request.user.ownImages.all()
         # фильтруем по тегам
         query_tags = self.request.GET.get('tags')
         res = [i.id for i in queryset]
@@ -85,7 +84,8 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
         res_set = set(res)
-        res = []
+        if query_image != "" or query_text != "":
+            res = []
         for i in result[0]:
             if int(i) in res_set:
                 res.append(i)
@@ -95,15 +95,13 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
 
         size = self.request.GET.get('size')
         size = 15 if size is None else int(size)
+        response = []
         if result[1] == "":
-            response = JsonResponse([{
-                'id': i,
-                'url': Memes.objects.get(pk=i).url
-            } for i in res[iteration * size:(iteration + 1) * size]], safe=False)
+            for i in res[iteration * size:(iteration + 1) * size]:
+                response.append(MemesSerializer(Memes.objects.get(pk=i), context=self.get_serializer_context()).data)
         else:
             response = HttpResponse(result[1])
-
-        return response
+        return JsonResponse(response, safe=False)
 
 
 # View Sets
