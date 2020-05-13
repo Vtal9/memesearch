@@ -1,10 +1,9 @@
 import React from 'react'
 import Center from '../layout/Center'
-import { Link, withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Typography, Card, CardContent, Dialog, DialogContent } from '@material-ui/core';
 import Subscription from '../components/Subscription'
 import steve from '../img/steve.jpg'
-import { AuthState } from '../util/Types'
 import Path from '../util/Path'
 import { PageProps } from './PageProps';
 
@@ -49,13 +48,11 @@ function backImg(url: string) {
 const yandex_money = 'https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets=%D0%9D%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D1%83%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0&targets-hint=&default-sum=100&button-text=11&payment-type-choice=on&hint=&successURL=&quickpay=shop&account=4100112271118330'
 const google_form = 'https://forms.gle/vtsFXmXxnqeh245U6'
 
-type Props = PageProps
-
 type State = {
   donateOpen: boolean
 }
 
-class Home extends React.Component<Props, State> {
+export default class Home extends React.Component<PageProps, State> {
   state = {
     donateOpen: false
   }
@@ -133,5 +130,3 @@ class Home extends React.Component<Props, State> {
     )
   }
 }
-
-export default withRouter(Home)

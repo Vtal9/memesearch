@@ -19,6 +19,7 @@ export default class Gallery extends React.Component<Props, State> {
     return (
       <div className="gallery">
         <ModalMeme
+          authState={this.props.authState}
           meme={this.state.dialogMeme}
           onClose={() => this.setState({ dialogMeme: undefined })}
         />

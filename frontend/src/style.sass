@@ -118,27 +118,33 @@ a
   .gallery-item
     margin: 0 20px 20px 0
     display: inline-block
-    position: relative
+    .actions
+      button
+        background: rgba(255, 255, 255, .9)
+        margin: 0 5px 5px 0
     img
       height: 200px
       display: block
       cursor: pointer
-    .actions
-      display: none
-      position: absolute
-      bottom: 0
-      right: 0
-      background: rgba(255, 255, 255, .9)
-    &:hover
-      .actions
-        display: block
 .spacing
   height: 20px
 li
   margin: 10px 0
 .tag-chip
   margin-right: 10px
-// .top
-//   padding: 20px 0
-//   background: white
-//   box-shadow: 0 0 5px #aaaaaa
+.actions-holder
+  position: relative
+  .actions
+    display: none
+    position: absolute
+    bottom: 0
+    right: 0
+  &:hover
+    .actions
+      display: block
+.voting
+  display: flex
+  align-items: center
+div.meme-footer
+  display: flex
+  justify-content: space-between

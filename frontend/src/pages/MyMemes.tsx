@@ -6,10 +6,7 @@ import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { myMemesApi } from '../api/MemesLists'
 import { PageProps } from './PageProps'
-import { withRouter } from 'react-router-dom'
 
-
-type Props = PageProps
 
 type State = {
   status:
@@ -17,7 +14,7 @@ type State = {
   | { type: 'done', list: InvisibleMeme[] }
 }
 
-class MyMemes extends React.Component<Props, State> {
+export default class MyMemes extends React.Component<PageProps, State> {
   state: State = {
     status: { type: 'loading' }
   }
@@ -53,5 +50,3 @@ class MyMemes extends React.Component<Props, State> {
     )
   }
 }
-
-export default withRouter(MyMemes)

@@ -1,6 +1,6 @@
 import Axios from 'axios'
 import { authHeader } from '../util/Funcs'
-import { InvisibleMeme, Tag, PureMeme, FullMeme } from '../util/Types'
+import { InvisibleMeme, Tag, PureMeme } from '../util/Types'
 
 
 export async function unmarkedApi() {

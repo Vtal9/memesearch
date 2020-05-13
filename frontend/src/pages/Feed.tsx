@@ -1,18 +1,15 @@
 import React from 'react'
 import Gallery from '../components/gallery/Gallery'
-import { AuthState, Tag, PureMeme } from '../util/Types'
+import { Tag, PureMeme } from '../util/Types'
 import { RadioGroup, FormControlLabel, Radio, Icon } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { memesFeedApi } from '../api/MemesFeed'
 import TagsPicker from '../components/TagsPicker'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { PageProps } from './PageProps'
 
 
 type Filter = "rating" | "time" | "ratio"
-
-type MyMemesProps = PageProps
 
 type FeedState = {
   status:
@@ -25,8 +22,8 @@ type FeedState = {
 }
 
 // TODO: make this beatiful: remove excess buttons, add likes and dislikes number etc
-class Feed extends React.Component<MyMemesProps, FeedState> {
-  constructor(props: MyMemesProps) {
+export default class Feed extends React.Component<PageProps, FeedState> {
+  constructor(props: PageProps) {
     super(props)
     this.state = {
       filter: 'rating',
@@ -137,5 +134,3 @@ class Feed extends React.Component<MyMemesProps, FeedState> {
     )
   }
 }
-
-export default withRouter(Feed)

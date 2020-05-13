@@ -2,6 +2,8 @@ import Axios from 'axios';
 import Token from './Token'
 import { PureMeme, InvisibleMeme, FullMeme } from './Types';
 
+// TODO speed up
+const YADISK_READ_TOKEN = 'AgAAAAA-tVsqAAZWU44pcDIOME6OsdH_mgZ99HM'
 
 export async function loadImage(pureMeme: PureMeme) {
   return await new Promise<HTMLImageElement>((resolve, reject) => {

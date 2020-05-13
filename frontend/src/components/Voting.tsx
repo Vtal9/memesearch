@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Icon, Typography, IconButton } from '@material-ui/core'
+import { Icon, Typography, IconButton } from '@material-ui/core'
 import Axios from 'axios'
 
 
@@ -9,41 +9,51 @@ type Props = {
 }
 
 type State = {
-  likes: number
-  dislikes: number
+  likes: number | undefined
+  dislikes: number | undefined
+  disabled: boolean
 }
 
 type Method = 'like' | 'dislike'
 
 export default class Voting extends React.Component<Props, State> {
-  state: State = { likes: 0, dislikes: 0 }
+  state: State = { likes: undefined, dislikes: undefined, disabled: true }
 
   async vote(method: Method) {
-    this.setState((await Axios.post<State>(`api/like?method=${method}&id=${this.props.id}`)).data)
+    this.setState({ disabled: true })
+    const data = (await Axios.post<State>(`api/like?method=${method}&id=${this.props.id}`)).data
+    this.setState({ ...data, disabled: false })
   }
 
   async componentDidMount() {
-    this.setState((await Axios.get<State>(`api/memes/${this.props.id}/`)).data)
+    const data = (await Axios.get<State>(`api/memes/${this.props.id}/`)).data
+    this.setState({ ...data, disabled: false })
   }
 
   render() {
     const handle = this.props.handle
-    return [
-      <IconButton
-        key={1}
-        onClick={() => {
-          this.vote('like')
-          handle && handle()
-        }}
-      ><Icon>thumb_up_alt</Icon></IconButton>,
-      <Typography key={3}>{this.state.likes - this.state.dislikes}</Typography>,
-      <IconButton
-        key={2}
-        onClick={() => {
-          this.vote('dislike')
-          handle && handle()
-        }}
-      ><Icon>thumb_down_alt</Icon></IconButton>,
-    ]
+    return (
+      <div className='voting'>
+        <IconButton
+          onClick={() => {
+            this.vote('like')
+            handle && handle()
+          }}
+        ><Icon>thumb_up_alt</Icon></IconButton>
+        <Typography>
+          {this.state.likes !== undefined && this.state.dislikes !== undefined ? (
+            this.state.likes - this.state.dislikes
+          ) : (
+            '...'
+          )}
+        </Typography>
+        <IconButton
+          onClick={() => {
+            this.vote('dislike')
+            handle && handle()
+          }}
+        ><Icon>thumb_down_alt</Icon></IconButton>
+      </div>
+    )
   }
 }

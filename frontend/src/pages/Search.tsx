@@ -1,5 +1,5 @@
 import React from 'react'
-import { Repo, AuthState, SearchRequest, PureMeme } from '../util/Types';
+import { Repo, SearchRequest, PureMeme } from '../util/Types';
 import SearchForm from '../components/SearchForm';
 import Center from '../layout/Center';
 import FlexCenter from '../layout/FlexCenter';
@@ -8,17 +8,14 @@ import BigFont from '../layout/BigFont';
 import Gallery from '../components/gallery/Gallery';
 import { searchApi } from '../api/Search'
 import { PageProps } from './PageProps';
-import { withRouter } from 'react-router-dom';
 
-
-type Props = PageProps
 
 type State = {
   status: 'initial' | 'loading' | 'done' | 'error'
   results: PureMeme[]
 }
 
-class Search extends React.Component<Props, State> {
+export default class Search extends React.Component<PageProps, State> {
   state: State = {
     status: 'initial',
     results: []
@@ -70,5 +67,3 @@ class Search extends React.Component<Props, State> {
     )
   }
 }
-
-export default withRouter(Search)

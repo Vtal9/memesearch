@@ -1,12 +1,14 @@
 import React from 'react'
 import { Dialog, DialogActions, Typography } from '@material-ui/core'
-import { FullMeme } from '../../util/Types'
+import { FullMeme, AuthState } from '../../util/Types'
 import Voting from '../Voting'
+import MemeActions from '../gallery/MemeActions'
 
 
 type Props = {
   meme?: FullMeme
   onClose?: () => void
+  authState: AuthState
 }
 
 export default class ModalMeme extends React.Component<Props> {
@@ -19,11 +21,9 @@ export default class ModalMeme extends React.Component<Props> {
       >
         {this.props.meme !== undefined && [
           <img src={this.props.meme.img.src} {...imageSize(this.props.meme.img)} key={1} />,
-          <DialogActions key={2}>
+          <DialogActions className='meme-footer' key={2}>
             <Voting id={this.props.meme.id} />
-            <a href={this.props.meme.img.src} target='_blank'>
-              <Typography>Открыть оригинал</Typography>
-            </a>
+            <MemeActions authState={this.props.authState} meme={this.props.meme} big />
           </DialogActions>
         ]}
       </Dialog>

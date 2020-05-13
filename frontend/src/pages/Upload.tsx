@@ -7,7 +7,6 @@ import MySwitch from '../components/MySwitch';
 import { loadImage } from '../util/Funcs';
 import FilePicker from '../components/FilePicker'
 import { uploadApi } from '../api/Upload';
-import { withRouter } from 'react-router-dom';
 import { PageProps } from '../pages/PageProps'
 
 
@@ -34,9 +33,7 @@ type UploadState = {
   desiredDestination: Repo
 }
 
-type UploadProps = PageProps
-
-class Upload extends React.Component<UploadProps, UploadState> {
+export default class Upload extends React.Component<PageProps, UploadState> {
   state: UploadState = {
     items: [] as UploadItem[],
     desiredDestination: this.props.authState.status === 'yes' ? Repo.Own : Repo.Public
@@ -46,7 +43,7 @@ class Upload extends React.Component<UploadProps, UploadState> {
     return this.props.authState.status === 'yes' ? this.state.desiredDestination : Repo.Public
   }
 
-  componentDidUpdate(prevProps: UploadProps) {
+  componentDidUpdate(prevProps: PageProps) {
     if (prevProps.authState.status !== 'yes' && this.props.authState.status === 'yes') {
       this.setState({ desiredDestination: Repo.Own })
     }
@@ -208,5 +205,3 @@ class Upload extends React.Component<UploadProps, UploadState> {
     )
   }
 }
-
-export default withRouter(Upload)

@@ -8,6 +8,7 @@ import { IconButton, Icon } from '@material-ui/core'
 type Props = WithSnackbarProps & {
   id: number
   own: boolean
+  size: 'small' | 'medium'
 }
 
 type State = {
@@ -41,7 +42,7 @@ class _AddRemove extends React.Component<Props, State> {
   render() {
     return (
       <IconButton
-        size='small'
+        size={this.props.size}
         disabled={this.state.disabled}
         onClick={() => {
           this.addDelete(this.state.own ? 'remove' : 'add')
@@ -54,9 +55,9 @@ class _AddRemove extends React.Component<Props, State> {
 
 export const AddRemove = withSnackbar(_AddRemove)
 
-export const FakeAdd = withSnackbar((props: WithSnackbarProps) => (
+export const FakeAdd = withSnackbar((props: WithSnackbarProps & { size: 'small' | 'medium' }) => (
   <IconButton
-    size='small'
+    size={props.size}
     title='Добавить в свою коллекцию'
     onClick={() => props.enqueueSnackbar('Авторизуйтесь, и вы сможете сохранять мемы в свою коллекцию')}
   ><Icon>add</Icon></IconButton>
