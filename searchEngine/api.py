@@ -37,9 +37,9 @@ class SearchAPI(generics.GenericAPIView):
             tags = query_tags.split(',')
             for tag_id in tags:
                 res = [meme.id for meme in Tags.objects.get(pk=tag_id).taggedMemes.filter(Q(id__in=res))]
-        # else:
-        #     if len(result[0]) < 10:
-        #         extra_urls = reserve_search(query_text)
+        else:
+            if len(result[0]) < 10:
+                extra_urls = reserve_search(query_text)
 
         # записываем их в  response
         iteration = self.request.GET.get('it')
