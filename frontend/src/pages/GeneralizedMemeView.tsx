@@ -1,12 +1,12 @@
 import React from 'react'
 import Center from '../layout/Center';
 import { CircularProgress, Card, Typography, Button, Icon, CardMedia } from '@material-ui/core';
-import { CenterPadding } from '../components/meme/DescriptionForm'
+import { CenterPadding } from '../components/forms/Description'
 import { FullMeme, Tag, PureMeme } from '../util/Types'
 import { Link } from 'react-router-dom';
 import BigFont from '../layout/BigFont';
 import { pureToFull, makeVisible } from '../util/Funcs';
-import { getMeme } from '../api/MemesLists';
+import { getMeme } from '../api/MemesGetters';
 import { PageProps } from './PageProps';
 
 

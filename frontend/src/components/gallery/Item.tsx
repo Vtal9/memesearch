@@ -2,7 +2,7 @@ import React from 'react'
 import { AuthState, FullMeme, PureMeme } from '../../util/Types'
 import { pureToFull } from '../../util/Funcs'
 import { CircularProgress } from '@material-ui/core'
-import MemeActions from './MemeActions'
+import MemeActions from '../actions/MemeActions'
 
 
 type Props = {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { AuthState, PureMeme, FullMeme } from '../../util/Types'
 import GalleryItem from './Item'
-import ModalMeme from '../meme/ModalMeme'
+import ModalMeme from '../../modals/Meme'
 
 type Props = {
   list: PureMeme[]

@@ -10,12 +10,12 @@ import logo from './img/logo.svg'
 import './style.sass'
 import { Typography } from '@material-ui/core'
 import { SnackbarProvider, withSnackbar } from 'notistack'
-import AuthBar from './components/auth/Bar';
+import AuthBar from './header/AuthBar';
 import { AuthState } from './util/Types'
 import AddTag from './pages/AddTag'
 import MyMemes from './pages/MyMemes'
 import Random from './pages/Random'
-import QuickSearch from './components/QuickSearch'
+import QuickSearch from './header/QuickSearch'
 import Path from './util/Path'
 import { PageProps } from './pages/PageProps'
 

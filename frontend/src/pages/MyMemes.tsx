@@ -4,7 +4,7 @@ import { InvisibleMeme } from '../util/Types'
 import { CircularProgress } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
-import { myMemesApi } from '../api/MemesLists'
+import { myMemesApi } from '../api/MemesGetters'
 import { PageProps } from './PageProps'
 
 

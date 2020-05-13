@@ -1,11 +1,11 @@
 import React from 'react'
 import { Typography, CircularProgress, Button, Card, CardMedia, CardContent } from '@material-ui/core'
 import Center from '../layout/Center'
-import Form, { CenterPadding } from '../components/meme/DescriptionForm'
+import Form, { CenterPadding } from '../components/forms/Description'
 import { Repo } from '../util/Types';
-import MySwitch from '../components/MySwitch';
+import MySwitch from '../components/inputs/MySwitch';
 import { loadImage } from '../util/Funcs';
-import FilePicker from '../components/FilePicker'
+import FilePicker from '../components/inputs/FilePicker'
 import { uploadApi } from '../api/Upload';
 import { PageProps } from '../pages/PageProps'
 

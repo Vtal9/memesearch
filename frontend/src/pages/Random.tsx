@@ -1,14 +1,14 @@
 import React from 'react'
 import { PageProps } from './PageProps'
-import GeneralizedMemePage from './GeneralizedMemePage'
-import { randomApi } from '../api/MemesLists'
+import GeneralizedMemeView from './GeneralizedMemeView'
+import { randomApi } from '../api/MemesGetters'
 import { CardActions } from '@material-ui/core'
-import Voting from '../components/Voting'
-import MemeActions from '../components/gallery/MemeActions'
+import Voting from '../components/actions/Voting'
+import MemeActions from '../components/actions/MemeActions'
 
 
 export default (props: PageProps) => (
-  <GeneralizedMemePage {...props}
+  <GeneralizedMemeView {...props}
     getRandom={() => randomApi([])}
     footer={p => (
       <CardActions className='meme-footer'>

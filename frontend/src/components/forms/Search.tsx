@@ -1,10 +1,10 @@
 import React from 'react'
 import { TextField, Grid, Button, Icon } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { AuthState } from '../util/Types';
-import Switch from '../components/MySwitch';
-import TagsPicker from '../components/TagsPicker';
-import { Tag, SearchRequest } from '../util/Types';
+import { AuthState } from '../../util/Types';
+import Switch from '../inputs/MySwitch';
+import TagsPicker from '../inputs/TagsPicker';
+import { Tag, SearchRequest } from '../../util/Types';
 
 
 interface Props extends React.Attributes, WithSnackbarProps {

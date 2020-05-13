@@ -1,8 +1,8 @@
 import React from 'react'
-import { Dialog, DialogActions, Typography } from '@material-ui/core'
-import { FullMeme, AuthState } from '../../util/Types'
-import Voting from '../Voting'
-import MemeActions from '../gallery/MemeActions'
+import { Dialog, DialogActions } from '@material-ui/core'
+import { FullMeme, AuthState } from '../util/Types'
+import Voting from '../components/actions/Voting'
+import MemeActions from '../components/actions/MemeActions'
 
 
 type Props = {

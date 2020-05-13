@@ -2,13 +2,13 @@ import React from 'react'
 import { FormControlLabel, Switch, Typography } from '@material-ui/core'
 
 
-type MySwitchProps = {
+type Props = {
   value: boolean
   onChange: (newValue: boolean) => void
   label: string
 }
 
-const MySwitch: React.FC<MySwitchProps> = props => (
+const MySwitch: React.FC<Props> = props => (
   <FormControlLabel
     control={
       <Switch

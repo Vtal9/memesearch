@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDropzone } from 'react-dropzone';
-import Gluejar from '../components/Gluejar'
+import Gluejar from './Gluejar'
 import { ButtonBase, Icon, Typography } from '@material-ui/core';
 
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Repo, SearchRequest, PureMeme } from '../util/Types';
-import SearchForm from '../components/SearchForm';
+import SearchForm from '../components/forms/Search';
 import Center from '../layout/Center';
 import FlexCenter from '../layout/FlexCenter';
 import { CircularProgress } from '@material-ui/core';

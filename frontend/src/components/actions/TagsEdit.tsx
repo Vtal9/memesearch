@@ -1,6 +1,6 @@
 import React from 'react'
 import { IconButton, Icon, Dialog, DialogContent, DialogActions } from '@material-ui/core'
-import TagsForm from '../TagsForm'
+import TagsForm from '../forms/Tags'
 import { withSnackbar, WithSnackbarProps } from 'notistack'
 
 

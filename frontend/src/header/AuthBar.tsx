@@ -1,10 +1,9 @@
 import React from 'react'
-import { AuthState } from '../../util/Types';
+import { AuthState } from '../util/Types';
 import { Typography, Button, Icon, MenuItem, MenuList, Popover, Divider } from '@material-ui/core'
-import Token from '../../util/Token';
-import AuthWindow from './Modal';
-import Path from '../../util/Path';
-import { pages } from '../../App';
+import Token from '../util/Token';
+import AuthWindow from '../modals/Auth';
+import { pages } from '../App';
 
 
 type State = {

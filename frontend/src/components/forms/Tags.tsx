@@ -1,18 +1,9 @@
 import React from 'react'
 import { Typography, Button, Select, MenuItem, InputLabel, FormControl } from '@material-ui/core'
 import Axios from 'axios'
-import { Tag } from '../util/Types'
+import { Tag } from '../../util/Types'
+import { getTags } from '../../api/Tags'
 
-
-export function getTags() {
-  return new Promise<Tag[]>((resolve, reject) => {
-    Axios.get<Tag[]>(`tags/api/all/`).then(response => {
-      resolve(response.data)
-    }).catch(() => {
-      reject()
-    })
-  })
-}
 
 type TagsFormState = {
   status:

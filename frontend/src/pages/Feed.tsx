@@ -4,8 +4,8 @@ import { Tag, PureMeme } from '../util/Types'
 import { RadioGroup, FormControlLabel, Radio, Icon } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
-import { memesFeedApi } from '../api/MemesFeed'
-import TagsPicker from '../components/TagsPicker'
+import { feedApi } from '../api/MemesGetters'
+import TagsPicker from '../components/inputs/TagsPicker'
 import { PageProps } from './PageProps'
 
 
@@ -57,7 +57,7 @@ export default class Feed extends React.Component<PageProps, FeedState> {
 
   async load() {
     this.setState({ status: { type: 'loading' } })
-    const addition: PureMeme[] = (await memesFeedApi(
+    const addition: PureMeme[] = (await feedApi(
       this.state.filter,
       this.state.plusTags.map(tag => tag.id),
       this.state.minusTags.map(tag => tag.id),
