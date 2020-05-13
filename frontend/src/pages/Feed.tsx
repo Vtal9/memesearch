@@ -56,6 +56,7 @@ export default class Feed extends React.Component<PageProps, FeedState> {
   }
 
   async load() {
+    this.pagesLoaded++
     this.setState({ status: { type: 'loading' } })
     const addition: InvisibleMeme[] = (await feedApi(
       this.state.filter,
@@ -72,7 +73,6 @@ export default class Feed extends React.Component<PageProps, FeedState> {
     this.setState({
       status: { type: 'done' }, list
     })
-    this.pagesLoaded++
   }
 
   render() {
