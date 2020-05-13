@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, permissions, generics
@@ -13,12 +12,10 @@ from .serializers import ImagesDescriptionsSerializer
 from .serializers import ImagesSerializer
 from .serializers import TextDescriptionsSerializer
 
+
 # APIs
 
 # search by all memes
-from ..memes.serializers import MemesSerializer
-
-
 class SearchAPI(generics.GenericAPIView):
     serializer_class = ImagesSerializer
 
