@@ -24,7 +24,7 @@ export default class Voting extends React.Component<Props, State> {
   async vote(method: Method) {
     this.setState({ disabled: true })
     const data = (await Axios.post<State>(`api/like?method=${method}&id=${this.props.id}`)).data
-    this.setState({ ...data, disabled: false })
+    this.setState({ ...data })
   }
 
   async componentDidMount() {
