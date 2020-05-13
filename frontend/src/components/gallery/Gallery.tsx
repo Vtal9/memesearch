@@ -24,7 +24,7 @@ export default class Gallery extends React.Component<Props, State> {
           onClose={() => this.setState({ dialogMeme: undefined })}
         />
         {this.props.list.map(item => (
-          <GalleryItem key={item.url} unloadedMeme={item}
+          <GalleryItem key={item.id + item.url} unloadedMeme={item}
             authState={this.props.authState}
             openDialog={meme => {
               this.setState({ dialogMeme: meme })

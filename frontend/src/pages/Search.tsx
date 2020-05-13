@@ -3,7 +3,7 @@ import { Repo, SearchRequest, PureMeme } from '../util/Types';
 import SearchForm from '../components/forms/Search';
 import Center from '../layout/Center';
 import FlexCenter from '../layout/FlexCenter';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Paper } from '@material-ui/core';
 import BigFont from '../layout/BigFont';
 import Gallery from '../components/gallery/Gallery';
 import { searchApi } from '../api/Search'
@@ -38,17 +38,15 @@ export default class Search extends React.Component<PageProps, State> {
   render() {
     return (
       <div>
-        <div className='top'>
+        <Center>
           <div className='spacing' />
-          <Center>
-            <SearchForm
-              authState={this.props.authState}
-              query={/*this.props.query*/''} // TODO FIX
-              onRequest={request => this.handleRequest(request)}
-              disabled={this.state.status === 'loading'}
-            />
-          </Center>
-        </div>
+          <SearchForm
+            authState={this.props.authState}
+            query={/*this.props.query*/''} // TODO FIX
+            onRequest={request => this.handleRequest(request)}
+            disabled={this.state.status === 'loading'}
+          />
+        </Center>
         <Center>
           <div className='gallery'>
             {this.state.status === 'loading' &&

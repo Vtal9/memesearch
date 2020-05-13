@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextField, Grid, Button } from '@material-ui/core';
+import { TextField, Grid, Button, Paper } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { AuthState } from '../../util/Types';
 import Switch from '../inputs/MySwitch';
@@ -77,62 +77,59 @@ class Search extends React.Component<Props, State> {
 
   render() {
     return (
-      <form onSubmit={e => this.performSearch(e)}>
-        <Grid container spacing={2} style={{width: '100%'}}>
-          <Grid item style={{ flex: 1 }}>
-            <Grid container spacing={2}>
-              {this.state.extended ? [
-                <Grid item xs={12} key={2}>
-                  <TextField value={this.state.textQuery}
-                    onChange={e => this.setState({ textQuery: e.target.value })}
-                    label='Что написано?' fullWidth />
-                </Grid>,
-                <Grid item xs={12} key={1}>
-                  <TextField value={this.state.imageQuery}
-                    onChange={e => this.setState({ imageQuery: e.target.value })}
-                    label='Что изображено?' fullWidth />
-                </Grid>
-              ] :
-                <Grid item xs={12}>
-                  <TextField value={this.state.query} onChange={e => this.setState({ query: e.target.value })}
-                    fullWidth autoFocus label='Какой мем ищете?' />
-                </Grid>
-              }
-              <Grid item xs={12}>
-                <TagsPicker
-                  tags={this.state.tags}
-                  onChange={tags => this.setState({ tags }, this.performSearch)}
-                ><AddIcon />Тег</TagsPicker>
-              </Grid>
-              <Grid item xs={12}>
-                <Switch value={this.state.extended} label='Расширенный поиск'
-                  onChange={checked => {
-                    if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
-                      this.setState({ textQuery: this.state.query, imageQuery: this.state.query })
-                    }
-                    this.setState({ extended: checked }, this.performSearch)
-                  }} />
-                <Switch
-                  value={this.state.own}
-                  label='Поиск по личной коллекции'
-                  onChange={checked => {
-                    if (checked && this.props.authState.status !== 'yes') {
-                      this.props.enqueueSnackbar('Пожалуйста, авторизуйтесь')
-                    } else {
-                      this.setState({ own: checked }, this.performSearch)
-                    }
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item>
+      <Paper component='form' onSubmit={e => this.performSearch(e)} className='search-controls'>
+        <div className='row' style={{ justifyContent: 'space-between' }}>
+          {this.state.extended ? (
+            <div className='text-fields control'>
+              <TextField value={this.state.textQuery}
+                onChange={e => this.setState({ textQuery: e.target.value })}
+                label='Что написано?' fullWidth />
+              <div className='small-spacing' />
+              <TextField value={this.state.imageQuery}
+                onChange={e => this.setState({ imageQuery: e.target.value })}
+                label='Что изображено?' fullWidth />
+            </div>
+            ) : (
+            <div className='text-fields control'>
+              <TextField value={this.state.query} onChange={e => this.setState({ query: e.target.value })}
+                fullWidth autoFocus label='Какой мем ищете?' />
+            </div>
+          )}
+        </div>
+        <div className='row'>
+          <div className='button control'>
             <Button variant='contained' color='primary' type='submit'
               disabled={this.props.disabled}
             >Искать</Button>
-          </Grid>
-        </Grid>
-      </form>
+          </div>
+          <div className='switches control'>
+            <Switch value={this.state.extended} label='Расширенный поиск'
+              onChange={checked => {
+                if (checked && this.state.textQuery === '' && this.state.imageQuery == '') {
+                  this.setState({ textQuery: this.state.query, imageQuery: this.state.query })
+                }
+                this.setState({ extended: checked }, this.performSearch)
+              }} />
+            <Switch
+              value={this.state.own}
+              label='Поиск по личной коллекции'
+              onChange={checked => {
+                if (checked && this.props.authState.status !== 'yes') {
+                  this.props.enqueueSnackbar('Пожалуйста, авторизуйтесь')
+                } else {
+                  this.setState({ own: checked }, this.performSearch)
+                }
+              }}
+            />
+          </div>
+        </div>
+        <div className='row control'>
+          <TagsPicker
+            tags={this.state.tags}
+            onChange={tags => this.setState({ tags }, this.performSearch)}
+          >Выбрать теги</TagsPicker>
+        </div>
+      </Paper>
     )
   }
 }
