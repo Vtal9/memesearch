@@ -59,11 +59,12 @@ class VkApiPosts:
 
         return urls, cur_timestamp
 
-    def get_all_photos_urls(self, pub_domain, max_photos=0, from_comments=False, min_timestamp=0):
+    def get_all_photos_urls_with_timestamps(self, pub_domain, max_photos=0, from_comments=False, min_timestamp=0):
         latest_timestamp = min_timestamp
-        urls_from_posts = []
+        urls_from_posts_with_timestamps = [] # tuples ([urls], timestamp)
         urls_from_comments = []
         json_posts = self.get_all_json_data(pub_domain, max_photos)
+        json_posts.reverse()
         for post in json_posts:
             urls_from_this_post, cur_timestamp =\
                 self.image_urls_from_json_post(post, min_timestamp=min_timestamp)
@@ -74,12 +75,12 @@ class VkApiPosts:
             if cur_timestamp > latest_timestamp:
                 latest_timestamp = cur_timestamp
 
-            urls_from_posts.extend(urls_from_this_post)
+            urls_from_posts_with_timestamps.append((urls_from_this_post, cur_timestamp))
 
             if from_comments:
                 urls_from_comments.extend(self.get_img_urls_from_comments(self.get_post_comments(post)))
 
-        return urls_from_posts, urls_from_comments, latest_timestamp
+        return urls_from_posts_with_timestamps, urls_from_comments, latest_timestamp
 
     def get_most_liked_post(self, pub_domain, max_photos=0):
         json_posts = self.get_all_json_data(pub_domain, max_photos)

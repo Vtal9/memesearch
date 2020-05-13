@@ -1,12 +1,13 @@
 import React from 'react'
 import { Typography, CircularProgress, Button, Card, CardMedia, CardContent } from '@material-ui/core'
 import Center from '../layout/Center'
-import Form, { CenterPadding } from '../components/meme/DescriptionForm'
-import { Repo, AuthState } from '../util/Types';
-import MySwitch from '../components/MySwitch';
+import Form, { CenterPadding } from '../components/forms/Description'
+import { Repo } from '../util/Types';
+import MySwitch from '../components/inputs/MySwitch';
 import { loadImage } from '../util/Funcs';
-import FilePicker from '../components/FilePicker'
+import FilePicker from '../components/inputs/FilePicker'
 import { uploadApi } from '../api/Upload';
+import { PageProps } from '../pages/PageProps'
 
 
 class UploadItem {
@@ -32,11 +33,7 @@ type UploadState = {
   desiredDestination: Repo
 }
 
-type UploadProps = {
-  authState: AuthState
-}
-
-export default class Upload extends React.Component<UploadProps, UploadState> {
+export default class Upload extends React.Component<PageProps, UploadState> {
   state: UploadState = {
     items: [] as UploadItem[],
     desiredDestination: this.props.authState.status === 'yes' ? Repo.Own : Repo.Public
@@ -46,7 +43,7 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
     return this.props.authState.status === 'yes' ? this.state.desiredDestination : Repo.Public
   }
 
-  componentDidUpdate(prevProps: UploadProps) {
+  componentDidUpdate(prevProps: PageProps) {
     if (prevProps.authState.status !== 'yes' && this.props.authState.status === 'yes') {
       this.setState({ desiredDestination: Repo.Own })
     }
@@ -94,18 +91,22 @@ export default class Upload extends React.Component<UploadProps, UploadState> {
       const result = await uploadApi(this.destination, file)
       try {
         if (result !== null) {
-          try {
-            const image = await loadImage(result)
-            this.withItem(current_index, item => {
-              item.status = {
-                type: 'uploaded',
-                id: result.id,
-                img: image
-              }
-              return item
-            })
-          } catch {
-            this.setError(current_index, 'Ошибка при отображении картинки')
+          if (!result.meme_already_exist) {
+            try {
+              const image = await loadImage(result)
+              this.withItem(current_index, item => {
+                item.status = {
+                  type: 'uploaded',
+                  id: result.id,
+                  img: image
+                }
+                return item
+              })
+            } catch {
+              this.setError(current_index, 'Ошибка при отображении картинки')
+            }
+          } else {
+            this.setError(current_index, 'Такой мем уже есть на нашем сайте')
           }
         } else {
           this.setError(current_index, 'Ошибка сервера')

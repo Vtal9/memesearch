@@ -1,8 +1,7 @@
 import React from 'react'
 import { AuthState, PureMeme, FullMeme } from '../../util/Types'
 import GalleryItem from './Item'
-import ModalMeme from '../meme/ModalMeme'
-
+import ModalMeme from '../../modals/Meme'
 
 type Props = {
   list: PureMeme[]
@@ -20,6 +19,7 @@ export default class Gallery extends React.Component<Props, State> {
     return (
       <div className="gallery">
         <ModalMeme
+          authState={this.props.authState}
           meme={this.state.dialogMeme}
           onClose={() => this.setState({ dialogMeme: undefined })}
         />

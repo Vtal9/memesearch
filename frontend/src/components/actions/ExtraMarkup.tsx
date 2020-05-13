@@ -1,11 +1,12 @@
 import React from 'react'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
 import { IconButton, Icon, DialogTitle, DialogContent, Dialog, DialogActions } from '@material-ui/core'
-import DescriptionForm from '../meme/DescriptionForm'
+import DescriptionForm from '../forms/Description'
 
 
 type Props = {
   id: number
+  size: 'small' | 'medium'
 } & WithSnackbarProps
 
 type State = {
@@ -20,7 +21,7 @@ class _ExtraMarkup extends React.Component<Props, State> {
   render() {
     return ([
       <IconButton
-        size='small'
+        size={this.props.size}
         onClick={() => {
           this.setState({ dialogOpen: true })
         }}
@@ -51,9 +52,9 @@ class _ExtraMarkup extends React.Component<Props, State> {
 
 export const ExtraMarkup = withSnackbar(_ExtraMarkup)
 
-export const FakeMarkup = withSnackbar(props => (
+export const FakeMarkup = withSnackbar((props: WithSnackbarProps & { size: 'small' | 'medium' }) => (
   <IconButton
-    size='small'
+    size={props.size}
     onClick={() => props.enqueueSnackbar('Нужна авторизация')}
     title='Доразметить'
   ><Icon>edit</Icon></IconButton>

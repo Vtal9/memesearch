@@ -1,28 +1,25 @@
 import React from 'react'
 import Gallery from '../components/gallery/Gallery'
-import { AuthState, InvisibleMeme } from '../util/Types'
+import { InvisibleMeme } from '../util/Types'
 import { CircularProgress } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
-import { myMemesApi } from '../api/MemesLists'
+import { myMemesApi } from '../api/MemesGetters'
+import { PageProps } from './PageProps'
 
 
-type MyMemesProps = {
-  authState: AuthState
-}
-
-type MyMemesState = {
+type State = {
   status:
   | { type: 'loading' }
   | { type: 'done', list: InvisibleMeme[] }
 }
 
-export default class MyMemes extends React.Component<MyMemesProps, MyMemesState> {
-  constructor(props: MyMemesProps) {
-    super(props)
-    this.state = {
-      status: { type: 'loading' }
-    }
+export default class MyMemes extends React.Component<PageProps, State> {
+  state: State = {
+    status: { type: 'loading' }
+  }
+
+  componentDidMount() {
     this.load()
   }
 

@@ -5,6 +5,7 @@ export type FullMeme = InvisibleMeme & {
 export type InvisibleMeme = PureMeme & {
   imageDescription: string
   textDescription: string
+  fileName: string
   likes: number
   dislikes: number
   tags: Tag[]

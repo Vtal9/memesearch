@@ -1,6 +1,5 @@
 import React from 'react'
 import { HashRouter as Router, Route, Link, withRouter, Redirect, useRouteMatch, Switch } from 'react-router-dom'
-import H from 'history'
 import Center from './layout/Center'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
@@ -10,14 +9,15 @@ import Feed from './pages/Feed'
 import logo from './img/logo.svg'
 import './style.sass'
 import { Typography } from '@material-ui/core'
-import { SnackbarProvider } from 'notistack'
-import AuthBar from './components/auth/Bar';
+import { SnackbarProvider, withSnackbar } from 'notistack'
+import AuthBar from './header/AuthBar';
 import { AuthState } from './util/Types'
 import AddTag from './pages/AddTag'
 import MyMemes from './pages/MyMemes'
 import Random from './pages/Random'
-import QuickSearch from './components/QuickSearch'
+import QuickSearch from './header/QuickSearch'
 import Path from './util/Path'
+import { PageProps } from './pages/PageProps'
 
 
 const TitleSetter = (props: { title: string }) => {
@@ -25,8 +25,15 @@ const TitleSetter = (props: { title: string }) => {
   return null
 }
 
-const Tab = (props: { label: string, to: string }) => {
-  const match = useRouteMatch({ path: props.to })
+export function toUrl(path: string) {
+  const i = path.indexOf(':')
+  const to = i == -1 ? path : path.substr(0, i) + '.'
+  return to
+}
+
+const Tab = (props: { label: string, match: string, to: string }) => {
+  const match = useRouteMatch({ path: props.match })
+
   return match ? (
     <div className='header-link active'>
       <Typography>{props.label}</Typography>
@@ -38,21 +45,36 @@ const Tab = (props: { label: string, to: string }) => {
   )
 }
 
+type Page = {
+  match: string
+  title: string
+  cmp: React.ComponentClass<PageProps> | ((p: PageProps) => JSX.Element)
+  location: 'header' | 'authbar' | 'no'
+}
+
+const rawPages: Page[] = [
+  { match: Path.TINDER, title: 'Тиндер', cmp: Random, location: 'header' },
+  { match: Path.FEED, title: 'Лента', cmp: Feed, location: 'header' },
+  { match: Path.SEARCH, title: 'Поиск', cmp: Search, location: 'header' },
+  { match: Path.UPLOAD, title: 'Загрузить', cmp: Upload, location: 'authbar' },
+  { match: Path.MARKUP, title: 'Разметить', cmp: Markup, location: 'authbar' },
+  { match: Path.HOME, title: 'О проекте', cmp: Home, location: 'no' },
+  { match: '/newtag', title: 'Новый тег', cmp: AddTag, location: 'no' }, // TODO remove
+  { match: Path.COLLECTION, title: 'Коллекция', cmp: MyMemes, location: 'authbar' },
+]
+
+export const pages = rawPages.map(item => {
+  return {
+    ...item,
+    cmp: withSnackbar(withRouter(item.cmp)),
+    url: toUrl(item.match)
+  }
+})
+
 const App = withRouter(props => {
   const [ searchQuery, search ] = React.useState('')
   const [ authBar, setAuthBar ] = React.useState<AuthBar | null>(null)
   const [ authState, setAuthState ] = React.useState<AuthState>({ status: 'unknown' })
-
-  const pages = [
-    { url: Path.TINDER, title: 'Тиндер', cmp: <Random authState={authState} />, tab: true },
-    { url: Path.FEED, title: 'Лента', cmp: <Feed authState={authState} />, tab: true },
-    { url: Path.SEARCH, title: 'Поиск', cmp: <Search query={searchQuery} authState={authState} />, tab: true },
-    { url: Path.UPLOAD, title: 'Загрузить', cmp: <Upload authState={authState} />, tab: false },
-    { url: Path.MARKUP, title: 'Разметить', cmp: <Markup />, tab: false },
-    { url: Path.HOME, title: 'О проекте', cmp: <Home authState={authState} onRegisterClick={() => (authBar as AuthBar).openRegister()} />, tab: false },
-    { url: '/newtag', title: 'Новый тег', cmp: <AddTag />, tab: false }, // TODO remove
-    { url: Path.COLLECTION, title: 'Коллекция', cmp: <MyMemes authState={authState} />, tab: false },
-  ]
 
   const displaySearch = !useRouteMatch({ path: Path.SEARCH })
 
@@ -75,8 +97,8 @@ const App = withRouter(props => {
             </div>
             <div className='vmiddle'>
               <div className='header-links'>
-                {pages.filter(page => page.tab).map(page =>
-                  <Tab to={page.url} label={page.title} key={page.url} />
+                {pages.filter(page => page.location === 'header').map(page =>
+                  <Tab to={page.url} label={page.title} key={page.url} match={page.match} />
                 )}
                 <AuthBar
                   authState={authState}
@@ -89,9 +111,9 @@ const App = withRouter(props => {
         </Center>
       </div>
       {pages.map(page => (
-        <Route path={page.url} key={page.url}>
+        <Route path={page.match} key={page.url}>
           <TitleSetter title={page.title} />
-          {page.cmp}
+          <page.cmp authState={authState} />
         </Route>
       ))}
     </div>

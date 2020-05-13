@@ -1,9 +1,9 @@
 import React from 'react'
-import { AuthState } from '../../util/Types';
+import { AuthState } from '../util/Types';
 import { Typography, Button, Icon, MenuItem, MenuList, Popover, Divider } from '@material-ui/core'
-import Token from '../../util/Token';
-import AuthWindow from './Modal';
-import Path from '../../util/Path';
+import Token from '../util/Token';
+import AuthWindow from '../modals/Auth';
+import { pages } from '../App';
 
 
 type State = {
@@ -82,7 +82,7 @@ export default class AuthBar extends React.Component<Props, State> {
             startIcon={<Icon>account_circle</Icon>}
             endIcon={<Icon>expand_more</Icon>}
             onClick={e => this.setState({ userMenuAnchor: e.currentTarget })}
-          />
+          >{''}</Button>
           <Popover
             open={this.state.userMenuAnchor !== null}
             anchorEl={this.state.userMenuAnchor}
@@ -90,9 +90,9 @@ export default class AuthBar extends React.Component<Props, State> {
             onClose={() => this.setState({ userMenuAnchor: null })}
           >
             <MenuList>
-              <MenuItem onClick={() => this.switchTo(Path.COLLECTION)}>Коллекция</MenuItem>
-              <MenuItem onClick={() => this.switchTo(Path.MARKUP)}>Разметить</MenuItem>
-              <MenuItem onClick={() => this.switchTo(Path.UPLOAD)}>Загрузить</MenuItem>
+              {pages.filter(page => page.location === 'authbar').map(page => (
+                <MenuItem key={page.url} onClick={() => this.switchTo(page.url)}>{page.title}</MenuItem>
+              ))}
               <Divider />
               <MenuItem onClick={() => {
                 Token.unset()

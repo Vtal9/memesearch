@@ -2,10 +2,7 @@ import React from 'react'
 import { AuthState, FullMeme, PureMeme } from '../../util/Types'
 import { pureToFull } from '../../util/Funcs'
 import { CircularProgress } from '@material-ui/core'
-import { AddRemove, FakeAdd } from './AddRemove'
-import { Copy } from './Copy'
-import { ExtraMarkup, FakeMarkup } from './ExtraMarkup'
-import { TagsEdit, FakeTagsEdit } from './TagsEdit'
+import MemeActions from '../actions/MemeActions'
 
 
 type Props = {
@@ -50,33 +47,11 @@ export default class GalleryItem extends React.Component<Props, State> {
       this.state.type === 'loading' ? (
         <CircularProgress className='gallery-item' />
       ) : (
-        <div className='gallery-item'>
+        <div className='gallery-item actions-holder'>
           <img src={this.state.meme.img.src}
             onClick={() => this.openDialog()}
           />
-          {this.props.authState.status === 'yes' ? (
-            <div className='actions'>
-              <AddRemove
-                id={this.state.meme.id}
-                own={this.state.meme.owner.some(owner => 
-                  this.props.authState.status === 'yes' &&
-                  this.props.authState.user.id === owner.id
-                )}
-              />
-              <Copy img={this.state.meme.img} />
-              <ExtraMarkup
-                id={this.state.meme.id}
-              />
-              <TagsEdit id={this.state.meme.id} />
-            </div>
-          ) : (
-            <div className="actions">
-              <FakeAdd />
-              <Copy img={this.state.meme.img} />
-              <FakeMarkup />
-              <FakeTagsEdit />
-            </div>
-          )}
+          <MemeActions authState={this.props.authState} meme={this.state.meme} edit />
         </div>
       )
     )

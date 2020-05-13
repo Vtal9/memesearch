@@ -5,6 +5,7 @@ import { IconButton, Icon } from '@material-ui/core'
 
 type Props = {
   img: HTMLImageElement
+  size: 'small' | 'medium'
 } & WithSnackbarProps
 
 type State = {
@@ -49,7 +50,7 @@ class _Copy extends React.Component<Props, State> {
     return (
       <IconButton
         disabled={this.state.disabled}
-        size='small'
+        size={this.props.size}
         onClick={() => this.copy()}
         title='Копировать в буфер обмена'
       ><Icon>file_copy</Icon></IconButton>

@@ -2,13 +2,10 @@ import React from 'react'
 import Center from '../layout/Center'
 import { Link } from 'react-router-dom'
 import { Typography, Card, CardContent, Dialog, DialogContent } from '@material-ui/core';
-import BigFont from '../layout/BigFont';
 import Subscription from '../components/Subscription'
-import tactics from '../img/tactics.jpg'
-import musk from '../img/musk.jpg'
 import steve from '../img/steve.jpg'
-import { AuthState } from '../util/Types'
 import Path from '../util/Path'
+import { PageProps } from './PageProps';
 
 const Heading = (props: React.PropsWithChildren<{}>) => (
   <Typography variant='h4' align='center' style={{ fontWeight: 100 }}>
@@ -48,23 +45,14 @@ function backImg(url: string) {
   }
 }
 
-const WhiteList = (props: React.PropsWithChildren<{}>) =>
-  <ul style={{ marginTop: 20, color: 'white' }}>{props.children}</ul>
-
 const yandex_money = 'https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets=%D0%9D%D0%B0%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D1%83%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0&targets-hint=&default-sum=100&button-text=11&payment-type-choice=on&hint=&successURL=&quickpay=shop&account=4100112271118330'
-const smeshariki = 'https://sun9-35.userapi.com/IuO4PcE7HUqo1XF7W3MlMHIXdRnP73c9LlbVtA/JhrH53AWHWI.jpg'
 const google_form = 'https://forms.gle/vtsFXmXxnqeh245U6'
 
-interface HomeProps {
-  authState: AuthState
-  onRegisterClick: () => void
-}
-
-interface HomeState {
+type State = {
   donateOpen: boolean
 }
 
-export default class Home extends React.Component<HomeProps, HomeState> {
+export default class Home extends React.Component<PageProps, State> {
   state = {
     donateOpen: false
   }
@@ -85,7 +73,7 @@ export default class Home extends React.Component<HomeProps, HomeState> {
                 {this.props.authState.status === "no" ?
                   <a href="#" onClick={e => {
                     e.preventDefault()
-                    this.props.onRegisterClick()
+                    //this.props.onRegisterClick() TODO
                   }}>Зарегистрируйтесь</a>
                 :
                   'Зарегистрируйтесь'

@@ -1,12 +1,14 @@
 import React from 'react'
-import { Dialog, DialogActions, Typography } from '@material-ui/core'
-import { FullMeme } from '../../util/Types'
-import Voting from '../Voting'
+import { Dialog, DialogActions } from '@material-ui/core'
+import { FullMeme, AuthState } from '../util/Types'
+import Voting from '../components/actions/Voting'
+import MemeActions from '../components/actions/MemeActions'
 
 
 type Props = {
   meme?: FullMeme
   onClose?: () => void
+  authState: AuthState
 }
 
 export default class ModalMeme extends React.Component<Props> {
@@ -19,11 +21,9 @@ export default class ModalMeme extends React.Component<Props> {
       >
         {this.props.meme !== undefined && [
           <img src={this.props.meme.img.src} {...imageSize(this.props.meme.img)} key={1} />,
-          <DialogActions key={2}>
+          <DialogActions className='meme-footer' key={2}>
             <Voting id={this.props.meme.id} />
-            <a href={this.props.meme.img.src} target='_blank'>
-              <Typography>Открыть оригинал</Typography>
-            </a>
+            <MemeActions authState={this.props.authState} meme={this.props.meme} big />
           </DialogActions>
         ]}
       </Dialog>
@@ -35,7 +35,7 @@ export default class ModalMeme extends React.Component<Props> {
 function imageSize(img: HTMLImageElement) {
   const [ imgW, imgH ] = [ img.width, img.height ]
   const [ clientW, clientH ] = [ window.innerWidth, window.innerHeight ]
-  const [ availableW, availableH ] = [ clientW - 64, clientH - 110 ]
+  const [ availableW, availableH ] = [ clientW - 64, clientH - 130 ]
   const scale = Math.min(1, availableW / imgW, availableH / imgH)
   return { width: imgW * scale, height: imgH * scale }
 }

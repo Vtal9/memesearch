@@ -16,7 +16,7 @@ from converter import convert
 
 def delete_meme(meme):
     y = settings.Y
-    y.remove(meme.fileName, permanently=True)  # удаляем мем с яндекс диска
+ #   y.remove(meme.fileName, permanently=True)  # не удаляем мем с яндекс диска, чтобы бэкапы норм работали
     Memes.objects.filter(id=meme.id).delete()  # удаляем из бд
 
 
@@ -87,7 +87,9 @@ def delete_duplicates():
     img_hashes_set = find_unique_img_hashes()
 
     for img_hash in img_hashes_set:
+        print("img_hash: " + img_hash)
         identical_memes = Memes.objects.filter(image_hash=img_hash).all()  # получаем все мемы с этим хешом
+        print("identical_memes: " + str(len(identical_memes)))
         union_memes_and_delete_excess(identical_memes)
 
 

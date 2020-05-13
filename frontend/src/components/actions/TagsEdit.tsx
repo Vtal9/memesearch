@@ -1,11 +1,12 @@
 import React from 'react'
 import { IconButton, Icon, Dialog, DialogContent, DialogActions } from '@material-ui/core'
-import TagsForm from '../TagsForm'
-import { withSnackbar } from 'notistack'
+import TagsForm from '../forms/Tags'
+import { withSnackbar, WithSnackbarProps } from 'notistack'
 
 
 type Props = {
   id: number
+  size: 'small' | 'medium'
 }
 
 type State = {
@@ -24,7 +25,7 @@ export class TagsEdit extends React.Component<Props, State> {
   render() {
     return ([
       <IconButton
-        size='small'
+        size={this.props.size}
         title='Добавить тег'
         onClick={() => {
           this.setState({ dialogOpen: true })
@@ -47,9 +48,9 @@ export class TagsEdit extends React.Component<Props, State> {
   }
 }
 
-export const FakeTagsEdit = withSnackbar(props => (
+export const FakeTagsEdit = withSnackbar((props: WithSnackbarProps & { size: 'small' | 'medium' }) => (
   <IconButton
-    size='small'
+    size={props.size}
     title='Добавить тег'
     onClick={() => props.enqueueSnackbar('Нужна авторизация')}
   >
