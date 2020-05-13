@@ -13,10 +13,12 @@ from .serializers import ImagesDescriptionsSerializer
 from .serializers import ImagesSerializer
 from .serializers import TextDescriptionsSerializer
 
-
 # APIs
 
 # search by all memes
+from ..memes.serializers import MemesSerializer
+
+
 class SearchAPI(generics.GenericAPIView):
     serializer_class = ImagesSerializer
 
@@ -48,16 +50,14 @@ class SearchAPI(generics.GenericAPIView):
         size = self.request.GET.get('size')
         size = 15 if size is None else int(size)
 
+        response = []
         if result[1] == "":
-            response = JsonResponse([{
-                'id': i,
-                'url': Memes.objects.get(pk=i).url
-            } for i in res[iteration * size:(iteration + 1) * size]] + [{
-                'url': url
-            } for url in extra_urls], safe=False)
+            for i in res[iteration * size:(iteration + 1) * size]:
+                response.append({MemesSerializer(Memes.objects.get(pk=i), context=self.get_serializer_context()).data})
+            response += [{'url': url} for url in extra_urls]
         else:
             response = HttpResponse(result[1])
-        return response
+        return JsonResponse(response, safe=False)
 
 
 # search by own memes
@@ -95,15 +95,13 @@ class SearchOwnMemesAPI(generics.GenericAPIView):
 
         size = self.request.GET.get('size')
         size = 15 if size is None else int(size)
+        response = []
         if result[1] == "":
-            response = JsonResponse([{
-                'id': i,
-                'url': Memes.objects.get(pk=i).url
-            } for i in res[iteration * size:(iteration + 1) * size]], safe=False)
+            for i in res[iteration * size:(iteration + 1) * size]:
+                response.append({MemesSerializer(Memes.objects.get(pk=i), context=self.get_serializer_context()).data})
         else:
             response = HttpResponse(result[1])
-
-        return response
+        return JsonResponse(response, safe=False)
 
 
 # View Sets
