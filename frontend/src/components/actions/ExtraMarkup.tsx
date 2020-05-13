@@ -1,7 +1,8 @@
 import React from 'react'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
-import { IconButton, Icon, DialogTitle, DialogContent, Dialog, DialogActions } from '@material-ui/core'
+import { IconButton, DialogTitle, DialogContent, Dialog, DialogActions } from '@material-ui/core'
 import DescriptionForm from '../forms/Description'
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 
 
 type Props = {
@@ -27,7 +28,7 @@ class _ExtraMarkup extends React.Component<Props, State> {
         }}
         title='Доразметить'
         key={1}
-      ><Icon>edit</Icon></IconButton>,
+      ><EditOutlinedIcon /></IconButton>,
       <Dialog
         key={2}
         open={this.state.dialogOpen}
@@ -57,5 +58,5 @@ export const FakeMarkup = withSnackbar((props: WithSnackbarProps & { size: 'smal
     size={props.size}
     onClick={() => props.enqueueSnackbar('Нужна авторизация')}
     title='Доразметить'
-  ><Icon>edit</Icon></IconButton>
+  ><EditOutlinedIcon /></IconButton>
 ))

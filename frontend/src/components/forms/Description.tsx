@@ -1,8 +1,9 @@
 import React, { FormEvent } from 'react'
-import { TextField, Grid, Button, Icon, Typography } from '@material-ui/core';
+import { TextField, Grid, Button, Typography } from '@material-ui/core';
 import Axios, { AxiosResponse } from 'axios'
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { authHeader } from '../../util/Funcs';
+import CheckIcon from '@material-ui/icons/Check'
 
 
 function updateDescription(id: number, textDescription: string, imageDescription: string, concat?: boolean) {
@@ -131,7 +132,7 @@ class Form extends React.Component<FormProps, FormState> {
           <Grid item>
             <Button variant='contained' color='primary' type='submit'
               disabled={this.props.memeId === false || this.state.state === 'saving'}
-              startIcon={<Icon>done</Icon>}
+              startIcon={<CheckIcon />}
             >Готово</Button>
           </Grid>
         </Grid>

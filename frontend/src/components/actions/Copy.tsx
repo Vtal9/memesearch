@@ -1,6 +1,7 @@
 import React from 'react'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
-import { IconButton, Icon } from '@material-ui/core'
+import { IconButton } from '@material-ui/core'
+import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 
 
 type Props = {
@@ -53,7 +54,7 @@ class _Copy extends React.Component<Props, State> {
         size={this.props.size}
         onClick={() => this.copy()}
         title='Копировать в буфер обмена'
-      ><Icon>file_copy</Icon></IconButton>
+      ><FileCopyOutlinedIcon /></IconButton>
     )
   }
 }

@@ -1,7 +1,8 @@
 import React from 'react'
-import { TextField, Button, Typography, Icon } from '@material-ui/core';
+import { TextField, Button, Typography } from '@material-ui/core';
 import Axios from 'axios';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
+import CheckIcon from '@material-ui/icons/Check';
 
 
 const email_regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -29,7 +30,7 @@ export default withSnackbar(function Subscription(props: WithSnackbarProps) {
   return (
     done ? (
       <div style={{ display: 'flex', alignItems: 'center', margin: '10px 0' }}>
-        <Icon>check</Icon>
+        <CheckIcon />
         <Typography>Подписка оформлена</Typography>
       </div>
     ) : (

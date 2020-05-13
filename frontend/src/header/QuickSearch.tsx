@@ -1,5 +1,6 @@
 import React from 'react'
-import { TextField, InputAdornment, IconButton, Icon } from '@material-ui/core'
+import { TextField, InputAdornment, IconButton } from '@material-ui/core'
+import SearchIcon from '@material-ui/icons/Search'
 
 
 type Props = {
@@ -38,7 +39,7 @@ export default class QuickSearch extends React.Component<Props, State> {
           InputProps={{
             endAdornment:
               <InputAdornment position='end'>
-                <IconButton onClick={e => this.handleSubmit(e)}><Icon>search</Icon></IconButton>
+                <IconButton onClick={e => this.handleSubmit(e)}><SearchIcon /></IconButton>
               </InputAdornment>
           }}
         />

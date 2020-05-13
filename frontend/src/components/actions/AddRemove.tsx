@@ -1,7 +1,9 @@
 import React from 'react'
 import { WithSnackbarProps, withSnackbar } from 'notistack'
-import { IconButton, Icon } from '@material-ui/core'
+import { IconButton } from '@material-ui/core'
 import { addOrRemove } from '../../api/AddOrRemove'
+import AddIcon from '@material-ui/icons/Add';
+import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 
 
 type Props = WithSnackbarProps & {
@@ -43,7 +45,7 @@ class _AddRemove extends React.Component<Props, State> {
           this.addOrRemove(this.state.own ? 'remove' : 'add')
         }}
         title={this.state.own ? 'Удалить из своей коллекции' : 'Добавить в свою коллекцию'}
-      ><Icon>{this.state.own ? 'delete' : 'add'}</Icon></IconButton>
+      >{this.state.own ? <DeleteOutlinedIcon /> : <AddIcon />}</IconButton>
     )
   }
 }
@@ -55,5 +57,5 @@ export const FakeAdd = withSnackbar((props: WithSnackbarProps & { size: 'small' 
     size={props.size}
     title='Добавить в свою коллекцию'
     onClick={() => props.enqueueSnackbar('Авторизуйтесь, и вы сможете сохранять мемы в свою коллекцию')}
-  ><Icon>add</Icon></IconButton>
+  ><AddIcon /></IconButton>
 ))

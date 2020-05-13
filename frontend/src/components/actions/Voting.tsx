@@ -1,6 +1,8 @@
 import React from 'react'
-import { Icon, Typography, IconButton } from '@material-ui/core'
+import { Typography, IconButton } from '@material-ui/core'
 import Axios from 'axios'
+import ThumbUpOutlinedIcon from '@material-ui/icons/ThumbUpOutlined';
+import ThumbDownOutlinedIcon from '@material-ui/icons/ThumbDownOutlined';
 
 
 type Props = {
@@ -39,7 +41,7 @@ export default class Voting extends React.Component<Props, State> {
             this.vote('like')
             handle && handle()
           }}
-        ><Icon>thumb_up_alt</Icon></IconButton>
+        ><ThumbUpOutlinedIcon /></IconButton>
         <Typography>
           {this.state.likes !== undefined && this.state.dislikes !== undefined ? (
             this.state.likes - this.state.dislikes
@@ -52,7 +54,7 @@ export default class Voting extends React.Component<Props, State> {
             this.vote('dislike')
             handle && handle()
           }}
-        ><Icon>thumb_down_alt</Icon></IconButton>
+        ><ThumbDownOutlinedIcon /></IconButton>
       </div>
     )
   }

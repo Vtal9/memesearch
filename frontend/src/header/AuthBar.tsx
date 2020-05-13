@@ -1,9 +1,11 @@
 import React from 'react'
 import { AuthState } from '../util/Types';
-import { Typography, Button, Icon, MenuItem, MenuList, Popover, Divider } from '@material-ui/core'
+import { Typography, Button, MenuItem, MenuList, Popover, Divider } from '@material-ui/core'
 import Token from '../util/Token';
 import AuthWindow from '../modals/Auth';
 import { pages } from '../App';
+import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 
 type State = {
@@ -79,8 +81,8 @@ export default class AuthBar extends React.Component<Props, State> {
           <Button
             color='primary'
             variant='outlined'
-            startIcon={<Icon>account_circle</Icon>}
-            endIcon={<Icon>expand_more</Icon>}
+            startIcon={<AccountCircleOutlinedIcon />}
+            endIcon={<ExpandMoreIcon />}
             onClick={e => this.setState({ userMenuAnchor: e.currentTarget })}
           >{''}</Button>
           <Popover

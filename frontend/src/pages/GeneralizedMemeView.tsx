@@ -1,6 +1,6 @@
 import React from 'react'
 import Center from '../layout/Center';
-import { CircularProgress, Card, Typography, Button, Icon, CardMedia } from '@material-ui/core';
+import { CircularProgress, Card, Typography, Button, CardMedia } from '@material-ui/core';
 import { CenterPadding } from '../components/forms/Description'
 import { FullMeme, Tag, PureMeme } from '../util/Types'
 import { Link } from 'react-router-dom';
@@ -8,6 +8,8 @@ import BigFont from '../layout/BigFont';
 import { pureToFull, makeVisible } from '../util/Funcs';
 import { getMeme } from '../api/MemesGetters';
 import { PageProps } from './PageProps';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import NavigateNextIcon from '@material-ui/icons/NavigateNext'
 
 
 type State = (
@@ -138,7 +140,7 @@ export default class GeneralizedMemePage extends React.Component<Props, State> {
               color='primary'
               variant='outlined'
               onClick={() => this.props.history.goBack()}
-              startIcon={<Icon>arrow_back</Icon>}
+              startIcon={<ArrowBackIcon />}
             >Назад</Button>
             <div className='spacing'></div>
             <Card className='meme-form single'>
@@ -149,7 +151,7 @@ export default class GeneralizedMemePage extends React.Component<Props, State> {
               <Button
                 className='refresh'
                 onClick={() => this.nextLocation(true)}
-                endIcon={<Icon>navigate_next</Icon>}
+                endIcon={<NavigateNextIcon />}
                 color='primary'
               >Следующий мем</Button>
             }

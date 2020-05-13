@@ -1,7 +1,8 @@
 import React from 'react'
-import { IconButton, Icon, Dialog, DialogContent, DialogActions } from '@material-ui/core'
+import { IconButton, Dialog, DialogContent, DialogActions } from '@material-ui/core'
 import TagsForm from '../forms/Tags'
 import { withSnackbar, WithSnackbarProps } from 'notistack'
+import LocalOfferOutlinedIcon from '@material-ui/icons/LocalOfferOutlined';
 
 
 type Props = {
@@ -32,7 +33,7 @@ export class TagsEdit extends React.Component<Props, State> {
         }}
         key={1}
       >
-        <Icon>local_offer</Icon>
+        <LocalOfferOutlinedIcon />
       </IconButton>,
       <Dialog
         open={this.state.dialogOpen}
@@ -54,6 +55,6 @@ export const FakeTagsEdit = withSnackbar((props: WithSnackbarProps & { size: 'sm
     title='Добавить тег'
     onClick={() => props.enqueueSnackbar('Нужна авторизация')}
   >
-    <Icon>local_offer</Icon>
+    <LocalOfferOutlinedIcon />
   </IconButton>
 ))

@@ -1,7 +1,7 @@
 import React from 'react'
 import Gallery from '../components/gallery/Gallery'
 import { Tag, PureMeme } from '../util/Types'
-import { RadioGroup, FormControlLabel, Radio, Icon } from '@material-ui/core'
+import { RadioGroup, FormControlLabel, Radio } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { feedApi } from '../api/MemesGetters'
@@ -109,7 +109,7 @@ export default class Feed extends React.Component<PageProps, FeedState> {
                 this.replace = true
                 this.setState({ plusTags }, this.load)}
               }
-            ><Icon fontSize='small'>add</Icon>Тег</TagsPicker>
+            >+ Тег</TagsPicker>
           </div>
           <div style={{ marginLeft: 20 }}>
             <TagsPicker
@@ -119,7 +119,7 @@ export default class Feed extends React.Component<PageProps, FeedState> {
                 this.replace = true
                 this.setState({ minusTags }, this.load)}
               }
-            ><Icon fontSize='small'>remove</Icon>Тег</TagsPicker>
+            >- Тег</TagsPicker>
           </div>
         </div>
         {this.state.status.type === 'done' &&
