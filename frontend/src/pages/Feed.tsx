@@ -1,12 +1,13 @@
 import React from 'react'
 import Gallery from '../components/gallery/Gallery'
 import { Tag, PureMeme } from '../util/Types'
-import { RadioGroup, FormControlLabel, Radio } from '@material-ui/core'
+import { Select, MenuItem, FormControl, FormLabel, ExpansionPanel, ExpansionPanelSummary, Typography, ExpansionPanelDetails } from '@material-ui/core'
 import Center from '../layout/Center'
 import BigFont from '../layout/BigFont'
 import { feedApi } from '../api/MemesGetters'
 import TagsPicker from '../components/inputs/TagsPicker'
 import { PageProps } from './PageProps'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
 
 type Filter = "rating" | "time" | "ratio"
@@ -80,52 +81,63 @@ export default class Feed extends React.Component<PageProps, FeedState> {
       <Center>
         <div className='spacing'></div>
         <div>
-          <RadioGroup
-            style={{ flexDirection: 'row' }}
-            value={this.state.filter}
-            onChange={e => {
-              this.pagesLoaded = 0
-              this.replace = true
-              this.setState({ filter: e.target.value as Filter }, this.load)
-            }}
+        <ExpansionPanel>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
           >
-            <FormControlLabel value="rating" control={
-              <Radio color='primary' />
-            } label="По рейтингу" />
-            <FormControlLabel value="time" control={
-              <Radio color='primary' />
-            } label="По времени" />
-            <FormControlLabel value="ratio" control={
-              <Radio color='primary' />
-            } label="По отношению лайки / дизлайки" />
-          </RadioGroup>
-        </div>
-        <div style={{ display: 'flex' }}>
-          <div>
-            <TagsPicker
-              tags={this.state.plusTags}
-              onChange={plusTags => {
-                this.pagesLoaded = 0
-                this.replace = true
-                this.setState({ plusTags }, this.load)}
-              }
-            >+ Тег</TagsPicker>
-          </div>
-          <div style={{ marginLeft: 20 }}>
-            <TagsPicker
-              tags={this.state.minusTags}
-              onChange={minusTags => {
-                this.pagesLoaded = 0
-                this.replace = true
-                this.setState({ minusTags }, this.load)}
-              }
-            >- Тег</TagsPicker>
-          </div>
+            <Typography>Параметры ленты</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails className='feed-controls'>
+            <FormControl className='control'>
+              <FormLabel>Сортировка</FormLabel>
+              <Select
+                style={{ marginTop: 8 }}
+                value={this.state.filter}
+                onChange={e => {
+                  this.pagesLoaded = 0
+                  this.replace = true
+                  this.setState({ filter: e.target.value as Filter }, this.load)
+                }}
+              >
+                <MenuItem value='rating'>По рейтингу</MenuItem>
+                <MenuItem value='time'>По времени</MenuItem>
+                <MenuItem value='ratio'>По соотношению лайки / дизлайки</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl className='control'>
+            <FormLabel>Показывать только с тегами:</FormLabel>
+              <div className="small-spacing" />
+              <TagsPicker
+                tags={this.state.plusTags}
+                onChange={plusTags => {
+                  this.pagesLoaded = 0
+                  this.replace = true
+                  this.setState({ plusTags }, this.load)}
+                }
+              >Выбрать</TagsPicker>
+            </FormControl>
+            <FormControl className='control'>
+              <FormLabel>Исключить из выдачи теги:</FormLabel>
+              <div className="small-spacing" />
+              <TagsPicker
+                tags={this.state.minusTags}
+                onChange={minusTags => {
+                  this.pagesLoaded = 0
+                  this.replace = true
+                  this.setState({ minusTags }, this.load)}
+                }
+              >Выбрать</TagsPicker>
+            </FormControl>
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
         </div>
         {this.state.status.type === 'done' &&
           <div>
             {this.state.list.length === 0 &&
-              <BigFont>Мемы кончились... :c</BigFont>
+              <div>
+                <div className="spacing" />
+                <BigFont>Мемы кончились... :c</BigFont>
+              </div>
             }
           </div>
         }

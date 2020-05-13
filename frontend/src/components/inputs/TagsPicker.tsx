@@ -59,7 +59,7 @@ export default class TagsPicker extends React.Component<Props, State> {
       )
     case 'done':
       return (
-        <div>
+        <div className='tags-with-button'>
           {this.props.tags.map(item => (
             // TODO?: Add difference to +tag and -tag
             <Chip
@@ -87,8 +87,9 @@ export default class TagsPicker extends React.Component<Props, State> {
             />
           ))}
           <Button
-            variant='contained'
+            variant='outlined'
             size='small'
+            className='add'
             onClick={e => this.setState({ menuAnchor: e.currentTarget })}
           >{this.props.children}</Button>
           <Menu
