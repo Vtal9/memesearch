@@ -134,7 +134,9 @@ a
 li
   margin: 10px 0
 .tags-with-button
+  margin-bottom: -8px
   .add
+    margin-bottom: 8px
     vertical-align: top
 .tag-chip
   margin: 0 8px 8px 0
@@ -156,7 +158,9 @@ div.meme-footer
   justify-content: space-between
 .feed-controls
   display: flex
-  margin: -8px
+  padding: 8px
+  @media (max-width: $medium-screen)
+    flex-direction: column
   .control
     flex: 1
     margin: 8px
