@@ -6,6 +6,7 @@ import Subscription from '../components/Subscription'
 import Path from '../util/Path'
 import { PageProps } from './PageProps';
 
+
 const Heading = (props: React.PropsWithChildren<{}>) => (
   <Typography variant='h4' align='center' style={{ fontWeight: 100 }}>
     {props.children}
@@ -22,7 +23,7 @@ const Section = (props: any) => (
   </div>
 )
 
-const elon_musk = 'https://ichef.bbci.co.uk/news/1024/branded_news/7727/production/_103330503_musk3.jpg'
+const musk = 'https://sun9-46.userapi.com/c853524/v853524127/233bc0/ThRnsRxbv9k.jpg'
 
 export default class Home extends React.Component<PageProps> {
   render() {
@@ -37,7 +38,7 @@ export default class Home extends React.Component<PageProps> {
             </li>
             <li>
               <Typography>
-                Орите с мемов в <Link to={Path.TINDER}>&laquo;Тиндере&raquo;</Link>
+                Орите с мемов в <Link to={Path.TINDER}>Тиндере</Link>
                 &nbsp;и <Link to={Path.FEED}>Ленте</Link>, попутно добавляя их в свою коллекцию
               </Typography>
             </li>
@@ -53,7 +54,7 @@ export default class Home extends React.Component<PageProps> {
           </ul>
         </Section>
         <Section style={{ textAlign: 'center' }}>
-          <img src={elon_musk} width={300} />
+          <img src={musk} style={{ width: '100%' }} />
         </Section>
         <Section>
           <div style={{
