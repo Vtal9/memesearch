@@ -23,6 +23,7 @@ type Props = {
   getRandom: () => Promise<InvisibleMeme>
   footer: React.FC<{ meme: FullMeme, self: GeneralizedMemePage }>
   nextButton?: boolean
+  filters?: JSX.Element
 } & PageProps
 
 export default class GeneralizedMemePage extends React.Component<Props, State> {
@@ -134,15 +135,15 @@ export default class GeneralizedMemePage extends React.Component<Props, State> {
     return (
       <Center>
         <div className='spacing'></div>
+        <Button
+          color='primary'
+          variant='outlined'
+          onClick={() => this.props.history.goBack()}
+          startIcon={<ArrowBackIcon />}
+        >Назад</Button>
+        <div className='spacing'></div>
         {this.state.status === 'ready' ? (
           <div>
-            <Button
-              color='primary'
-              variant='outlined'
-              onClick={() => this.props.history.goBack()}
-              startIcon={<ArrowBackIcon />}
-            >Назад</Button>
-            <div className='spacing'></div>
             <Card className='meme-form single'>
               <CardMedia component='img' className='img' image={this.state.meme.img.src} />
               <this.props.footer meme={this.state.meme} self={this} />
@@ -157,8 +158,9 @@ export default class GeneralizedMemePage extends React.Component<Props, State> {
             }
           </div>
         ) : (
-          <CenterPadding><CircularProgress /></CenterPadding>
+          <CenterPadding><CircularProgress /><div className='spacing' /></CenterPadding>
         )}
+        {this.props.filters}
       </Center>
     )
   }
